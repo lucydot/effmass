@@ -9,4 +9,4 @@ install:
 # command to run tests
 script: coverage run --rcfile=.coveragerc -m pytest 
 after_success:
-  - code-climate-test-reporter --token $CODECLIMATE_REPO_TOKEN
+  - codeclimate-test-reporter --token $CODECLIMATE_REPO_TOKEN
