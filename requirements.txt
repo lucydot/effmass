@@ -2,3 +2,4 @@ vasppy
 numpy
 matplotlib
 pytest-lazy-fixture
+codeclimate-test-reporter

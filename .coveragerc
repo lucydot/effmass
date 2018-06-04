@@ -1,0 +1,5 @@
+[run]
+source = effmass
+omit = 
+    */python?.?/*
+    */lib-python/?.?/*.py
