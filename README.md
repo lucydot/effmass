@@ -1,7 +1,7 @@
 # effmass
 
 [![Build Status](https://travis-ci.com/lucydot/effmass.svg?branch=master)](https://travis-ci.com/lucydot/effmass)
-[![Test Coverage](https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg)](https://codeclimate.com/github/lucydot/effmass/coverage)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8e038dc0a93d25a4c3f6/test_coverage)](https://codeclimate.com/github/lucydot/effmass/test_coverage)
 
 Python package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. 
 
