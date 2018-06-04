@@ -8,6 +8,7 @@ python:
 install:
   - pip install -r requirements.txt
 # command to run tests
-script: coverage run --rcfile=.coveragerc pytest 
+before_script: coverage run --rcfile=.coveragerc
+script: pytest 
 after_success:
   - code-climate-test-reporter --token $CC_TEST_REPORTER_ID
