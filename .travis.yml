@@ -1,13 +1,12 @@
-env:
-  global:
-    - CC_TEST_REPORTER_ID=f8158911609a6f81e96595477f11720f2aa4449615bc5720bff9a4cc1f46696f
 language: python
 python:
   - "3.6"
 # command to install dependencies
+notifications:
+  email: false
 install:
   - pip install -r requirements.txt
 # command to run tests
 script: coverage run --rcfile=.coveragerc -m pytest 
 after_success:
-  - code-climate-test-reporter --token $CC_TEST_REPORTER_ID
+  - code-climate-test-reporter --token $CODECLIMATE_REPO_TOKEN
