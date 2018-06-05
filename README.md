@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/lucydot/effmass.svg?branch=master)](https://travis-ci.com/lucydot/effmass)
 [![Test Coverage](https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg)](https://codeclimate.com/github/lucydot/effmass/coverage)
 
-`effmass` is a Python package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
+`effmass` is a Python package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
 Examples are provided in a Jupyter notebook [here](nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb).
 API documentation is [here](effmass.readthedocs.io/en/latest/).
@@ -30,6 +30,10 @@ This requires the `VASP` output file `DOSCAR`. Using density-of-states data and 
 
 **Plot fits to the dispersion**
 Selected bandstructure segments and approximations to the dispersion (assuming a Kane, quadratic, or higher order fit) can be visualised.
+
+## Development
+
+Development is in progress and hosted on [Github](https://github.com/lucydot/effmass). Please use the [issue tracker]((https://github.com/lucydot/effmass/issues/) for feature requests, bug reports and more general questions. If you would like to contribute, please do so via a pull request.
 
 ## Installation
 
