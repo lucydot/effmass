@@ -37,7 +37,7 @@ Development is in progress and hosted on [Github](https://github.com/lucydot/eff
 
 ## Installation
 
-TODO.
+TODO - register on PyPI
 
 ## Tests
 
@@ -55,3 +55,8 @@ This code has been tested with Python versions 3.6.
 An overview of the features of effmass along with example code is contained in a [Jupyter notebook](nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb), which is available in the `paper` directory.
 
 API documentation is available [here](effmass.readthedocs.io/en/latest/).
+
+## Citing
+
+TODO - register on Zenodo for DOI.
+TODO - submit to JOSS for DOI.
