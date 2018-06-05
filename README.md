@@ -23,7 +23,7 @@ These correspond to the valence band maxima and conduction band minima. Maxima a
 The curvature (aka inertial) and transport effective masses are calculated using the derivatives of a fitted polynomial function. The optical effective mass
 
 **Assess the extent of non-parabolicity**
-Parameters of the Kane quasi-linear dispersion are calculated to quantify the extent of non-parabolicity over a given energy range.
+Parameters of the Kane quasi-linear dispersion are calculated to quantify the extent of non-parabolicity over a given energy range. add
 
 **Calculate electron fill level from DOS data**
 
