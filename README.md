@@ -27,7 +27,7 @@ The curvature (aka inertial), transport and optical effective masses are calcula
 Parameters of the Kane quasi-linear dispersion are calculated to quantify the extent of non-parabolicity over a given energy range. add
 
 **Calculate the quasi-fermi level for a given carrier concentration:**
-This requires the `VASP` output file `DOSCAR`. Using density-of-states data and assuming no thermal smearing, `effmass` can calculate the energy to which states are occupied. This is a useful proxy to the quasi-Fermi level.
+This requires the `VASP` output file `DOSCAR`. Using density-of-states data and assuming no thermal smearing, `effmass` can calculate the energy to which states are occupied. This is a useful approximation to the quasi-Fermi level.
 
 **Plot fits to the dispersion:**
 Selected bandstructure segments and approximations to the dispersion (assuming a Kane, quadratic, or higher order fit) can be visualised.
