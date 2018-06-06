@@ -6,8 +6,8 @@
 
 `effmass` is a Python package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
-Examples are provided in a Jupyter notebook [here](nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb).
-API documentation is [here](effmass.readthedocs.io/en/latest/).
+Examples are provided in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb).
+API documentation is [here](https://effmass.readthedocs.io/en/latest/).
 Source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
 
 ## Features
@@ -53,9 +53,9 @@ This code has been tested with Python versions 3.6.
 
 ## Documentation
 
-An overview of the features of effmass along with example code is contained in a [Jupyter notebook](nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb), which is available in the `paper` directory.
+An overview of the features of effmass along with example code is contained in a [Jupyter notebook](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb), which is available in the `paper` directory.
 
-API documentation is available [here](effmass.readthedocs.io/en/latest/).
+API documentation is available [here](https://effmass.readthedocs.io/en/latest/).
 
 ## Citing
 
