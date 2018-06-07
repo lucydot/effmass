@@ -4,7 +4,7 @@
 [![Test Coverage](https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg)](https://codeclimate.com/github/lucydot/effmass/coverage)
 ![Documentation](https://readthedocs.org/projects/pip/badge/?version=latest)
 
-`effmass` is a Python package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
+`effmass` is a Python 3 package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
 Examples are provided in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb).
 API documentation is [here](https://effmass.readthedocs.io/en/latest/).
@@ -38,7 +38,25 @@ Development is in progress and hosted on [Github](https://github.com/lucydot/eff
 
 ## Installation
 
-TODO - register on PyPI
+```
+pip install effmass
+```
+
+Or download the latest release from [GitHub](https://github.com/lucydot/effmass/releases), and install
+```
+cd effmass
+python setup.py install
+```
+
+Or clone the latest development version
+```
+git clone git@github.com:lucydot/effmass.git
+```
+and install the same way.
+```
+cd effmass
+python setup.py install 
+```
 
 ## Tests
 
