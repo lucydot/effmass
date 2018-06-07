@@ -1,4 +1,4 @@
-import oscoverage==4.3.4
+import os
 from effmass import __version__
 
 try:
