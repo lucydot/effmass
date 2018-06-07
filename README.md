@@ -4,6 +4,7 @@
 [![Documentation](https://readthedocs.org/projects/pip/badge/?version=latest)](https://effmass.readthedocs.io/en/latest)
 [![Build Status](https://travis-ci.com/lucydot/effmass.svg?branch=master)](https://travis-ci.com/lucydot/effmass)
 [![Test Coverage](https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg)](https://codeclimate.com/github/lucydot/effmass/coverage)
+[![DOI](https://zenodo.org/badge/136037407.svg)](https://zenodo.org/badge/latestdoi/136037407)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 `effmass` is a Python 3 package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
@@ -81,7 +82,7 @@ API documentation is available [here](https://effmass.readthedocs.io/en/latest/)
 
 This code can be cited as:
 
-Whalley, Lucy D. (2018). *effmass - an effective mass package*. http://doi.org/10.5281/zenodo.VS
+Whalley, Lucy D. (2018). *effmass - an effective mass package*. http://doi.org/10.5281/zenodo.136037407
 
 ### Bibtex
 
@@ -91,7 +92,7 @@ Whalley, Lucy D. (2018). *effmass - an effective mass package*. http://doi.org/1
   title        = {effmass: 0.1.0},
   month        = jun,
   year         = 2018,
-  doi          = {10.5281/zenodo.VS},
-  url          = {http://dx.doi.org/10.5281/zenodo.VS}
+  doi          = {10.5281/zenodo.136037407},
+  url          = {http://dx.doi.org/10.5281/zenodo.136037407}
 }
 ```
