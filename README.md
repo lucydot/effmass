@@ -82,7 +82,7 @@ API documentation is available [here](https://effmass.readthedocs.io/en/latest/)
 
 This code can be cited as:
 
-Whalley, Lucy D. (2018). *effmass - an effective mass package*. http://doi.org/10.5281/zenodo.136037407
+Whalley, Lucy D. (2018). *effmass - an effective mass package*. http://doi.org/10.5281/zenodo.1285137
 
 ### Bibtex
 
@@ -92,7 +92,7 @@ Whalley, Lucy D. (2018). *effmass - an effective mass package*. http://doi.org/1
   title        = {effmass: 0.1.0},
   month        = jun,
   year         = 2018,
-  doi          = {10.5281/zenodo.136037407},
-  url          = {http://dx.doi.org/10.5281/zenodo.136037407}
+  doi          = {10.5281/zenodo.1285137},
+  url          = {http://dx.doi.org/10.5281/zenodo.1285137}
 }
 ```
