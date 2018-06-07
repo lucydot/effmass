@@ -77,7 +77,21 @@ An overview of the features of effmass along with example code is contained in a
 
 API documentation is available [here](https://effmass.readthedocs.io/en/latest/).
 
-## Citing
+## Citing `effmass`
 
-TODO - register on Zenodo for DOI.
-TODO - submit to JOSS for DOI.
+This code can be cited as:
+
+Whalley, Lucy D. (2018). *effmass - an effective mass package*. http://doi.org/10.5281/zenodo.VS
+
+### Bibtex
+
+```
+@misc{Whalley_Zenodo2018a,
+  author       = {Lucy D. Whalley},
+  title        = {effmass: 0.1.0},
+  month        = jun,
+  year         = 2018,
+  doi          = {10.5281/zenodo.VS},
+  url          = {http://dx.doi.org/10.5281/zenodo.VS}
+}
+```
