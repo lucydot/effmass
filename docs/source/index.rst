@@ -6,25 +6,16 @@
 Effmass
 =======
 
-Python package for calculating the effective mass from a bandstructure calculations. Rahter than fitting a quadratic and relying upont he parabolic approximation, we fit a higher order polynomial and use this calculate a non-parabolic optical effective mass. This documentation is best understood by reading this paper which makes use of the package.
-
 .. figure:: .static/electronworries.png
     :align: right
     :figwidth: 300px
     :alt: "Do I look fat in this potential?" -- electron
 
-The package can:
+`effmass` is a Python package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
-1. **Read in a bandstructure**: Currently this requires the VASP output files PROCAR and OUTCAR. It is assumed you have walked through a 1D slice of the Brillouin Zone, capturing the maxima and minima of interest.
+Examples are provided in a Jupyter notebook `here <nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb>`_.
+Source code is available as a git repository at `https://github.com/lucydot/effmass <https://github.com/lucydot/effmass>`_.
 
-2. **Locate the extrema**: These correspond to the valence band maxima and conduction band minima.
-
-4. **Quantify non-parabolicity**: By calculating the alpha parmeter as defined in the Kane-quasi linear dispersion.
-
-s. **Calculate bandedge (parabolic) effective mass and optical (non-parabolic) effective mass**: The optical effective mass can weighted according to the density of states (with option to read in from DOSCAR) and probability of occupation (fermi-dirac distribution).
-
-Effmass is free and open source. If you have any issues, please raise them in the `Github issues tracker <https://github.com/lucydot/effmass/issues>`_.
-If you use this package please cite.
 
 Details
 -------
@@ -32,9 +23,10 @@ Details
 :Authors: Lucy Whalley
 :Contact: lucywhalley@gmail.com
 :GitHub: https://github.com/lucydot
-:License: MIT
 :Citation: :download:`bibtex<.static/CITATION>`
-:Build: Travis CI badge here
+:Build: .. image:: https://travis-ci.com/lucydot/effmass.svg?branch=master
+
+:Testing: .. image:: https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg
 
 Documentation
 -------------
@@ -42,9 +34,13 @@ Documentation
 .. toctree::
    :maxdepth: 1
    
+   Features
    Installation
-   Usage
-   API docs
+   API documentation
+   Development
+   Testing
+   License
+   Acknowledgements
 
 
 
