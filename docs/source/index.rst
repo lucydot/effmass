@@ -24,9 +24,14 @@ Details
 :Contact: lucywhalley@gmail.com
 :GitHub: https://github.com/lucydot
 :Citation: :download:`bibtex<.static/CITATION>`
-:Build: .. image:: https://travis-ci.com/lucydot/effmass.svg?branch=master
 
-:Testing: .. image:: https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg
+.. image:: https://badge.fury.io/py/effmass.svg
+.. image:: https://readthedocs.org/projects/pip/badge/?version=latest
+.. image:: https://travis-ci.com/lucydot/effmass.svg?branch=master
+.. image:: https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg
+.. image:: https://zenodo.org/badge/136037407.svg
+.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
+
 
 Documentation
 -------------
