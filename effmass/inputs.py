@@ -19,13 +19,13 @@ class Settings:
 
     """
 
-    def __init__(self,energy_range=2, extrema_search_depth=1,bandfit=6):
+    def __init__(self,energy_range=0.25, extrema_search_depth=0.025,bandfit=6):
         """
         Initialises an instance of the Settings class and checks input using :meth:`check_settings()`.
 
         Args:
-            energy_range (float): energy in eV over which the segment extends.
-            extrema_search_depth (float): energy in eV from bandedge over which to search for extrema.    
+            energy_range (float): energy in eV over which the segment extends. Defaults to 0.25 eV.
+            extrema_search_depth (float): energy in eV from bandedge over which to search for extrema. Defaults to 0.025 eV.
             degree_bandfit (int): the degree of the polynomial which is used to fit to dispersion data when calculating the transport mass.  
  
         Returns:
@@ -143,7 +143,8 @@ class Data():
             None.
 
         Notes:
-            If the DOS has been sampled at more than 10000 points then this function will break at the expression for `num_data_points`.
+            If the DOS has been sampled at more than 10000 points then this function will break at the expression for `num_data_points`. 
+            In this case, edit your DOSCAR file so that in the header there is a space preceding the number of points.
         """
         with open(filename,'r') as f:
             lines = f.readlines()
