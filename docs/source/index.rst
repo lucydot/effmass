@@ -44,6 +44,7 @@ Documentation
    API documentation
    Development
    Testing
+   Citing
    License
    Acknowledgements
 
