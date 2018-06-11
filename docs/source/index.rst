@@ -26,12 +26,17 @@ Details
 :Citation: :download:`bibtex<.static/CITATION>`
 
 .. image:: https://badge.fury.io/py/effmass.svg
+   :target: https://pypi.org/project/effmass/0.1.0/  
 .. image:: https://readthedocs.org/projects/pip/badge/?version=latest
+   :target: http://effmass.readthedocs.io/en/latest/
 .. image:: https://travis-ci.com/lucydot/effmass.svg?branch=master
+   :target: https://travis-ci.com/lucydot/effmass
 .. image:: https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg
+   :target: https://codeclimate.com/github/lucydot/effmass/code
 .. image:: https://zenodo.org/badge/136037407.svg
+   :target: https://zenodo.org/record/1285137#.Wx6QdFMvxBw
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
-
+   :target: https://opensource.org/licenses/MIT
 
 Documentation
 -------------
