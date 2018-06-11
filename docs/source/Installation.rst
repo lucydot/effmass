@@ -5,7 +5,7 @@ Installation
 .. code-block:: bash
     pip install effmass
 
-Or download the latest release from [GitHub](https://github.com/lucydot/effmass/releases), and install
+Or download the latest release from `GitHub <https://github.com/lucydot/effmass/releases>`_, and install
 
 .. code-block:: bash
     cd effmass
