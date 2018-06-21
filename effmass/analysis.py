@@ -125,6 +125,31 @@ class Segment:
         idx = self.explosion_index(polyfit_order=polyfit_order)
         assert idx > 3, "Unable to calculate alpha parameter as inflexion too close to extrema"
 
+    def explosion_index(self, polyfit_order=6):
+        r"""
+        This will find the index at which there is a change in sign of the second derivative. 
+
+        In the region of this point the first derivative will pass through zero and so the transport mass (:math:`\frac{1}{\delta E \delta k}`) will explode.
+
+        Args:
+            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
+
+        Notes:
+            This marks the point at which the Kane dispersion is definitely not valid, although it may be that the Kane dispersion is a poor approximation prior to this.
+        """
+        dedk, d2edk2 = self.poly_derivatives(
+            polyfit_order=polyfit_order,
+            dk=self.dk_bohr,
+            polyfit_weighting=False)
+        sign = np.sign(d2edk2)
+        signchange = ((np.roll(sign, 1) - sign) != 0).astype(int)
+        signchange[0] = 0
+        if 1 in signchange:
+            cutoff = np.where(signchange == 1)[0][0]
+        else:
+            cutoff = len(self.dE_eV) - 1
+        return cutoff
+
     def _fermi_function(self, eigenvalue, fermi_level=None, temp=300):
         r""" 
         Calculates the probability that an eigenstate is occupied using Fermi-Dirac statistics:
@@ -838,27 +863,4 @@ class Segment:
                   for k in np.linspace(self.dk_bohr[0], self.dk_bohr[-1], 100)]
         return values
 
-    def explosion_index(self, polyfit_order=6):
-        r"""
-        This will find the index at which there is a change in sign of the second derivative. 
 
-        In the region of this point the first derivative will pass through zero and so the transport mass (:math:`\frac{1}{\delta E \delta k}`) will explode.
-
-        Args:
-            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-
-        Notes:
-            This marks the point at which the Kane dispersion is definitely not valid, although it may be that the Kane dispersion is a poor approximation prior to this.
-        """
-        dedk, d2edk2 = self.poly_derivatives(
-            polyfit_order=polyfit_order,
-            dk=self.dk_bohr,
-            polyfit_weighting=False)
-        sign = np.sign(d2edk2)
-        signchange = ((np.roll(sign, 1) - sign) != 0).astype(int)
-        signchange[0] = 0
-        if 1 in signchange:
-            cutoff = np.where(signchange == 1)[0][0]
-        else:
-            cutoff = len(self.dE_eV) - 1
-        return cutoff
