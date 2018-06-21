@@ -47,6 +47,7 @@ Documentation
    Features
    Installation
    API documentation
+   Implementation
    Development
    Testing
    Citing
