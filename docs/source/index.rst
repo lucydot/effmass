@@ -28,7 +28,7 @@ Details
 .. image:: https://badge.fury.io/py/effmass.svg
    :target: https://pypi.org/project/effmass/0.1.0/  
 .. image:: https://readthedocs.org/projects/pip/badge/?version=latest
-   :target: http://effmass.readthedocs.io/en/latest/
+   :target: http://effmass.readthedocs.io/en/latest/?badge=latest
 .. image:: https://travis-ci.com/lucydot/effmass.svg?branch=master
    :target: https://travis-ci.com/lucydot/effmass
 .. image:: https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg
