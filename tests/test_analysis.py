@@ -9,7 +9,7 @@ def test_check_poly_order():
 
 def test_check_kanefit_points(toy_segments):
 	with pytest.raises(AssertionError):
-		analysis._check_kanefit_points(2)
+		toy_segments._check_kanefit_points(2)
 
 def test_solve_quadratic():
 	a = 2
@@ -18,20 +18,20 @@ def test_solve_quadratic():
 	assert np.allclose(np.array(analysis._solve_quadratic(a,b,c)),np.array([1.5,2.5]))
 
 def test_fermi_function(MAPI_soc_segment_object_hole):
-	assert math.isclose(MAPI_soc_segment_object_hole.fermi_function(0,0),0.5)
-	assert MAPI_soc_segment_object_hole.fermi_function(0,1) < 0.5
-	assert MAPI_soc_segment_object_hole.fermi_function(1,0) > 0.5
+	assert math.isclose(MAPI_soc_segment_object_hole._fermi_function(0,0),0.5)
+	assert MAPI_soc_segment_object_hole._fermi_function(0,1) < 0.5
+	assert MAPI_soc_segment_object_hole._fermi_function(1,0) > 0.5
 
 def test_fermi_function_toy(toy_segments):
     online_calc = 1 - 0.999970880324388
-    assert math.isclose(toy_segments[0].fermi_function(0.48,0.75),online_calc,rel_tol=1E-5)
+    assert math.isclose(toy_segments[0]._fermi_function(0.48,0.75),online_calc,rel_tol=1E-5)
     online_calc = 1 - 0.999986565914777
-    assert math.isclose(toy_segments[0].fermi_function(0.46,0.75),online_calc,rel_tol=1E-5)
+    assert math.isclose(toy_segments[0]._fermi_function(0.46,0.75),online_calc,rel_tol=1E-5)
 
 def test_fermi_function(MAPI_soc_segment_object_electron):
-	assert math.isclose(MAPI_soc_segment_object_electron.fermi_function(0,0),0.5)
-	assert MAPI_soc_segment_object_electron.fermi_function(0,1) > 0.5
-	assert MAPI_soc_segment_object_electron.fermi_function(1,0) < 0.5
+	assert math.isclose(MAPI_soc_segment_object_electron._fermi_function(0,0),0.5)
+	assert MAPI_soc_segment_object_electron._fermi_function(0,1) > 0.5
+	assert MAPI_soc_segment_object_electron._fermi_function(1,0) < 0.5
 
 def test_ptype(MAPI_soc_segment_object_hole):
 	assert MAPI_soc_segment_object_hole._ptype() == "hole"
@@ -94,7 +94,7 @@ def test_alpha(toy_segments):
 def test_kane_mass_bandedge(toy_segments):
 	toy_segments[0].dk_bohr = np.array([0.1,0.2,0.3,0.4,0.5]) # toy data with characteristic curve
 	toy_segments[0].dE_hartree = np.array([0.00124534733,0.004927169016,0.01089396461,0.01892547876,0.02876732333])
-	assert math.isclose(toy_segments[0].kane_mass_bandedge(polyfit_order=6,truncate=False),4,rel_tol=1E-3)
+	assert math.isclose(toy_segments[0].kane_mass_band_edge(polyfit_order=6,truncate=False),4,rel_tol=1E-3)
 
 # TODO: average_allband_optical_effmass, calc_allband_optical_effmass, functions associated with analytic optical Kane effmass, optical mass and use of weighting
 
