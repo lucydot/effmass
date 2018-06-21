@@ -1,35 +1,14 @@
 #! /usr/bin/env python3
 import matplotlib
-matplotlib.use('Agg')
-
 import matplotlib.pyplot as plt
 import numpy as np
-
 
 from effmass import dos
 from effmass import ev_to_hartree
 from effmass.dos import _check_integrated_dos_loaded
 from effmass.dos import _check_dos_loaded
-
-plt.style.use('ggplot')
-np.set_printoptions(formatter={'float_kind': lambda x: "%.2g" % x})  # print options for all float elements in numpy arrays
-
-def _pretty_info(Segment):
-    """
-    Helper function which formats segment direction and band data.
-
-    Args:
-        Segment (Segment): instance of the :class:`Segment` class.
-
-    Returns:
-        str: string containing formated direction and band information.
-    """
-    info_string =  (
-                 "{0:.0f}".format(Segment.direction[0])+
-                 "{0:.0f}".format(Segment.direction[1])+
-                 "{0:.0f}".format(Segment.direction[2])+"_"+
-                 str(Segment.band))
-    return info_string
+from effmass.analysis import _check_kanefit_points
+from effmass.analysis import _check_poly_order
 
 def plot_segments(Data,Settings,segments):
     """
@@ -114,95 +93,35 @@ def plot_dos(Data):
 
     return fig, ax
 
-def plot_fits(Segment,poly_degree,print_to_file=False):
-    r"""
-    Plots the quadratic fit, polynomial fit and Kane fit to the DFT calculated dispersion.
-
-    The energy is in eV, length in reciprocal space is in angstrom$^{-1}$.
-
-    Args:
-        Segment (Segment): instance of the :class:`Segment` class.
-        poly_degree (int): the degree of the polynomial fit.
-        print_to_file (bool, optional): True to print plot to .png file. Defaults to False.
-
-    Returns:
-        Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
-    """
-    fig = plt.figure(figsize=(8,8))
-    ax = fig.add_subplot(111)
-    ax.scatter(Segment.dk_angs,Segment.dE_eV,marker="x",s=200,label="DFT dispersion")
-    ax.plot(np.linspace(Segment.dk_angs[0],Segment.dk_angs[-1],100),[i/ev_to_hartree for i in Segment.return_quadfit(polyfit_order=2,polyfit_weighting=True)],marker="o",label="weighted polynomial parabolic",linewidth=0.01)
-    ax.plot(np.linspace(Segment.dk_angs[0],Segment.dk_angs[-1],100),[i/ev_to_hartree for i in Segment.return_finite_difference_fit()],marker="<", ms=5, label="finite difference parabolic")
-    ax.plot(np.linspace(Segment.dk_angs[0],Segment.dk_angs[-1],100),[i/ev_to_hartree for i in Segment.return_polyfit(polyfit_order=poly_degree,polyfit_weighting=False)],marker="v",label="polynomial order {}".format(poly_degree))
-    if Segment.check_kanefit_points():
-        ax.plot(np.linspace(Segment.dk_angs[0],Segment.dk_angs[-1],100), [i/ev_to_hartree for i in Segment.return_kanefit(polyfit_order=poly_degree)], marker="^",label="Kane quasi-linear")
-    ax.set_xlim(left=0)
-
-    ax.legend(fontsize=12)
-
-    if print_to_file:
-        plt.savefig(_pretty_info(Segment)+"_fit",type="png")
-
-    return fig, ax
-
-
-def plot_effmass(Segment,poly_degree,print_to_file=False):
-    r"""
-    Plots the conductivity (second derivative) and transport (first derivative) effective mass against distance from extrema.
-
-    The mass is in units of electron rest mass (:math:`m_e`), distance from extrema is in angstrom :math:`^{-1}`.
-
-    Args:
-        Segment (Segment): instance of the :class:`Segment` class.
-        Settings (Settings): the degree of the polynomial fit used to calculate the effective masses.
-        print_to_file (bool, optional): True to print plot to .png file. Defaults to False.
-
-    Returns:
-        Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
-    """
-    fig = plt.figure(figsize=(8,8))
-    ax = fig.add_subplot(111)
-    ax.plot(Segment.dk_angs,Segment.calc_conductivity_effmass(polyfit_order=poly_degree,dk=Segment.dk_angs),label="conductivity mass")
-    ax.plot(Segment.dk_angs,Segment.calc_transport_effmass(polyfit_order=poly_degree,dk=Segment.dk_angs),label="transport mass")
-
-    ax.set_xlim(left=0)
-
-    ax.legend(fontsize=12)
-
-    if print_to_file:
-        plt.savefig(_pretty_info(Segment)+"_effmass",type="png")    
-
-    return fig, ax
-
 def print_results(segment,data,settings,polyfit_order=6):
 
+    _check_poly_order(polyfit_order)
+
     print (segment.ptype, segment.direction)
-    print ("finite difference mass is {:.2f}".format(segment.calc_finite_difference_effmass()))
-    print ("3-point parabolic mass is {:.2f}".format(segment.calc_five_point_effmass())) 
-    print ("weighted parabolic mass is {:.2f}".format(segment.calc_conductivity_effmass(polyfit_order=2,polyfit_weighting=True)[0]))
-    if segment.calc_alpha(polyfit_order=polyfit_order) is not None:
-        print ("alpha is {:.3f} 1/eV".format(segment.calc_alpha(polyfit_order=polyfit_order)*ev_to_hartree))
-        print ("kane mass at bandedge is {:.3f}".format(segment.calc_kane_mass_bandedge(polyfit_order=polyfit_order)))
+    print ("3-point finite difference mass is {:.2f}".format(segment.finite_difference_effmass()))
+    print ("3-point parabolic mass is {:.2f}".format(segment.five_point_leastsq_effmass())) 
+    print ("weighted parabolic mass is {:.2f}".format(segment.weighted_leastsq_effmass()))
+
+    if segment.alpha(polyfit_order=polyfit_order) is not None:
+        print ("alpha is {:.2f} 1/eV".format(segment.alpha(polyfit_order=polyfit_order)*ev_to_hartree))
+        print ("kane mass at bandedge is {:.2f}".format(segment.kane_mass_band_edge(polyfit_order=polyfit_order)))
     else: 
         print ("no kane parameters calculated")
     if segment.explosion_index(polyfit_order=polyfit_order) == len(segment.dE_eV):
-        print ("quasi linear approximation valid for whole segment")
+        print ("the Kane quasi linear approximation is valid for the whole segment")
         
     else:
-        print ("range of quasi-linear until {:.3f} eV".format(segment.dE_eV[segment.explosion_index(polyfit_order=polyfit_order)]))
-    if segment.ptype == "electron":
-        fermi_level = data.CBM
-    if segment.ptype == "hole":
-        fermi_level = data.VBM
-    print ("optical mass at band edge (assuming Kane dispersion) is {:.2f}".format(segment.calc_optical_effmass_kane_dispersion(fermi_level = fermi_level)))    
+        print ("the Kane quasi-linear approximation is valid until {:.2f} eV".format(segment.dE_eV[segment.explosion_index(polyfit_order=polyfit_order)]))
+    print ("optical mass at band edge (assuming the Kane dispersion) is {:.2f}".format(segment.calc_optical_effmass_kane_dispersion(fermi_level = fermi_level)))    
     
     plt.figure(figsize=(8,8))
-    plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.return_polyfit(polyfit_order=polyfit_order,polyfit_weighting=False),ev_to_hartree),marker="x",ms = 5,label="polynomial order {}".format(polyfit_order))
-    plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.return_finite_difference_fit(),ev_to_hartree),marker="<", ms=5, label="finite diff parabolic")
-    plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.return_five_point_fit(),ev_to_hartree),marker="p",ms = 5,label="five point parabolic")
-    plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.return_polyfit(polyfit_order=2,polyfit_weighting=True),ev_to_hartree),marker=">",ms = 5,label="weighted parabolic")
-    if segment.return_kanefit(polyfit_order=polyfit_order) is not None:
-        plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.return_kanefit(polyfit_order=polyfit_order),ev_to_hartree),marker="o",ms = 5,label="Kane quasi-linear")
+    plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.poly_fit(polyfit_order=polyfit_order,polyfit_weighting=False),ev_to_hartree),marker="x",ms = 5,label="polynomial order {}".format(polyfit_order))
+    plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.finite_difference_fit(),ev_to_hartree),marker="<", ms=5, label="finite diff parabolic")
+    plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.five_point_leastsq_fit(),ev_to_hartree),marker="p",ms = 5,label="five point parabolic")
+    plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.weighted_leastsq_fit(),ev_to_hartree),marker=">",ms = 5,label="weighted parabolic")
+
+    if segment.kane_fit(polyfit_order=polyfit_order) is not None:
+        plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.kane_fit(polyfit_order=polyfit_order),ev_to_hartree),marker="o",ms = 5,label="Kane quasi-linear")
     plt.xlabel(r"k ($ \AA^{-1} $)")
     plt.ylabel("energy (eV)")
     plt.scatter(segment.dk_angs,segment.dE_eV,marker="x", s=200,label="DFT")
@@ -214,8 +133,8 @@ def print_results(segment,data,settings,polyfit_order=6):
 
     plt.figure(figsize=(8,8))
     idx = segment.explosion_index(polyfit_order=polyfit_order)
-    plt.scatter(segment.dE_hartree[1:idx+1],segment.calc_transport_effmass(polyfit_order=polyfit_order,dk=segment.dk_bohr,polyfit_weighting=False)[1:idx+1])
-    plt.plot([0,segment.dE_hartree[idx]],np.polyval(np.polyfit(segment.dE_hartree[1:idx+1],segment.calc_transport_effmass(polyfit_order=polyfit_order,dk=segment.dk_bohr,polyfit_weighting=False)[1:idx+1],1),[0,segment.dE_hartree[idx]]))
+    plt.scatter(segment.dE_hartree[1:idx+1],segment.transport_effmass(polyfit_order=polyfit_order,dk=segment.dk_bohr,polyfit_weighting=False)[1:idx+1])
+    plt.plot([0,segment.dE_hartree[idx]],np.polyval(np.polyfit(segment.dE_hartree[1:idx+1],segment.transport_effmass(polyfit_order=polyfit_order,dk=segment.dk_bohr,polyfit_weighting=False)[1:idx+1],1),[0,segment.dE_hartree[idx]]))
     plt.ylabel("transport mass")
     plt.xlabel("energy (hartree)")
     plt.xlim([0,segment.dE_hartree[idx]])

@@ -24,24 +24,23 @@ def _check_poly_order(polyfit_order):
     """
     assert polyfit_order > 1, "the order of the polynomial must be 2 or higher"
 
-def weighted_mean(values, weighting):
-    r"""
-    Calculates the mean of values :math:`v_i` with weighting :math:`w_i`: :math:`\frac{\sum_i(v_iw_i)}{\sum_i(w_i)}`.
+ def _check_kanefit_points(self,polyfit_order=6):
+    """
+    Raises an AssertionError if there are not enough data points to fit a Kane dispersion. 
 
     Args:
-        values (list(float)): values of which we want the weighted mean.
-        weighting (list(float)): weighting for each of these values.
+        polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
     
     Returns:
-        float: the weighted mean of the values.
-    
+        None.
     """
-    weighted_mean= np.sum(np.multiply(values, weighting)) / np.sum(weighting)
-    return weighted_mean
+    idx = self.explosion_index(polyfit_order=polyfit_order)
+    assert idx>3, "Unable to calculate alpha parameter as inflexion too close to extrema"
 
-def solve_quadratic(a,b,c):
+def _solve_quadratic(a,b,c):
     r"""
-    Solves quadratic equation of the form :math:`ax^2+bx+c=0` for each value of c given.
+    Solves quadratic equation of the form :math:`ax^2+bx+c=0` for multiple values of c.
+    If the determinant is more than 0 (two solutions), it always returns the larger root.
 
     Args:
         a (float): the coefficient of :math:`x^2`.
@@ -62,68 +61,6 @@ def solve_quadratic(a,b,c):
         if d > 0:
             x.append((-b+np.sqrt(d))/(2*a))
     return x
-
-def _average_allband_optical_effmass(group,polyfit_order=6, optical_weighted_average=True):
-    """
-    Helper function for calc_allband_optical_effmass.
-
-    Args:
-        group (iterator): iterator of :class:`~effmass.analysis.Segment` instances grouped by direction and occupation.
-        polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-        optical_weighted_average (bool, optional): If True, a weighting (proportional to the product of the Fermi-Dirac function and density of states) is applied. If False, no weighting is applied. Defaults to True. 
-        use_doscar (bool, optional): If True, DOSCAR data is used as density of states weighting. If False, :math:`k^2` is used. Defaults to False.
-
-    Returns:
-        float: optical mass calculated using multiple segments which have the same direction and occupation. 
-    """
-
-    mass = []
-    weight = []
-    for segment in group:
-        mass.append(segment.calc_conductivity_effmass(polyfit_order=polyfit_order, dk=segment.dk_bohr))
-        if optical_weighted_average:
-            weight.append(segment.return_weighting())
-        else:
-            weight.append(np.ones(len(segment.energies)))
-    optical_mass = np.power(weighted_mean(np.power(mass[0],-1), weight[0]),-1)
-    return optical_mass
-
-def calc_allband_optical_effmass(segments,polyfit_order=6,optical_weighted_average=True):
-    r"""
-    Calculates the optical effective mass across multiple segments, where the dispersion of each Segment has been approximated with a polynomial function.
-
-    This optical effective mass :math:`m_o` is defined as:
-        .. math::
-           \frac{1}{m_o} = \frac{ \sum_b \sum_i (f(E_i)g(k_i)\frac{\delta^2E}{\delta k^2}|_i)}{\sum_b \sum_i (f(E_i)g(k))}
-
-    where :math:`\frac{\delta^2E}{\delta k^2}` is the second derivative of the polynomial fit evaluated at :attr:`~effmass.analysis.Segment.dk_bohr`, :math:`\sum_b` is the sum over all bands which are in the same direction and have the same occupancy,
-    :math:`\sum_i` is the sum over all eigenstates within each band Segment, :math:`f_(E_i)` is the probability of occupation (Fermi-Dirac statistics),
-    :math:`g(k_i)` is the density of states at that k-point.
-    Segments can be in different directions and have different occupancy.
-    The function will sort them accordingly and average across only those which have common direction and occupation.
-
-    Args:
-        segments (list(Segment)): A list of Segment instances.
-        polyfit_order (int, optional): order of polynomial used to approximate the dispersion.
-            Defaults to 6.
-        optical_weighted_average (bool, optional): If True, a weighting (proportional to the product of the Fermi-Dirac function and density of states) is applied. If False, no weighting is applied. Defaults to True. See :meth:`effmass.analysis.Segment.return_weighting`.
-        use_doscar (bool, optional): If True, :attr:`effmass.inputs.Data.dos` is used as density of states weighting. If False, :attr:`~effmass.analysis.Segment.dk_bohr`:math:`^2` is used. Defaults to False. See :meth:`effmass.analysis.Segment.return_weighting`.
-
-    Returns:
-        list: A 2-dimensional list. Each row contains [:attr:`~effmass.analysis.Segment.direction`,:attr:`~effmass.analysis.Segment.occupancy`,optical_mass,iterator] for each group of Segment instances with share the same occupation and direction.
-        The optical mass is an average across the group of Segment instances and is given in units of electron mass. The iterator is an <itertools group>`https://docs.python.org/2/library/itertools.html#itertools.groupby`_ object.
-
-    """
-    allband_effmass = []
-    sorted_segments = sorted(segments, key=lambda x: str(np.absolute(x.direction)))
-    for direction, group in itertools.groupby(sorted_segments,lambda x: str(np.absolute(x.direction))):
-        sorted_group = sorted(group, key=lambda x: x.occupancy[0])
-        for occupation, group in itertools.groupby(sorted_group,lambda x: x.occupancy[0]):    
-            optical_mass = _average_allband_optical_effmass(group,polyfit_order=polyfit_order,optical_weighted_average=optical_weighted_average)
-            allband_effmass.append([direction, occupation, optical_mass, group])
-
-    return allband_effmass
-
 
 class Segment:
     """
@@ -173,14 +110,13 @@ class Segment:
         self.dE_hartree = np.multiply(self.energies - self.energies[0],ev_to_hartree)
         self.occupancy = np.array([Data.occupancy[band,k] for k in kpoint_indices])
         self.direction = extrema.calculate_direction(self.kpoints[1],self.kpoints[2])
-        self.ptype = self.return_ptype()
-        self.bandedge_energy = self.return_bandedge_energy(Data)
+        self.ptype = self._ptype()
+        self.bandedge_energy = self._bandedge_energy(Data)
         self.fermi_energy = Data.fermi_energy
-        self.dos = self.return_dos(Data)
-        self.integrated_dos = self.return_integrated_dos(Data)
+        self.dos = self._dos(Data)
+        self.integrated_dos = self._integrated_dos(Data)
 
-
-    def fermi_function(self,eigenvalue,fermi_level=None,temp=300):
+    def _fermi_function(self,eigenvalue,fermi_level=None,temp=300):
         r""" 
         Calculates the probability that an eigenstate is occupied using Fermi-Dirac statistics:
             ..math::
@@ -206,7 +142,29 @@ class Segment:
 
         return probability
 
-    def return_ptype(self):
+    def weighting(self, fermi_level=None, temp=300):
+        """
+        Calculates a weighting for each kpoint using the Fermi-Dirac statistics.
+
+        Args:
+            quasi_fermi_level (float, optional): The fermi level to be used in Fermi-Dirac statistics. Defaults to :attr:`effmass.inputs.Segment.fermi_energy`.
+            temp (float, optional): The temperature (K) to be used in Fermi-Dirac statistics. Defaults to 300.
+
+        Returns: 
+            array(float): A 1-dimensional array which contains the weighting for each k-point.
+
+        Notes:
+            The weighting is relative only: constants will cancel out when using to weight least square fits or means.
+
+        """
+  
+        fermi_level = self.fermi_energy if fermi_level is None else fermi_level
+        # weighting is given by the fermi function
+        weighting = (np.array([self._fermi_function(E, fermi_level=fermi_level,temp=temp) for E in self.energies]))  
+
+        return weighting
+
+    def _ptype(self):
         """
         Identifies the quasi particle, determined by the occupancy of the first k-point in the segment.
 
@@ -230,7 +188,7 @@ class Segment:
             particle = "unknown"
         return particle
 
-    def return_bandedge_energy(self,Data):
+    def _bandedge_energy(self,Data):
         """
         Identifies the bandedge energy of the :class:`~effmass.analysis.Segment`, determined by the occupancy of the first k-point.
 
@@ -254,7 +212,7 @@ class Segment:
 
         return bandedge_energy
 
-    def return_dos(self,Data):
+    def _dos(self,Data):
         """
         Returns slice of :attr:`effmass.Data.dos` corresponding to the energy range of the segment.
 
@@ -276,7 +234,7 @@ class Segment:
 
         return dos
 
-    def return_integrated_dos(self,Data):
+    def _integrated_dos(self,Data):
         """
         Returns slice of :attr:`effmass.Data.integrated_dos` corresponding to the energy range of the segment.
 
@@ -296,33 +254,11 @@ class Segment:
                         integrated_dos.append(Data.integrated_dos[j][1])
                         break
         return integrated_dos
-        
-    def return_weighting(self, fermi_level=None, temp=300):
-        """
-        Calculates a weighting for each kpoint using the Fermi-Dirac statistics.
-
-        Args:
-            quasi_fermi_level (float, optional): The fermi level to be used in Fermi-Dirac statistics. Defaults to :attr:`effmass.inputs.Segment.fermi_energy`.
-            temp (float, optional): The temperature (K) to be used in Fermi-Dirac statistics. Defaults to 300.
-
-        Returns: 
-            array(float): A 1-dimensional array which contains the weighting for each k-point.
-
-        Notes:
-            The weighting is relative only: constants will cancel out when using to weight least square fits or means.
-
-        """
-  
-        fermi_level = self.fermi_energy if fermi_level is None else fermi_level
-        # weighting is given by the fermi function
-        weighting = (np.array([self.fermi_function(E, fermi_level=fermi_level,temp=temp) for E in self.energies]))  
-
-        return weighting
 
      #### The collection of methods below calculate the optical effective mass by integrating numerically the analytical
-     #### expression for FD,DOS and second derivative of dispersion (currently only the Kane dispersion is implemented).
+     #### expression for the second derivative of the Kane dispersion multiplied by a Fermi-Dirac weighting.
 
-    def return_mass_integration(self,fermi_level=None,temp=300,alpha=None,mass_bandedge=None,upper_limit=None):
+    def mass_integration(self,fermi_level=None,temp=300,alpha=None,mass_bandedge=None,upper_limit=None):
         """
         Integrates the product of the fermi-dirac distribution, density of states and second derivative of kane dispersion along the one-dimensional slice of k-space defined by :class:`~effmass.analysis.Segment` (up to :meth:`~effmass.analysis.Segment.explosion_index`). 
 
@@ -337,8 +273,8 @@ class Segment:
             float: The optical effective mass (units of electron mass), defined as the inverse of the second derivative of a kane dispersion, weighted according to occupancy of available eigenstates (the product of density of states and the fermi-dirac distribution).
         """
         
-        alpha = self.calc_alpha() if alpha is None else alpha
-        mass_bandedge = self.calc_kane_mass_bandedge() if mass_bandedge is None else mass_bandedge
+        alpha = self.alpha() if alpha is None else alpha
+        mass_bandedge = self.kane_mass_band_edge() if mass_bandedge is None else mass_bandedge
         upper_limit = self.dk_bohr[self.explosion_index()] if upper_limit is None else upper_limit
         fermi_level = self.fermi_energy if fermi_level is None else fermi_level
 
@@ -381,7 +317,7 @@ class Segment:
         """
         # returns in eV
 
-        return (solve_quadratic(alpha,1,[(-k*k)/(2*mass_bandedge)])[0])/ev_to_hartree
+        return (_solve_quadratic(alpha,1,[(-k*k)/(2*mass_bandedge)])[0])/ev_to_hartree
 
     def _second_derivative_kane_dispersion(self,k,alpha,mass_bandedge):
         """
@@ -390,7 +326,7 @@ class Segment:
         # returns in eV
         return 1 / (mass_bandedge*((1+ ((2*k*k*alpha)/(mass_bandedge)))**(3/2)))
 
-    def return_weight_integration(self,fermi_level=None,temp=300,alpha=None,mass_bandedge=None,upper_limit=None):
+    def weight_integration(self,fermi_level=None,temp=300,alpha=None,mass_bandedge=None,upper_limit=None):
         """
         Integrates the product of the fermi-dirac distribution and density of states along the one-dimensional slice of k-space defined by :class:`~effmass.analysis.Segment` (up to :meth:`~effmass.analysis.Segment.explosion_index`). 
 
@@ -402,8 +338,8 @@ class Segment:
         Returns:
             float: A normalisation factor for :meth:`~effmass.analysis.Segment.return_mass_integration`.
         """
-        alpha = self.calc_alpha() if alpha is None else alpha
-        mass_bandedge = self.calc_kane_mass_bandedge() if mass_bandedge is None else mass_bandedge
+        alpha = self.alpha() if alpha is None else alpha
+        mass_bandedge = self.kane_mass_band_edge() if mass_bandedge is None else mass_bandedge
         fermi_level = self.fermi_energy if fermi_level is None else fermi_level
         upper_limit = self.dk_bohr[self.explosion_index()] if upper_limit is None else upper_limit
         result = scipy.integrate.quad(self._weight_integrand,0,upper_limit,args=(fermi_level,temp,alpha,mass_bandedge))
@@ -415,9 +351,9 @@ class Segment:
         """
         return self.fd(k,fermi_level,temp,alpha,mass_bandedge)
 
-    def calc_optical_effmass_kane_dispersion(self,fermi_level=None,temp=300,alpha=None,mass_bandedge=None,upper_limit=None):
+    def optical_effmass_kane_dispersion(self,fermi_level=None,temp=300,alpha=None,mass_bandedge=None,upper_limit=None):
         r"""
-        Calculates an optical effective mass for a single :class:`~effmass.analysis.Segment` where the dispersion is approximated with a quasi-linear function.
+        Calculates the optical effective mass, with the dispersion approximated by a Kane quasi-linear function.
 
         This optical effective mass is defined as:
             ..math::
@@ -451,14 +387,14 @@ class Segment:
             if self.ptype == "hole":
               print ("Fermi level {} is beyond the energy range where the Kane dispersion is valid.".format(fermi_level))
 
-        top = self.return_mass_integration(fermi_level=fermi_level,temp=temp,alpha=alpha,mass_bandedge=mass_bandedge,upper_limit=upper_limit)
-        bottom = self.return_weight_integration(fermi_level=fermi_level,alpha=alpha,mass_bandedge=mass_bandedge,temp=temp,upper_limit=upper_limit)
+        top = self.mass_integration(fermi_level=fermi_level,temp=temp,alpha=alpha,mass_bandedge=mass_bandedge,upper_limit=upper_limit)
+        bottom = self.weight_integration(fermi_level=fermi_level,alpha=alpha,mass_bandedge=mass_bandedge,temp=temp,upper_limit=upper_limit)
 
         return bottom[0]/top[0]
 
     ####
 
-    def _construct_polynomial_function(self, polyfit_order=6, polyfit_weighting=True):
+    def _polynomial_function(self, polyfit_order=6, polyfit_weighting=True):
         """
         Helper function which constructs a polynomial function using a least squares fit to dispersion data.
         """
@@ -469,7 +405,7 @@ class Segment:
         sym_dE = np.concatenate((self.dE_hartree[::-1],self.dE_hartree[1:]))
         if polyfit_weighting:
             # weight to enable a better fit for the values where it is important
-            weighting=self.return_weighting()
+            weighting=self.weighting()
         else:
             weighting = np.ones(len(self.dE_hartree))
         W = np.append(weighting[::-1],weighting[1:]) # as it needs same dimensions as x and y.
@@ -486,7 +422,7 @@ class Segment:
         #function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W)) ----> simple polyfit call for sanity's sake
         return function
     
-    def calc_poly_derivatives(self, polyfit_order=6,polyfit_weighting=True,dk=[]):
+    def poly_derivatives(self, polyfit_order=6,polyfit_weighting=True,dk=[]):
         """
         Constructs a polynomial function using a least squares fit to Segment dispersion data, then evaluates first and second order derivatives.
 
@@ -498,7 +434,7 @@ class Segment:
         Returns:
             tuple: A tuple containing a 1d array of first derivatives and 1d array of second derivatives, evaluated at dk: ([dedk],[d2edk2])
         """
-        function = self._construct_polynomial_function(polyfit_order=polyfit_order, polyfit_weighting=polyfit_weighting)
+        function = self._polynomial_function(polyfit_order=polyfit_order, polyfit_weighting=polyfit_weighting)
         if dk == []:
             dk = np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)
         dedk = function.deriv(m=1)(dk)
@@ -506,7 +442,7 @@ class Segment:
 
         return dedk, d2edk2
 
-    def return_polyfit(self, polyfit_order=6,polyfit_weighting=True):
+    def poly_fit(self, polyfit_order=6,polyfit_weighting=True):
         """
         Constructs a polynomial function using a least squares fit to :class:`~effmass.analysis.Segment` dispersion data, then evaluates at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.
 
@@ -517,26 +453,118 @@ class Segment:
         Returns:
             array: 1d array containing energies (hartree).
         """
-        function = self._construct_polynomial_function(polyfit_order=polyfit_order, polyfit_weighting=polyfit_weighting)
+        function = self._polynomial_function(polyfit_order=polyfit_order, polyfit_weighting=polyfit_weighting)
         values = np.polyval(function,np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100))
         return values
 
-    def check_kanefit_points(self,polyfit_order=6):
-        """
-        Raises an AssertionError if there are not enough data points to fit a Kane dispersion. 
+    def optical_poly_effmass(self, polyfit_order=6):
+        r"""
+        Calculates the optical effective mass with a polynomial approximation to the dispersion
 
+        This optical effective mass is defined as:
+            ..math::
+                \frac{1}{m_o} = \frac{\sum_i f(E_i) g(k_i) \frac{\delta^2 E}{\delta k^2}|_i}{\sum f(E_i) g(k_i)}
+
+        where the sum is over eigenstates i contained withing the :class:`~effmass.analysis.Segment`. :math:`f_(E_i)` is the probability of occupation (Fermi-Dirac statistics) and :math:`g(k_i)` is the density of states at that k-point.
+        
         Args:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
         
         Returns:
-            None.
+            float: The optical effective mass (units of electron mass) of the :class:`~effmass.analysis.Segment`.
         """
-        idx = self.explosion_index(polyfit_order=polyfit_order)
-        assert idx>3, "Unable to calculate alpha parameter as inflexion too close to extrema"
+        conductivity_mass = self.inertial_effmass(polyfit_order=polyfit_order,dk=self.dk_bohr)
+        if optical_weighted_average:
+            weighting = self.weighting()
+        optical_mass = np.power(np.average(np.power(conductivity_mass,-1), weights=weighting),-1)
+        return optical_mass
 
-    def return_kanefit(self, polyfit_order=6):
+    def inertial_effmass(self, polyfit_order=6,dk=[],polyfit_weighting=False):
         r"""
-        Constructs a kane quasi linear dispersion, then evaluates at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.
+        Calculates the inertial (curvature) effective mass (:math:`\frac{1}{\frac{\delta^2E}{\delta k^2}}`), evaluated at :attr:`~effmass.analysis.Segment.dk_bohr`.
+
+        Args:
+            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
+            dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate second order derivatives. Defaults to 100 points evenly distributed across the whole segment.
+            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.
+        
+        Returns:
+            array(float). 1d array containing the conductivity effective mass (in units of electron rest mass) evaluated at the points specified in dk.
+        """
+        dedk, d2edk2 = self.poly_derivatives(polyfit_order=polyfit_order,dk=dk,polyfit_weighting=polyfit_weighting)
+        conductivity_mass = [( 1 / x) for x in d2edk2]
+        return conductivity_mass
+
+    def transport_effmass(self, polyfit_order=6,dk=[],polyfit_weighting=False):
+        r"""
+        Calculates the transport mass (:math:`\frac{k}{\delta E \delta k}`), evaluated at :attr:`~effmass.analysis.Segment.dk_bohr` .
+
+        Args:
+            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
+            dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate first order derivatives. Defaults to 100 points evenly distributed across the whole segment.
+            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.
+           
+        Returns:
+            array(float). 1d array containing the transport effective mass (in units of electron rest mass) evaluated at the points specified in dk.
+        """
+        dedk, d2edk2= self.poly_derivatives(polyfit_order=polyfit_order,dk=dk,polyfit_weighting=polyfit_weighting)
+        # dk=0 for first term gives discontinuity
+        if dk == []:
+            dk = np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)
+        transport_mass = [( x / y) for x, y in zip(dk[1:], dedk[1:])]
+        transport_mass = np.append(np.array([np.nan]), transport_mass)
+        return transport_mass
+
+    def alpha(self, polyfit_order=6,truncate=True):
+        r"""
+        The transport mass (:math:`\frac{k}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The gradient of this line determines the alpha parameter which is used in the kane dispersion.
+        
+        See :meth:`effmass.analysis.Segment.calc_transport_effmass`.
+
+        Args:
+            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
+            truncate (bool, optional): If True, data only up to :meth:`effmass.analysis.Segment.explosion_index` is used. If False, alpha is calculated using data for the whole segment. Defaults to True.
+
+        Returns:
+            float: The alpha parameter (hartree :math:`^{-1}`).
+        """
+        if truncate:
+            _check_kanefit_points(polyfit_order=polyfit_order)
+        transport_mass = self.transport_effmass(polyfit_order=polyfit_order,dk=self.dk_bohr,polyfit_weighting=False)
+        if truncate:
+            idx = self.explosion_index(polyfit_order=polyfit_order)
+            gradient, intercept = np.polyfit(self.dE_hartree[1:idx+1], transport_mass[1:idx+1],1)
+        else:
+            gradient, intercept = np.polyfit(self.dE_hartree[1:], transport_mass[1:],1)
+        alpha = np.divide(gradient,2*intercept)
+        return alpha          
+                                  
+    def kane_mass_band_edge(self, polyfit_order=6,truncate=True):
+        r"""
+        The transport mass (:math:`\frac{1}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The intercept of this line with the y-axis gives a transport mass at bandedge which is used as a parameter in the kane dispersion.
+        
+        See :meth:`effmass.analysis.Segment.calc_transport_effmass`.
+
+        Args:
+            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
+            truncate (bool, optional): If True, data only up to :meth:`effmass.analysis.Segment.explosion_index` is used. If False, alpha is calculated using data for the whole segment. Defaults to True.
+        
+        Returns:
+            float: transport mass at bandedge (in units of electron mass).
+        """
+        if truncate:
+            _check_kanefit_points(polyfit_order=polyfit_order)
+        transport_mass = self.transport_effmass(polyfit_order=polyfit_order,dk=self.dk_bohr,polyfit_weighting=False)
+        if truncate:
+            idx = self.explosion_index(polyfit_order=polyfit_order)
+            gradient, intercept = np.polyfit(self.dE_hartree[1:idx+1], transport_mass[1:idx+1],1)
+        else:
+            gradient, intercept = np.polyfit(self.dE_hartree[1:], transport_mass[1:],1)
+        return intercept   # intercept is the band edge transport mass
+
+    def kane_fit(self, polyfit_order=6):
+        r"""
+        Calculate the Kane quasi-linear dispersion parameters, then evaluates at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.
 
         The Kane quasi-linear dispersion is described by 
             ..math::
@@ -554,140 +582,16 @@ class Segment:
         Returns:
             array: 1d array containing energies (hartree).
         """
-        self.check_kanefit_points(polyfit_order=polyfit_order)
-        alpha = self.calc_alpha(polyfit_order=polyfit_order)
-        transport_mass_bandedge = self.calc_kane_mass_bandedge(polyfit_order=polyfit_order)
+        _check_kanefit_points(polyfit_order=polyfit_order)
+        alpha = self.alpha(polyfit_order=polyfit_order)
+        transport_mass_bandedge = self.kane_mass_band_edge(polyfit_order=polyfit_order)
         bandedge_energy = [((k**2)) / (2*transport_mass_bandedge) for k in np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)]
-        roots = solve_quadratic(alpha, 1, [(-1)*ele for ele in bandedge_energy]) 
-        return roots    
+        roots = _solve_quadratic(alpha, 1, [(-1)*ele for ele in bandedge_energy]) 
+        return roots  
 
-    def return_quadfit(self, polyfit_order=6,polyfit_weighting=True):
+    def finite_difference_effmass(self):
         """
-        Calculates the curvature at bandedge uing a least squares fit to :class:`~effmass.analysis.Segment` dispersion data. The corresponding pure quadratic function is then evaluated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.
-
-        Args:
-            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used. Defaults to True. See :meth:`effmass.analysis.Segment.return_weighting`.
-        
-        Returns:
-            array: 1d array containing energies (hartree).
-        """
-        dedk, d2edk2 = self.calc_poly_derivatives(polyfit_order=polyfit_order,polyfit_weighting=polyfit_weighting)
-        m_bandedge =  1 / d2edk2[0]
-        values = [((k**2)/(2*m_bandedge)) for k in np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)]
-        return values
-
-    def calc_optical_effmass(self, polyfit_order=6, optical_weighted_average=True):
-        r"""
-        Calculates an optical effective mass for a single :class:`~effmass.analysis.Segment` where the dispersion is approximated with a polynomial.
-
-        This optical effective mass is defined as:
-            ..math::
-                \frac{1}{m_o} = \frac{\sum_i f(E_i) g(k_i) \frac{\delta^2 E}{\delta k^2}|_i}{\sum f(E_i) g(k_i)}
-
-        where the sum is over eigenstates i contained withing the :class:`~effmass.analysis.Segment`. :math:`f_(E_i)` is the probability of occupation (Fermi-Dirac statistics) and :math:`g(k_i)` is the density of states at that k-point.
-        
-        Args:
-            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-            optical_weighted_average (bool, optional): If True, a weighting (proportional to the product of the Fermi-Dirac function and density of states) is applied. If False, no weighting is applied. Defaults to True. See :meth:`effmass.analysis.Segment.return_weighting`.
-        
-        Returns:
-            float: The optical effective mass (units of electron mass) of the :class:`~effmass.analysis.Segment`.
-        """
-        conductivity_mass = self.calc_conductivity_effmass(polyfit_order=polyfit_order,dk=self.dk_bohr)
-        if optical_weighted_average:
-            weighting = self.return_weighting()
-        else:
-            weighting = np.ones(len(self.energies))
-        optical_mass = np.power(weighted_mean(np.power(conductivity_mass,-1), weighting),-1)
-        return optical_mass
-
-    def calc_conductivity_effmass(self, polyfit_order=6,dk=[],polyfit_weighting=False):
-        r"""
-        Calculates the conductivity mass (:math:`\frac{1}{\frac{\delta^2E}{\delta k^2}}`), evaluated at :attr:`~effmass.analysis.Segment.dk_bohr`.
-
-        Args:
-            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-            dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate second order derivatives. Defaults to 100 points evenly distributed across the whole segment.
-            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.
-        
-        Returns:
-            array(float). 1d array containing the conductivity effective mass (in units of electron rest mass) evaluated at the points specified in dk.
-        """
-        dedk, d2edk2 = self.calc_poly_derivatives(polyfit_order=polyfit_order,dk=dk,polyfit_weighting=polyfit_weighting)
-        conductivity_mass = [( 1 / x) for x in d2edk2]
-        return conductivity_mass
-
-    def calc_transport_effmass(self, polyfit_order=6,dk=[],polyfit_weighting=False):
-        r"""
-        Calculates the transport mass (:math:`\frac{k}{\delta E \delta k}`), evaluated at :attr:`~effmass.analysis.Segment.dk_bohr` .
-
-        Args:
-            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-            dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate first order derivatives. Defaults to 100 points evenly distributed across the whole segment.
-            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.
-           
-        Returns:
-            array(float). 1d array containing the transport effective mass (in units of electron rest mass) evaluated at the points specified in dk.
-        """
-        dedk, d2edk2= self.calc_poly_derivatives(polyfit_order=polyfit_order,dk=dk,polyfit_weighting=polyfit_weighting)
-        # dk=0 for first term gives discontinuity
-        if dk == []:
-            dk = np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)
-        transport_mass = [( x / y) for x, y in zip(dk[1:], dedk[1:])]
-        transport_mass = np.append(np.array([np.nan]), transport_mass)
-        return transport_mass
-
-    def calc_alpha(self, polyfit_order=6,truncate=True):
-        r"""
-        The transport mass (:math:`\frac{k}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The gradient of this line determines the alpha parameter which is used in the kane dispersion.
-        
-        See :meth:`effmass.analysis.Segment.calc_transport_effmass`.
-
-        Args:
-            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-            truncate (bool, optional): If True, data only up to :meth:`effmass.analysis.Segment.explosion_index` is used. If False, alpha is calculated using data for the whole segment. Defaults to True.
-
-        Returns:
-            float: The alpha parameter (hartree :math:`^{-1}`).
-        """
-        if truncate:
-            self.check_kanefit_points(polyfit_order=polyfit_order)
-        transport_mass = self.calc_transport_effmass(polyfit_order=polyfit_order,dk=self.dk_bohr,polyfit_weighting=False)
-        if truncate:
-            idx = self.explosion_index(polyfit_order=polyfit_order)
-            gradient, intercept = np.polyfit(self.dE_hartree[1:idx+1], transport_mass[1:idx+1],1)
-        else:
-            gradient, intercept = np.polyfit(self.dE_hartree[1:], transport_mass[1:],1)
-        alpha = np.divide(gradient,2*intercept)
-        return alpha          
-                                  
-    def calc_kane_mass_bandedge(self, polyfit_order=6,truncate=True):
-        r"""
-        The transport mass (:math:`\frac{1}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The intercept of this line with the y-axis gives a transport mass at bandedge which is used as a parameter in the kane dispersion.
-        
-        See :meth:`effmass.analysis.Segment.calc_transport_effmass`.
-
-        Args:
-            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-            truncate (bool, optional): If True, data only up to :meth:`effmass.analysis.Segment.explosion_index` is used. If False, alpha is calculated using data for the whole segment. Defaults to True.
-        
-        Returns:
-            float: transport mass at bandedge (in units of electron mass).
-        """
-        if truncate:
-            self.check_kanefit_points(polyfit_order=polyfit_order)
-        transport_mass = self.calc_transport_effmass(polyfit_order=polyfit_order,dk=self.dk_bohr,polyfit_weighting=False)
-        if truncate:
-            idx = self.explosion_index(polyfit_order=polyfit_order)
-            gradient, intercept = np.polyfit(self.dE_hartree[1:idx+1], transport_mass[1:idx+1],1)
-        else:
-            gradient, intercept = np.polyfit(self.dE_hartree[1:], transport_mass[1:],1)
-        return intercept   # intercept is the band edge transport mass
-
-    def calc_finite_difference_effmass(self):
-        """
-        The bandedge curvature is calculated using a second order forward finite difference method. This is then inverted to give an effective mass.
+        The curvature at the band edge is calculated using a second order forward finite difference method. This is then inverted to give an effective mass.
 
         Args:
             None
@@ -700,9 +604,9 @@ class Segment:
         mass = 1/x
         return mass
 
-    def return_finite_difference_fit(self):
+    def finite_difference_fit(self):
         r"""
-        Calculates the curvature at bandedge using a finite difference method and then evaluates the corresponding quadratic dispersion along :attr:`~effmass.analysis.Segment.dk_bohr`.
+        Calculates the curvature at the band edge using a finite difference method and then evaluates the corresponding quadratic dispersion along :attr:`~effmass.analysis.Segment.dk_bohr`.
 
         See :meth:`effmass.analysis.Segment.calc_finite_difference_effmass`.
 
@@ -712,46 +616,91 @@ class Segment:
         Returns:
             list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr` using the quadratic approximation. 
         """
-        m_bandedge = self.calc_finite_difference_effmass()
+        m_bandedge = self.finite_difference_effmass()
         values = [((k**2)/(2*m_bandedge)) for k in np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)]
         return values
 
-    def calc_five_point_effmass(self):
+    def weighted_leastsq_effmass(self):
         """
-        Calculates a polyfit using only 3 DFT points (symmetry makes 5).
+        Fits a parabolic dispersion using the weighted least-squares method to all points in the segment, plus those from symmetry, E(k)=E(-k).
 
         Args:
             None
 
         Returns:
-            float: Bandedge effective mass from polynomial fit (in units of electron mass).
+            float: Curvature effective mass (in units of electron mass)
+
+        Notes:
+            weighting is given by the Fermi-Dirac distribution.
+        """
+
+     
+        # and https://stackoverflow.com/questions/19624997/understanding-scipys-least-square-function-with-irls
+        # for how to incorporate weighting see https://stackoverflow.com/questions/27128688/how-to-use-least-squares-with-weight-matrix-in-python
+    
+        negative_dk = [-value for value in self.dk_bohr[::-1]]
+        sym_dk = np.concatenate((negative_dk,self.dk_bohr[1:]))
+        coeff_matrix = np.vstack([sym_dk ** 2]).T 
+        
+        weighting=self.weighting()
+        W = np.append(weighting[::-1],weighting[1:]) # as it needs same dimensions as x and y.
+        W = np.sqrt(np.diag(W)) # to allow dot product between weight and matrix/y.
+
+        sym_dE = np.concatenate((self.dE_hartree[::-1],self.dE_hartree[1:]))
+        w_sym_dE = np.dot(sym_dE, W)
+        w_coeff_matrix = np.dot(W,coeff_matrix)
+        
+        coeff = np.linalg.lstsq(w_coeff_matrix, w_sym_dE)[0]
+        mass = 1/(2*coeff[0])
+        return mass
+
+    def weighted_leastsq_fit(self):
+                """ 
+        Calculates the curvature effective mass using a weighted least-squares fit and then evaluates the corresponding parabolic dispersion along :attr:`~effmass.analysis.Segment.dk_bohr`. 
+        
+        Args:
+            None
+
+        Returns:
+            list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.
+        """
+
+        m_bandedge = self.weighted_leastsq_effmass()
+        values = [((k**2)/(2*m_bandedge)) for k in np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)]
+        return values
+
+    def five_point_leastsq_effmass(self):
+        """
+        Fits a parabolic dispersion using the least-squares method to 5 points (3 DFT-calculated points + 2 from symmetry).
+
+        Args:
+            None
+
+        Returns:
+            float: Curvature effective mass (in units of electron mass).
 
         Notes:
             no weighting is used.
-            function primarily for comparison against a weighted fit across multiple points.
         """
 
         sym_dk = np.array([-self.dk_bohr[2],-self.dk_bohr[1],self.dk_bohr[0],self.dk_bohr[1],self.dk_bohr[2]])
         sym_dE = np.array([self.dE_hartree[2],self.dE_hartree[1],self.dE_hartree[0],self.dE_hartree[1],self.dE_hartree[2]])
         coeff_matrix = np.vstack([sym_dk ** 2]).T 
         coeff = np.linalg.lstsq(coeff_matrix, sym_dE)[0]
-        #print (coeff_linalg)
-        #coeff = np.polyfit(sym_dk,sym_dE,2)
-        #print (coeff)
         mass = 1/(2*coeff[0])
         return mass
 
-    def return_five_point_fit(self):
+    def five_point_leastsq_fit(self):
         """ 
-        Calculates the curvature at band edge using a polynomial fit and then evaluates the corresponding quadratic dispersion along :attr:`~effmass.analysis.Segment.dk_bohr`. 
+        Calculates the curvature effective mass using a parabolic least-squares fit and then evaluates the corresponding parabolic dispersion along :attr:`~effmass.analysis.Segment.dk_bohr`. 
         
         Args:
             None
 
         Returns:
-            list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr` using the quadratic approximation. 
+            list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.
         """
-        m_bandedge = self.calc_five_point_effmass()
+        m_bandedge = self.five_point_leastsq_effmass()
         values = [((k**2)/(2*m_bandedge)) for k in np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)]
         return values
 
