@@ -2,7 +2,6 @@
 
 from vasppy import procar, outcar
 from effmass import extrema
-from effmass import kt_to_ev
 import math
 import warnings
 import numpy as np
@@ -148,7 +147,7 @@ class Data():
         if self.fermi_energy > self.CBM:
             warnings.warn("The fermi energy is higher than the CBM")
         if ((self.occupancy == 0) | (self.occupancy == 1) |
-            (self.occupancy == 2)).all() == False:
+            (self.occupancy == 2)).all() is False:
             warnings.warn("You have partial occupancy of bands")
 
     def parse_DOSCAR(self, filename='./DOSCAR'):
@@ -167,26 +166,12 @@ class Data():
         with open(filename, 'r') as f:
             lines = f.readlines()
 
-        fermi = float(lines[5].split()[3])
         num_data_points = int(lines[5].split()[2])
-        energy = [float(x.split()[0]) for x in lines[6:]]
         if len(lines[6].split()) == 5:
-            dos_up = [
-                float(x.split()[1]) for x in lines[6:num_data_points + 6]
-            ]
-            dos_down = [
-                float(x.split()[2]) for x in lines[6:num_data_points + 6]
-            ]
             self.dos = np.array([[
                 float(x.split()[0]),
                 float(x.split()[1]) + float(x.split()[2])
             ] for x in lines[6:num_data_points + 6]])
-            int_dos_up = [
-                float(x.split()[3]) for x in lines[6:num_data_points + 6]
-            ]
-            int_dos_down = [
-                float(x.split()[4]) for x in lines[6:num_data_points + 6]
-            ]
             self.integrated_dos = np.array([[
                 float(x.split()[0]),
                 float(x.split()[3]) + float(x.split()[4])

@@ -1,10 +1,8 @@
 #! /usr/bin/env python3
 
 import warnings
-import itertools
 import scipy
 import numpy as np
-from scipy import integrate
 from effmass import extrema
 from effmass import angstrom_to_bohr
 from effmass import ev_to_hartree
@@ -277,8 +275,8 @@ class Segment:
                         break
         return integrated_dos
 
-    #### The collection of methods below calculate the optical effective mass by integrating numerically the analytical
-    #### expression for the second derivative of the Kane dispersion multiplied by a Fermi-Dirac weighting.
+    # The collection of methods below calculate the optical effective mass by integrating numerically the analytical
+    # expression for the second derivative of the Kane dispersion multiplied by a Fermi-Dirac weighting.
 
     def mass_integration(self,
                          fermi_level=None,
@@ -505,7 +503,7 @@ class Segment:
         coeff = np.append(np.linalg.lstsq(w_coeff_matrix, w_sym_dE)[0],
                           [0])  # remember to set zeroth power to 0!
         function = np.poly1d(coeff)
-        #function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W)) ----> simple polyfit call for sanity's sake
+        # function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W)) ----> simple polyfit call for sanity's sake
         return function
 
     def poly_derivatives(self,
@@ -526,7 +524,7 @@ class Segment:
         """
         function = self._polynomial_function(
             polyfit_order=polyfit_order, polyfit_weighting=polyfit_weighting)
-        if dk == None:
+        if dk is None:
             dk = np.linspace(self.dk_bohr[0], self.dk_bohr[-1], 100)
         dedk = function.deriv(m=1)(dk)
         d2edk2 = function.deriv(m=2)(dk)
@@ -568,12 +566,11 @@ class Segment:
         Returns:
             float: The optical effective mass (units of electron mass) of the :class:`~effmass.analysis.Segment`.
         """
-        conductivity_mass = self.inertial_effmass(
+        inertial_mass = self.inertial_effmass(
             polyfit_order=polyfit_order, dk=self.dk_bohr)
-        if optical_weighted_average:
-            weighting = self.weighting()
+        weighting = self.weighting()
         optical_mass = np.power(
-            np.average(np.power(conductivity_mass, -1), weights=weighting), -1)
+            np.average(np.power(inertial_mass, -1), weights=weighting), -1)
         return optical_mass
 
     def inertial_effmass(self,
@@ -618,7 +615,7 @@ class Segment:
             dk=dk,
             polyfit_weighting=polyfit_weighting)
         # dk=0 for first term gives discontinuity
-        if dk == None:
+        if dk is None:
             dk = np.linspace(self.dk_bohr[0], self.dk_bohr[-1], 100)
         transport_mass = [(x / y) for x, y in zip(dk[1:], dedk[1:])]
         transport_mass = np.append(np.array([np.nan]), transport_mass)

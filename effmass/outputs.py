@@ -5,7 +5,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-from effmass import dos
 from effmass import ev_to_hartree
 from effmass.dos import _check_integrated_dos_loaded
 from effmass.dos import _check_dos_loaded
