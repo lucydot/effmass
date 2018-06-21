@@ -24,19 +24,6 @@ def _check_poly_order(polyfit_order):
     """
     assert polyfit_order > 1, "the order of the polynomial must be 2 or higher"
 
- def _check_kanefit_points(self,polyfit_order=6):
-    """
-    Raises an AssertionError if there are not enough data points to fit a Kane dispersion. 
-
-    Args:
-        polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-    
-    Returns:
-        None.
-    """
-    idx = self.explosion_index(polyfit_order=polyfit_order)
-    assert idx>3, "Unable to calculate alpha parameter as inflexion too close to extrema"
-
 def _solve_quadratic(a,b,c):
     r"""
     Solves quadratic equation of the form :math:`ax^2+bx+c=0` for multiple values of c.
@@ -116,6 +103,19 @@ class Segment:
         self.dos = self._dos(Data)
         self.integrated_dos = self._integrated_dos(Data)
 
+    def _check_kanefit_points(self,polyfit_order=6):
+        """
+        Raises an AssertionError if there are not enough data points to fit a Kane dispersion. 
+
+        Args:
+            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
+        
+        Returns:
+            None.
+        """
+        idx = self.explosion_index(polyfit_order=polyfit_order)
+        assert idx>3, "Unable to calculate alpha parameter as inflexion too close to extrema"
+
     def _fermi_function(self,eigenvalue,fermi_level=None,temp=300):
         r""" 
         Calculates the probability that an eigenstate is occupied using Fermi-Dirac statistics:
@@ -192,8 +192,8 @@ class Segment:
         """
         Identifies the bandedge energy of the :class:`~effmass.analysis.Segment`, determined by the occupancy of the first k-point.
 
-        If :attr:`~effmass.analysis.Segment.ptype` is "hole", function returns the Data.VBM (as :class:`~effmass.analysis.Segment` is in the valence band).
-        an :attr:`~effmass.analysis.Segment.ptype` is "electron", function returns Data.CBM (as :class:`~effmass.analysis.Segment` is in the conduction band).
+        If :attr:`~effmass.analysis.Segment._ptype` is "hole", function returns the Data.VBM (as :class:`~effmass.analysis.Segment` is in the valence band).
+        an :attr:`~effmass.analysis.Segment._ptype` is "electron", function returns Data.CBM (as :class:`~effmass.analysis.Segment` is in the conduction band).
 
         Args:
             Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.
@@ -284,7 +284,7 @@ class Segment:
 
     def _mass_integrand(self,k,fermi_level, temp,alpha,mass_bandedge):
         """
-        Helper function for :meth:`~effmass.analysis.Segment.return_mass_integration`. A function for the weighted mass integrand.
+        Helper function for :meth:`~effmass.analysis.Segment.mass_integration`. A function for the weighted mass integrand.
         """
         return self.fd(k,fermi_level,temp,alpha,mass_bandedge)*(self._second_derivative_kane_dispersion(k,alpha,mass_bandedge))
 
@@ -321,7 +321,7 @@ class Segment:
 
     def _second_derivative_kane_dispersion(self,k,alpha,mass_bandedge):
         """
-        Helper function for :meth:`~effmass.analysis.Segment.return_mass_integration`. Analytic form of the second derivative of the kane dispersion.
+        Helper function for :meth:`~effmass.analysis.Segment.mass_integration`. Analytic form of the second derivative of the kane dispersion.
         """
         # returns in eV
         return 1 / (mass_bandedge*((1+ ((2*k*k*alpha)/(mass_bandedge)))**(3/2)))
@@ -336,7 +336,7 @@ class Segment:
             upper_limit (float, optional): The integration upper limit (bohr$^{-1}$). Defaults to where the Kane quasi-linear dispersion is no longer valide, defined by :meth:`~effmass.analysis.Segment.explosion_index`.
 
         Returns:
-            float: A normalisation factor for :meth:`~effmass.analysis.Segment.return_mass_integration`.
+            float: A normalisation factor for :meth:`~effmass.analysis.Segment.mass_integration`.
         """
         alpha = self.alpha() if alpha is None else alpha
         mass_bandedge = self.kane_mass_band_edge() if mass_bandedge is None else mass_bandedge
@@ -347,7 +347,7 @@ class Segment:
 
     def _weight_integrand(self,k,fermi_level,temp,alpha,mass_bandedge):
         """
-        Helper function for :meth:`~effmass.analysis.Segment.return_weight_integration`. A function for the weight integrand.
+        Helper function for :meth:`~effmass.analysis.Segment.weight_integration`. A function for the weight integrand.
         """
         return self.fd(k,fermi_level,temp,alpha,mass_bandedge)
 
@@ -363,7 +363,7 @@ class Segment:
             ..math::
                 \frac{\hbar ^2}{2m_{tb}} = E(1+\alpha E)
 
-        where the transport mass at bandedge (:math:`m_{tb}`) is calculated using :meth:`effmass.analysis.Segment.calc_kane_mass_bandedge` and the alpha parameter is calculated using :meth:`effmass.analysis.Segment.calc_alpha`.
+        where the transport mass at bandedge (:math:`m_{tb}`) is calculated using :meth:`effmass.analysis.Segment.kane_mass_band_edge` and the alpha parameter is calculated using :meth:`effmass.analysis.Segment.alpha`.
         
         Args:
             fermi_level (float, optional ): Fermi level (eV) to be used in Fermi-dirac statistics. Defaults to :attr:`~effmass.analysis.Segment.fermi_energy`.
@@ -519,7 +519,7 @@ class Segment:
         r"""
         The transport mass (:math:`\frac{k}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The gradient of this line determines the alpha parameter which is used in the kane dispersion.
         
-        See :meth:`effmass.analysis.Segment.calc_transport_effmass`.
+        See :meth:`effmass.analysis.Segment.transport_effmass`.
 
         Args:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
@@ -529,7 +529,7 @@ class Segment:
             float: The alpha parameter (hartree :math:`^{-1}`).
         """
         if truncate:
-            _check_kanefit_points(polyfit_order=polyfit_order)
+            self._check_kanefit_points(polyfit_order=polyfit_order)
         transport_mass = self.transport_effmass(polyfit_order=polyfit_order,dk=self.dk_bohr,polyfit_weighting=False)
         if truncate:
             idx = self.explosion_index(polyfit_order=polyfit_order)
@@ -543,7 +543,7 @@ class Segment:
         r"""
         The transport mass (:math:`\frac{1}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The intercept of this line with the y-axis gives a transport mass at bandedge which is used as a parameter in the kane dispersion.
         
-        See :meth:`effmass.analysis.Segment.calc_transport_effmass`.
+        See :meth:`effmass.analysis.Segment.transport_effmass`.
 
         Args:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
@@ -553,7 +553,7 @@ class Segment:
             float: transport mass at bandedge (in units of electron mass).
         """
         if truncate:
-            _check_kanefit_points(polyfit_order=polyfit_order)
+            self._check_kanefit_points(polyfit_order=polyfit_order)
         transport_mass = self.transport_effmass(polyfit_order=polyfit_order,dk=self.dk_bohr,polyfit_weighting=False)
         if truncate:
             idx = self.explosion_index(polyfit_order=polyfit_order)
@@ -574,7 +574,7 @@ class Segment:
             ..math::
                 m_t = m_{tb}(1+2\alpha E)
 
-        The transport mass :math:`m_t` is calculated by approximating the dispersion with a polynomial function and taking the first derivative, see :meth:`~effmass.analysis.Segment.calc_transport_effmass`.
+        The transport mass :math:`m_t` is calculated by approximating the dispersion with a polynomial function and taking the first derivative, see :meth:`~effmass.analysis.Segment.transport_effmass`.
 
         Args:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
@@ -582,7 +582,7 @@ class Segment:
         Returns:
             array: 1d array containing energies (hartree).
         """
-        _check_kanefit_points(polyfit_order=polyfit_order)
+        self._check_kanefit_points(polyfit_order=polyfit_order)
         alpha = self.alpha(polyfit_order=polyfit_order)
         transport_mass_bandedge = self.kane_mass_band_edge(polyfit_order=polyfit_order)
         bandedge_energy = [((k**2)) / (2*transport_mass_bandedge) for k in np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)]
@@ -599,7 +599,6 @@ class Segment:
         Returns:
             float: Bandedge effective mass from finite difference (in units of electron mass).
         """
-        #x =  ((32*self.dE_hartree[1]) - (2*self.dE_hartree[2]))/ (12*self.dk_bohr[1]*self.dk_bohr[1])
         x = (self.dE_hartree[2]-(2*self.dE_hartree[1]))/ (self.dk_bohr[1]**2)
         mass = 1/x
         return mass
@@ -608,7 +607,7 @@ class Segment:
         r"""
         Calculates the curvature at the band edge using a finite difference method and then evaluates the corresponding quadratic dispersion along :attr:`~effmass.analysis.Segment.dk_bohr`.
 
-        See :meth:`effmass.analysis.Segment.calc_finite_difference_effmass`.
+        See :meth:`effmass.analysis.Segment.finite_difference_effmass`.
 
         Args:
             None
@@ -635,8 +634,8 @@ class Segment:
         """
 
      
-        # and https://stackoverflow.com/questions/19624997/understanding-scipys-least-square-function-with-irls
-        # for how to incorporate weighting see https://stackoverflow.com/questions/27128688/how-to-use-least-squares-with-weight-matrix-in-python
+        # https://stackoverflow.com/questions/19624997/understanding-scipys-least-square-function-with-irls
+        # https://stackoverflow.com/questions/27128688/how-to-use-least-squares-with-weight-matrix-in-python
     
         negative_dk = [-value for value in self.dk_bohr[::-1]]
         sym_dk = np.concatenate((negative_dk,self.dk_bohr[1:]))
@@ -655,7 +654,7 @@ class Segment:
         return mass
 
     def weighted_leastsq_fit(self):
-                """ 
+        """ 
         Calculates the curvature effective mass using a weighted least-squares fit and then evaluates the corresponding parabolic dispersion along :attr:`~effmass.analysis.Segment.dk_bohr`. 
         
         Args:
@@ -716,7 +715,7 @@ class Segment:
         Notes:
             This marks the point at which the Kane dispersion is definitely not valid, although it may be that the Kane dispersion is a poor approximation prior to this.
         """
-        dedk, d2edk2 = self.calc_poly_derivatives(polyfit_order=polyfit_order, dk=self.dk_bohr,polyfit_weighting=False)
+        dedk, d2edk2 = self.poly_derivatives(polyfit_order=polyfit_order, dk=self.dk_bohr,polyfit_weighting=False)
         sign = np.sign(d2edk2)
         signchange = ((np.roll(sign,1)-sign) !=0).astype(int)
         signchange[0] = 0

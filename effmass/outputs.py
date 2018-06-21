@@ -7,7 +7,6 @@ from effmass import dos
 from effmass import ev_to_hartree
 from effmass.dos import _check_integrated_dos_loaded
 from effmass.dos import _check_dos_loaded
-from effmass.analysis import _check_kanefit_points
 from effmass.analysis import _check_poly_order
 
 def plot_segments(Data,Settings,segments):
@@ -112,7 +111,7 @@ def print_results(segment,data,settings,polyfit_order=6):
         
     else:
         print ("the Kane quasi-linear approximation is valid until {:.2f} eV".format(segment.dE_eV[segment.explosion_index(polyfit_order=polyfit_order)]))
-    print ("optical mass at band edge (assuming the Kane dispersion) is {:.2f}".format(segment.calc_optical_effmass_kane_dispersion(fermi_level = fermi_level)))    
+    print ("optical mass at band edge (assuming the Kane dispersion) is {:.2f}".format(segment.optical_effmass_kane_dispersion()))    
     
     plt.figure(figsize=(8,8))
     plt.plot(np.linspace(segment.dk_angs[0],segment.dk_angs[-1],100),np.divide(segment.poly_fit(polyfit_order=polyfit_order,polyfit_weighting=False),ev_to_hartree),marker="x",ms = 5,label="polynomial order {}".format(polyfit_order))
