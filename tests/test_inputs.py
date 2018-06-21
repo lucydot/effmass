@@ -4,6 +4,7 @@ import pytest
 import numpy as np
 from effmass import inputs
 from effmass import kt_to_ev
+import math
 
 @pytest.mark.parametrize("settings_object,extrema_search_depth,energy_range",[
 	(pytest.lazy_fixture('MAPI_settings_object'), 0.025, 0.25),
@@ -18,9 +19,9 @@ def test_settings(settings_object,extrema_search_depth,energy_range):
 ])
 def test_data(data_object,CBM,VBM,fermi_energy):
 	# note that there is testing done after parsing from PROCAR within the VASPPY module
-    assert data_object.CBM == CBM
-    assert data_object.VBM == VBM
-    assert data_object.fermi_energy == fermi_energy
+    assert math.isclose(data_object.CBM,CBM,rel_tol=1e-5)
+    assert math.isclose(data_object.VBM,VBM,rel_tol=1e-5)
+    assert math.isclose(data_object.fermi_energy,fermi_energy,rel_tol=1e-5)
 
 @pytest.mark.parametrize("data_object,num_points,dos_f3,integrated_dos_f3", [
 	(pytest.lazy_fixture('MAPI_soc_data_object_with_DOSCAR'),301,np.array([[ -2.26430000e+01,   0.00000000e+00],[ -2.25120000e+01,   0.00000000e+00],[ -2.23810000e+01,   0.00000000e+00]]),np.array([[ -2.26430000e+01,   0.00000000e+00],[ -2.25120000e+01,   0.00000000e+00],[ -2.23810000e+01,   0.00000000e+00]])),
@@ -28,6 +29,6 @@ def test_data(data_object,CBM,VBM,fermi_energy):
 def test_parse_DOSCAR(data_object,num_points,dos_f3,integrated_dos_f3):
     assert len(data_object.dos) == num_points
     assert len(data_object.integrated_dos) == num_points
-    assert np.array_equal(data_object.dos[:3],dos_f3)
-    assert np.array_equal(data_object.integrated_dos[:3],integrated_dos_f3)
+    assert np.allclose(data_object.dos[:3],dos_f3)
+    assert np.allclose(data_object.integrated_dos[:3],integrated_dos_f3)
     

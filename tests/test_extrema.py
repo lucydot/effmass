@@ -16,13 +16,13 @@ def test_calculate_direction(toy_data_object):
     a = toy_data_object.kpoints[0]
     b = toy_data_object.kpoints[1]
 
-    assert np.array_equal(extrema.calculate_direction(a,b),np.array([1,0,0]))
+    assert np.allclose(extrema.calculate_direction(a,b),np.array([1,0,0]))
 
 def test_calculate_direction_opposite(toy_data_object):
     a = toy_data_object.kpoints[1]
     b = toy_data_object.kpoints[0]
 
-    assert np.array_equal(extrema.calculate_direction(a,b),np.array([1,0,0]))
+    assert np.allclose(extrema.calculate_direction(a,b),np.array([1,0,0]))
 
 def test_change_direction(toy_data_object):
     
