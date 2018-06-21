@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import pytest
 from effmass import analysis, extrema, angstrom_to_bohr
 import numpy as np
@@ -9,7 +11,7 @@ def test_check_poly_order():
 
 def test_check_kanefit_points(toy_segments):
 	with pytest.raises(AssertionError):
-		toy_segments._check_kanefit_points(2)
+		toy_segments[0]._check_kanefit_points(2)
 
 def test_solve_quadratic():
 	a = 2
