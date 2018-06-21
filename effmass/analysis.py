@@ -422,7 +422,7 @@ class Segment:
         #function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W)) ----> simple polyfit call for sanity's sake
         return function
     
-    def poly_derivatives(self, polyfit_order=6,polyfit_weighting=True,dk=[]):
+    def poly_derivatives(self, polyfit_order=6,polyfit_weighting=True,dk=None):
         """
         Constructs a polynomial function using a least squares fit to Segment dispersion data, then evaluates first and second order derivatives.
 
@@ -435,7 +435,7 @@ class Segment:
             tuple: A tuple containing a 1d array of first derivatives and 1d array of second derivatives, evaluated at dk: ([dedk],[d2edk2])
         """
         function = self._polynomial_function(polyfit_order=polyfit_order, polyfit_weighting=polyfit_weighting)
-        if dk == []:
+        if dk == None:
             dk = np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)
         dedk = function.deriv(m=1)(dk)
         d2edk2 = function.deriv(m=2)(dk)
@@ -479,7 +479,7 @@ class Segment:
         optical_mass = np.power(np.average(np.power(conductivity_mass,-1), weights=weighting),-1)
         return optical_mass
 
-    def inertial_effmass(self, polyfit_order=6,dk=[],polyfit_weighting=False):
+    def inertial_effmass(self, polyfit_order=6,dk=None,polyfit_weighting=False):
         r"""
         Calculates the inertial (curvature) effective mass (:math:`\frac{1}{\frac{\delta^2E}{\delta k^2}}`), evaluated at :attr:`~effmass.analysis.Segment.dk_bohr`.
 
@@ -495,7 +495,7 @@ class Segment:
         conductivity_mass = [( 1 / x) for x in d2edk2]
         return conductivity_mass
 
-    def transport_effmass(self, polyfit_order=6,dk=[],polyfit_weighting=False):
+    def transport_effmass(self, polyfit_order=6,dk=None,polyfit_weighting=False):
         r"""
         Calculates the transport mass (:math:`\frac{k}{\delta E \delta k}`), evaluated at :attr:`~effmass.analysis.Segment.dk_bohr` .
 
@@ -509,7 +509,7 @@ class Segment:
         """
         dedk, d2edk2= self.poly_derivatives(polyfit_order=polyfit_order,dk=dk,polyfit_weighting=polyfit_weighting)
         # dk=0 for first term gives discontinuity
-        if dk == []:
+        if dk == None:
             dk = np.linspace(self.dk_bohr[0],self.dk_bohr[-1],100)
         transport_mass = [( x / y) for x, y in zip(dk[1:], dedk[1:])]
         transport_mass = np.append(np.array([np.nan]), transport_mass)
