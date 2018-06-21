@@ -65,7 +65,7 @@ def test_calc_poly_second_derivative(toy_segments):
     assert math.isclose(toy_segments[0].calc_poly_derivatives(polyfit_order=2, polyfit_weighting=False)[1][-1],2*0.5) # second derivative (factor 2 as to the power 2)
   
 def test_dot_product(toy_segments):
-	assert np.isclose(toy_segments[0].cartesian_kpoints,toy_segments[0].kpoints)
+	assert np.allclose(toy_segments[0].cartesian_kpoints,toy_segments[0].kpoints)
 	dk_bohr_by_hand = np.array([0,0.25/1.88973,0.5/1.88973])
 	assert np.allclose(toy_segments[0].dk_bohr, dk_bohr_by_hand)
 
