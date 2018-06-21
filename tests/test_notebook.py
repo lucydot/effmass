@@ -31,5 +31,5 @@ def _notebook_run(path):
     return nb, errors
 
 def test_ipynb():
-    nb, errors = _notebook_run('data/notebook.ipynb')
+    nb, errors = _notebook_run('./data/notebook.ipynb')
     assert errors == []
