@@ -36,7 +36,7 @@ Instead, we can then approximate the band structure with the Kane quasi-linear d
 [``effmass``](https://github.com/lucydot/effmass) [@Whalley2018] is a Python 3 package for calculating various definitions of effective mass  from the electronic bandstructure of a semiconducting material. 
 It contains a core class that calculates the effective mass and other associated properties of selected band structure segments.
 [``effmass``](https://github.com/lucydot/effmass) also contains functions for locating band structure extrema, calculating the Kane quasi-linear dispersion parameters and plotting approximations to the true dispersion.
-Parsing of electronic structure data is faciliated by the [``vasppy``](https://github.com/bjmorgan/vasppy) (@Morgan2018) package.
+Parsing of electronic structure data is faciliated by the [``vasppy``](https://github.com/bjmorgan/vasppy) [@Morgan2018] package.
 
 # Acknowledgements
 
