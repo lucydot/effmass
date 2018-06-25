@@ -1,0 +1,17 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+
+  ],
+  "identifier": "",
+  "codeRepository": "https://github.com/lucydot/effmass",
+  "datePublished": "2018-06-25",
+  "dateModified": "2018-06-25",
+  "dateCreated": "2018-06-25",
+  "description": "An effective mass package",
+  "keywords": "Python, materials science, DFT",
+  "license": "MIT",
+  "title": "effmass",
+  "version": "v0.1.0"
+}
