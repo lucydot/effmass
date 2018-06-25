@@ -1,7 +1,6 @@
 vasppy
 numpy
 matplotlib
-nbformat
 pytest-lazy-fixture
 coverage==4.3.4
 codeclimate-test-reporter
