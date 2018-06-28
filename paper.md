@@ -13,7 +13,6 @@ affiliations:
    index: 1
 date: 25 June 2018
 bibliography: paper.bib
-colorlinks: true
 ---
 
 # Summary
