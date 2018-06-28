@@ -14,7 +14,6 @@ affiliations:
 date: 25 June 2018
 bibliography: paper.bib
 colorlinks: true
-urlcolor: "TealBlue"
 ---
 
 # Summary
