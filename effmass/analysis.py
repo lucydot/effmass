@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
 import warnings
-import scipy
 import numpy as np
+from scipy import integrate
 from effmass import extrema
 from effmass import angstrom_to_bohr
 from effmass import ev_to_hartree
