@@ -1,12 +1,22 @@
 language: python
 python:
-  - "3.6"
-# command to install dependencies
+- '3.6'
 notifications:
   email: false
 install:
-  - pip install -r requirements.txt
-# command to run tests
-script: coverage run --rcfile=.coveragerc -m pytest 
+- pip install -r requirements.txt
+script: coverage run --rcfile=.coveragerc -m pytest
 after_success:
-  - codeclimate-test-reporter --token $CODECLIMATE_REPO_TOKEN
+- codeclimate-test-reporter --token $CODECLIMATE_REPO_TOKEN
+
+deploy:
+  provider: pypi
+  user: "lucydot"
+  on: 
+    tags: true
+    branch: master
+  password:
+    secure: XcFD/nlL4hyV+gg0eFibx9QML9bJSQiRgNQmdHXz/v6ZT0QmYGDvHU6MOxs2/RNYjcfKh5QjPoyrXyNjIu9urz4MeGVrwLzh/aA3ZGWeVP+jIHEAClYIvkqSFQvrWTngd96KE9RxQUSRFq8Vm8icSoZx3i0lEH3ZxX/hN5OG0K26CaUiid2f/W6MugHZoY9SEDlZpLDq1otd4fwv0Odkqxq6lixfbpymrmmAr/O3xt3QcD+pQYKHmW595AbqA/AepfGF7RHYeUfMB6mO1ApVD1GMSBQg4JdqwGuwqOs5T7yAX7la4+563qF2f77V6bbvg1IXhvwT/wpXgznUaF0UFbBcVZAcQ+eZGUXVvjp2EzMhMFl//0hygTfmL/4GA7/ZTHLBPiwhiR07QYBgM9Rytl6QPV9USPpjSVpNNa/cAp/hzlgtVeZbeI7sATk18iK4MfK7Xu51whgm/AD/OplIGLjxGV8k2qAHnhL0iDONPeq0eh6Ec3NWCb0Bj8MkiwalnbndMAwE7Ct15/8m6Z3wgLqX1fwSJW5gSdTyhbyF/yC/y+PfwgSpCLXZEqta8g/yRNZp6XtR/OwmXF3WkIW9rtRRXazIqPIMBLfsb3VH5mM7DRXpnB8Aft4n0dPmkRPSlwmJwtNDMk6iDdu6P5BIHvAMoh+JEPNSIq+urDO3a2M=
+env:
+  global:
+    secure: XvWI7Pdk3EUiUxXTQLp9Gez0WPBMuNBgtmLNFHle5llyedH2vilbeeSxpnd3gYOS1ZCrtE76JcfS5YCflCgRL/c/cliUbOwA1IlLOGO+zpLHFv8f1G/BC708bt5D8H0g7P4F2DlexyYG6/iiAnP7rWJ2O2HV5vR8wO4m4iHwXQV2gTwSbiwVOjqq2gtb96QSr6Lyr6E+oD/BSbY5sQ/ZaYYUn3CvZJ+5QljvO76d7xWDTBFlA34AOBAMvaSUo0xFNZ4rQsnMrY7coowQGXJYoQcNwOmWqBrQOvmrv1AfOkgyOexis6Aa4ijP7gGs4rttnZHWE/czCEN5dvjRsHooLM+LUJ8D5t3IaxzJEl4zuGngPzGK0x5ETKhFyBtlKX5t/tlKzyYX1zYnxXGDQFwejZp4yQTGWDgPnHqCY+8RPTF8IR6da4hXEav1GPA6Czlprivs/5tEwGawx7q0I35Pf8GiQ7mFQOTFgiwHjtPDZN8THtZOoCK0L2FGz8qrkpZC7Zd/HnV6FZ8W2qw4N387gyNidgUyWy5xod0360IAOwqFP8GRr82KoR1ySa5TOV4GjE5JoZjOF0IsuECalYyB6WIWL/kvFTU6iiAw7a9pwIwBTcp5XjpHXE4ryGB6+KDCf4LvcUYr+tU93nGP9uKlPiUsHqkNqPm0qsDV5bJrh+4=
