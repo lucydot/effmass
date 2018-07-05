@@ -1,6 +1,6 @@
 language: python
 python:
-- '3.6'
+- '3.6' 
 notifications:
   email: false
 install:
@@ -13,7 +13,7 @@ deploy:
   provider: pypi
   user: "lucydot"
   password:
-    secure: "MUTzcBaV0uy/1fDdiXhKsfdEx2dM/tiTlWk0sxBAmo6v+i4eamKDkMsuVtnuq8cOY219Y/8W4dqeXsuFKnLOSvsFGMZ6G6KqmcGT4budWhP7AAPJW9586MZrw6Ib7igFkNsnJGiL9CUO9DY0i+ZyZB7lHx1Co7BT+bkBNQCP+XxkVgWpVavSTN1rnLefws2IIaYUDmO/Da4EHK4jz0IM1UcftuUGf677imABTupHSh0U2MCywwkpQgiJUStP5xZBeBIPQ0IxFIU4IU2BCsUZNirEnzvk7FegPHZ35jgQ1IfsTP7pFr2SuTd+D4fKbn/pEaSL/uAUKI1vaLJmwVAgv8EOJAqePMR81Aemlk+8aDR+jSXICSdN9AgEwpElyektAUSY/ud4FZE7x0kcn7GCLjiNlADEUXyp1RsgNtGaqprlhXaURtaRD66pnNA3TE4DG++LQr1x7111pX9hxexqZAMxur8M1xijLHNMASoKf+bQhlsqZLsMGbAAw94wO4KufkentAdQfhnvzoHSuW2wDXyDmXo5r7h7XzLj2HNgddztF8/6m3rPGZ/HlPX2sNDFqHNSwbb4RWCu51XImiqd5Ov2puDr/b1C+UHz/ZRQofXRuZFc8rH/E8Rff95MW6xhYDw9kyUuqG3o/3iPUjkp3/VT16YVgFTyMMAqmucOZm4="
+    secure: "afb38Rvw+2hjUYXOIqOzCHxDG+DR0IuNPTb61Q3aNqjibhUSJr0erRz0fS9wdYub1eiQ6G52BDxjapyxyZDuF+MJIsBmS0a1PjnK7Szzaz9yuzVfPxoibN7SEqc7usYFRjdRiVzlrh6nGADsXw/pRF8ja+SeWhs+f6jTpxDvD5HJ/l7ogCNvoGQj0rv+4kVQdOCsYWszzAz2E51sGYC48Tc+395BjqaAMxoLZBHxsDPl+3xAI8NYbv6EGg/WTmN3Efi/RtR1IGChXFAOqH18peAWx9jJPerx9Bczetbq+SjaWuE1J2dxUs/gDuzoS68okYwfIw18ZYP3yvDhO7VFNRF0ndBsZtU57TU6pnkUHXSbfg1hhdnnTX1Zl7qdVihIAxYjTLGOS5zrExDn0Tt6B15+jNxM///8Iy78InVmzlbJ0rD3YoP7pfWZYNbm4PmLIRiQ+CwDsimoN/lRnJeiATatJ3R37/wjXxg6NUAnhlHK4fuj/cki3GYwjB8SyRYGUnmlg75YOHyoVPvVwgBagvHoZTCSlWVJU24YLqQG/GXfqiK5L1iRksRQKLT4GBP68gyvWG9WUUo1zmArdEDe/8gKzUEl5cvxLIv/KuBjtNpgjrreXK2l+6WBLMfNskmTZS/X7zBlJ3lb6XU3y5sk5w85to5NpwxOvWnz6Xj3/0M="
   on: 
     tags: true
     branch: master
