@@ -1,6 +1,6 @@
 language: python
 python:
-- '3.6' 
+- '3.6'
 notifications:
   email: false
 install:
@@ -8,12 +8,14 @@ install:
 script: coverage run --rcfile=.coveragerc -m pytest
 after_success:
 - codeclimate-test-reporter --token $CODECLIMATE_REPO_TOKEN
-
 deploy:
   provider: pypi
-  user: "lucydot"
+  user: lucydot
   password:
-    secure: "afb38Rvw+2hjUYXOIqOzCHxDG+DR0IuNPTb61Q3aNqjibhUSJr0erRz0fS9wdYub1eiQ6G52BDxjapyxyZDuF+MJIsBmS0a1PjnK7Szzaz9yuzVfPxoibN7SEqc7usYFRjdRiVzlrh6nGADsXw/pRF8ja+SeWhs+f6jTpxDvD5HJ/l7ogCNvoGQj0rv+4kVQdOCsYWszzAz2E51sGYC48Tc+395BjqaAMxoLZBHxsDPl+3xAI8NYbv6EGg/WTmN3Efi/RtR1IGChXFAOqH18peAWx9jJPerx9Bczetbq+SjaWuE1J2dxUs/gDuzoS68okYwfIw18ZYP3yvDhO7VFNRF0ndBsZtU57TU6pnkUHXSbfg1hhdnnTX1Zl7qdVihIAxYjTLGOS5zrExDn0Tt6B15+jNxM///8Iy78InVmzlbJ0rD3YoP7pfWZYNbm4PmLIRiQ+CwDsimoN/lRnJeiATatJ3R37/wjXxg6NUAnhlHK4fuj/cki3GYwjB8SyRYGUnmlg75YOHyoVPvVwgBagvHoZTCSlWVJU24YLqQG/GXfqiK5L1iRksRQKLT4GBP68gyvWG9WUUo1zmArdEDe/8gKzUEl5cvxLIv/KuBjtNpgjrreXK2l+6WBLMfNskmTZS/X7zBlJ3lb6XU3y5sk5w85to5NpwxOvWnz6Xj3/0M="
-  on: 
+    secure: "WExlC74LSaofcGZi9d+mZBpspFNfBA961q2gRbSGKOJLjNbszmw6AOpu4A2QSqHuQmbRX322AOQ9i3iFC6tCI0zAkKyb6q3DHj53qp8QPAR/oNQjPDwHg3W4u1+ZOvxShgsc7XViSyNuZCa0Y9kWjvH4BHtsNDeQJmqOJlsnxYr2SD+xMeoWvEi3xZ1ysT3HOqWYHBcHnc4VzaqnJhNlwYyFCmdE3ded8ES8gKLHqz5ZvQa1gsfSdSiDNfgeStCo9WVy6kHdKtWuLB/7CH37C4DFglAO41MW+BmIQckXZKZGDpsnb41q11rHsAqiVP+wm6Hfx3EQQzJJjF8C2pTBvaT/urs/QFEM5RQNzRtFemABikvN6153W5pQFBNn9RCjtJJDj0sHbRNCiDOQQ1EhTS0HL4bF7rfxyKWUFDwXGy0BXUk7SUzxPEogJueml9r/43W0Y+2bEcAxmpATPrWyCTQ9Evbxq0EjibbM/900n23Ysf5zwIpgpEasGfCDLSvNPhYGfjh7vePlnoT60zfuecCzWuzGdEHxt93yV17bk9yOuBHlI7v5gmEs4gp+CaqeKIz9Vi6QorR+mc2dN6GRMs1e+SlszpQ+LrPKVL6z+lZNDLwVkIo5mQlsz1x1FfFnkfyaGX+3CqfkD7O+btBYkLBSJBLGxZrl9ydsYuQ2PMo="
+  on:  
     tags: true
     branch: master
+env:
+  global:
+    secure: "WExlC74LSaofcGZi9d+mZBpspFNfBA961q2gRbSGKOJLjNbszmw6AOpu4A2QSqHuQmbRX322AOQ9i3iFC6tCI0zAkKyb6q3DHj53qp8QPAR/oNQjPDwHg3W4u1+ZOvxShgsc7XViSyNuZCa0Y9kWjvH4BHtsNDeQJmqOJlsnxYr2SD+xMeoWvEi3xZ1ysT3HOqWYHBcHnc4VzaqnJhNlwYyFCmdE3ded8ES8gKLHqz5ZvQa1gsfSdSiDNfgeStCo9WVy6kHdKtWuLB/7CH37C4DFglAO41MW+BmIQckXZKZGDpsnb41q11rHsAqiVP+wm6Hfx3EQQzJJjF8C2pTBvaT/urs/QFEM5RQNzRtFemABikvN6153W5pQFBNn9RCjtJJDj0sHbRNCiDOQQ1EhTS0HL4bF7rfxyKWUFDwXGy0BXUk7SUzxPEogJueml9r/43W0Y+2bEcAxmpATPrWyCTQ9Evbxq0EjibbM/900n23Ysf5zwIpgpEasGfCDLSvNPhYGfjh7vePlnoT60zfuecCzWuzGdEHxt93yV17bk9yOuBHlI7v5gmEs4gp+CaqeKIz9Vi6QorR+mc2dN6GRMs1e+SlszpQ+LrPKVL6z+lZNDLwVkIo5mQlsz1x1FfFnkfyaGX+3CqfkD7O+btBYkLBSJBLGxZrl9ydsYuQ2PMo="
