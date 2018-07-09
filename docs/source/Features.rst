@@ -29,7 +29,7 @@ Selected bandstructure segments and approximations to the dispersion (assuming a
 
 *Which features are unique to the effmass package?*
 
-Effective mass calculations are implemented in a number of other packages, including  `vasppy <https://github.com/bjmorgan/vasppy>`_ and `pymatgen <http://pymatgen.org/>`_, both of which are dependancies of effmass. However, to our knowledge, the following is unique to our implementation:
+Effective mass calculations are implemented in a number of other packages, including  `vasppy <https://github.com/bjmorgan/vasppy>`_ and `pymatgen <http://pymatgen.org/>`_, both of which are dependancies of `effmass`. However, to our knowledge, the following is unique to our implementation:
 
 - easily compare the values of curvature effective mass calculated using multiple numerical techniques (least-squares and polynomial fitting)
 - tailor the polynomial fitting used to approximate the DFT calculated dispersion: by choosing the order of the polynomial and the energy range to fit over.
