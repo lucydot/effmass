@@ -25,7 +25,7 @@ This requires the `VASP` output files `PROCAR` and `OUTCAR`. It is assumed you h
 These correspond to the valence band maxima and conduction band minima. Maxima and minima within a certain energy range can also be located.
 
 **Calculate curvature, transport and optical effective masses:**
-The curvature (aka inertial), transport and optical effective masses are calculated using the derivatives of a fitted polynomial function. The optical effective mass can also be calculated assuming a Kane dispersion.
+The curvature (aka inertial) and transport masses are calculated using the derivatives of a fitted polynomial function. The optical effective mass can also be calculated assuming a Kane dispersion.
 
 **Assess the extent of non-parabolicity:**
 Parameters of the Kane quasi-linear dispersion are calculated to quantify the extent of non-parabolicity over a given energy range. 
