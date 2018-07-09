@@ -85,8 +85,6 @@ def test_explosion_index(toy_segments):
  	toy_segments[0].dk_bohr = np.array([0.01,0.02,0.03,0.04,0.05,0.06,0.07]) # toy data with characteristic curve
  	toy_segments[0].dE_hartree = np.array([0,0.04,0.08,0.18,0.28,0.30,0.32])
  	assert toy_segments[0].explosion_index() == 4
-
-
 	
 def test_alpha(toy_segments):
 	toy_segments[0].dk_bohr = np.array([0.1,0.2,0.3,0.4,0.5]) # toy data with characteristic curve
@@ -97,6 +95,11 @@ def test_kane_mass_bandedge(toy_segments):
 	toy_segments[0].dk_bohr = np.array([0.1,0.2,0.3,0.4,0.5]) # toy data with characteristic curve
 	toy_segments[0].dE_hartree = np.array([0.00124534733,0.004927169016,0.01089396461,0.01892547876,0.02876732333])
 	assert math.isclose(toy_segments[0].kane_mass_band_edge(polyfit_order=6,truncate=False),4,rel_tol=1E-3)
+
+def test_optical_effmass_kane_dispersion(MAPI_soc_segment_object_electron):
+    effmass_result = MAPI_soc_segment_object_electron.optical_effmass_kane_dispersion(fermi_level = MAPI_soc_segment_object_electron.energies[0], alpha = 2, mass_bandedge = 0.3, upper_limit=0.1)
+    result = 0.3021574193931434
+    assert math.isclose(effmass_result, result)
 
 # TODO: average_allband_optical_effmass, calc_allband_optical_effmass, functions associated with analytic optical Kane effmass, optical mass and use of weighting
 
