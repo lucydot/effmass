@@ -324,6 +324,8 @@ class Segment:
 
         Returns:
             float: The optical effective mass (units of electron mass), defined as the inverse of the second derivative of a kane dispersion, weighted according to occupancy of available eigenstates (the product of density of states and the fermi-dirac distribution).
+        Note:
+            The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.
         """
 
         alpha = self.alpha() if alpha is None else alpha
@@ -362,6 +364,9 @@ class Segment:
 
         Returns:
             float: The probability that the eigenstate is occupied.
+        Note:
+            The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.
+           
         """
         assert temp > 0, "temperature must be more than 0K"
         if self.ptype == "electron":
@@ -404,8 +409,8 @@ class Segment:
                            alpha=None,
                            mass_bandedge=None,
                            upper_limit=None):
-        """Integrates the product of the fermi-dirac distribution and density
-        of states along the one-dimensional slice of k-space defined by
+        """Integrates the product of the fermi-dirac distribution
+        along the one-dimensional slice of k-space defined by
         :class:`~effmass.analysis.Segment` (up to
         :meth:`~effmass.analysis.Segment.explosion_index`).
 
@@ -416,6 +421,9 @@ class Segment:
 
         Returns:
             float: A normalisation factor for :meth:`~effmass.analysis.Segment.mass_integration`.
+        Note:
+            The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.
+       
         """
         alpha = self.alpha() if alpha is None else alpha
         mass_bandedge = self.kane_mass_band_edge(
@@ -466,6 +474,9 @@ class Segment:
 
         Returns:
             float: The optical effective mass (units of electron mass) of the :class:`~effmass.analysis.Segment`.
+
+        Note:
+           The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.
         """
 
         fermi_level = self.fermi_energy if fermi_level is None else fermi_level
