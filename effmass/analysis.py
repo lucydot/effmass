@@ -333,7 +333,7 @@ class Segment:
             self.explosion_index()] if upper_limit is None else upper_limit
         fermi_level = self.fermi_energy if fermi_level is None else fermi_level
 
-        result = scipy.integrate.quad(
+        result = integrate.quad(
             self._mass_integrand,
             0,
             upper_limit,
@@ -423,7 +423,7 @@ class Segment:
         fermi_level = self.fermi_energy if fermi_level is None else fermi_level
         upper_limit = self.dk_bohr[
             self.explosion_index()] if upper_limit is None else upper_limit
-        result = scipy.integrate.quad(
+        result = integrate.quad(
             self._weight_integrand,
             0,
             upper_limit,
