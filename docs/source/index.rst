@@ -13,9 +13,8 @@ Effmass
 
 `effmass` is a Python package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
-Examples are provided in a Jupyter notebook `here <nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb>`_.
+Examples are provided in a Jupyter notebook `here <https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb>`_.
 Source code is available as a git repository at `https://github.com/lucydot/effmass <https://github.com/lucydot/effmass>`_.
-
 
 Details
 -------
