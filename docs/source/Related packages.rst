@@ -1,7 +1,7 @@
 Related packages
 ================
 
-The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiriarity with Python. 
+The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiarity with Python. 
 Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed below will suit your needs better.
 
