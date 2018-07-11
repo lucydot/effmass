@@ -36,6 +36,9 @@ This requires the `VASP` output file `DOSCAR`. Using density-of-states data and 
 **Plot fits to the dispersion:**
 Selected bandstructure segments and approximations to the dispersion (assuming a Kane, quadratic, or higher order fit) can be visualised.
 
+The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiriarity with Python. Depending on the functionality and level of approximation you are looking for, 
+it may be that one of the packages listed [here](https://effmass.readthedocs.io/en/latest/related%20packages.html) will suit your needs better.
+
 ## Development
 
 Please use the Github [issue tracker](https://github.com/lucydot/effmass/issues/) for feature requests and bug reports. 
