@@ -44,14 +44,16 @@ If you would like to contribute please do so via a pull request. All contributor
 
 ## Installation
 
+`effmass` is a Python 3 package and requires key packages from the [SciPy ecosystem](https://www.scipy.org/about.html): SciPy, NumPy and Matplotlib. If you have not installed these packages before, it may be best to install them using your preferred package manager (eg: Homebrew). Note that together they will use >100MB of disk space. `effmass` can then be built using the Python package manager `pip`:
+
 ```
-pip install effmass
+pip3 install --user effmass
 ```
 
 Or download the latest release from [GitHub](https://github.com/lucydot/effmass/releases), and install
 ```
 cd effmass
-python setup.py install
+python3 setup.py install
 ```
 
 Or clone the latest development version
@@ -61,7 +63,7 @@ git clone git@github.com:lucydot/effmass.git
 and install the same way.
 ```
 cd effmass
-python setup.py install 
+python3 setup.py install 
 ```
 
 ## Tests
@@ -70,7 +72,7 @@ Automated testing of the latest commit happens [here](https://travis-ci.com/lucy
 
 Manual tests can be run using 
 ```
-python -m pytest
+python3 -m pytest
 ```
 
 This code has been tested with Python versions 3.6.
