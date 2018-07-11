@@ -11,7 +11,7 @@ it may be that one of the packages listed below will suit your needs better.
 
 `emc <https://github.com/afonari/emc>`_: Calculates the effective mass *tensor* using a finite-difference method for parabolic dispersions.
 
-`pymatgen <http://pymatgen.org>`_: This is installed as a dependancy of `effmass`. Calculates an average effective mass *tensor* for non-parabolic dispersions with multiple bands and extrema. Also calculates the Seebeck effective mass as defined [here](https://perso.uclouvain.be/geoffroy.hautier/wp-content/papercite-data/pdf/gibbs2017.pdf).
+`pymatgen <http://pymatgen.org>`_: This is installed as a dependancy of `effmass`. Calculates an average effective mass *tensor* for non-parabolic dispersions with multiple bands and extrema. Also calculates the Seebeck effective mass as defined `here <https://perso.uclouvain.be/geoffroy.hautier/wp-content/papercite-data/pdf/gibbs2017.pdf>`_.
 
 If you have an update to the information above then please use the Github `issue tracker <https://github.com/lucydot/effmass/issues/>`_. 
 
