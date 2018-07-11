@@ -36,7 +36,7 @@ It contains a core class that calculates the effective mass and other associated
 [``effmass``](https://github.com/lucydot/effmass) also contains functions for locating band structure extrema, calculating the Kane quasi-linear dispersion parameters and plotting approximations to the true dispersion.
 Parsing of electronic structure data is faciliated by the [``vasppy``](https://github.com/bjmorgan/vasppy) [@Morgan2018] package.
 
-The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiriarity with Python. Depending on the functionality and level of approximation you are looking for, 
+The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiarity with Python. Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed below will suit your needs better.
 
 # Related packages
