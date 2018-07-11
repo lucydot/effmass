@@ -8,6 +8,6 @@ Manual tests can be run using
 
 .. code-block:: python
 
-   python -m pytest
+   python3 -m pytest
 
 This code has been tested with Python version 3.6.
