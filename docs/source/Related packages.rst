@@ -2,7 +2,7 @@ Related packages
 ================
 
 The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiriarity with Python. 
-If you are looking to calculate the parabolic effective mass only, and would prefer a command line interface, 
+Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed below will suit your needs better.
 
 `vasppy <https://github.com/bjmorgan/vasppy>`_: This is installed as a dependancy of `effmass`. Calculates the effective mass using a least-squares quadratic fit for parabolic dispersions. 
