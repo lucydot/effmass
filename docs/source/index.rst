@@ -47,6 +47,7 @@ Documentation
    Installation
    API documentation
    Implementation
+   Related packages
    Development
    Testing
    Citing
