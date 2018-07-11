@@ -1,4 +1,5 @@
 vasppy
+scipy
 numpy
 matplotlib
 pytest-lazy-fixture
