@@ -12,8 +12,9 @@ from effmass.analysis import _check_poly_order
 
 
 def plot_segments(Data, Settings, segments):
-    """Plots bandstructure with the DFT-calculated points for each Segment
-    instance overlaid.
+    """Plots bandstructure overlaid with the DFT-calculated points for each Segment
+    instance. Each Segment is labelled with it's direction in reciprocal space
+    and segments list index number.
 
     Args:
         Data (Data): instance of the :class:`Data` class.
@@ -35,7 +36,7 @@ def plot_segments(Data, Settings, segments):
     for i in range(len(segments)):
         ax.scatter(segments[i].kpoint_indices, segments[i].energies - Data.VBM)
         ax.annotate(
-            segments[i].direction,
+            str(i)+", "+segments[i].direction,
             xy=(segments[i].kpoint_indices[-1],
                 segments[i].energies[-1] - Data.VBM),
             xytext=(segments[i].kpoint_indices[-1] + 1,
