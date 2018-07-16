@@ -24,6 +24,7 @@ config = {
 			  'scipy',
 			  'numpy', 
                           'matplotlib',
+                          'adjustText',
                           'codeclimate-test-reporter',
                           'pytest-lazy-fixture',
                           'coverage==4.3.4' ],

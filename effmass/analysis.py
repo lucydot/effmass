@@ -111,6 +111,19 @@ class Segment:
         self.fermi_energy = Data.fermi_energy
         self.dos = self._dos(Data)
         self.integrated_dos = self._integrated_dos(Data)
+        self._VBM = Data.VBM
+
+    def __str__(self):
+        """
+        Segment string method.
+
+        Returns:
+            A string containing the energy of the Segment extrema (referenced to the VBM) and the start- and end- points of the Segment in reciprocal space.
+        """
+        energy_str = "{0:.2f}".format(self.energies[0] - self._VBM)
+        start_str = str(np.round(self.kpoints[0],3))
+        end_str = str(np.round(self.kpoints[-1],3))
+        return energy_str+" eV; "+start_str+"-->"+end_str
 
     def _check_kanefit_points(self, polyfit_order=6):
         """Raises an AssertionError if there are not enough data points to fit

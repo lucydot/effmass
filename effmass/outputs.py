@@ -4,6 +4,7 @@ matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import numpy as np
+from adjustText import adjust_text
 
 from effmass import ev_to_hartree
 from effmass.dos import _check_integrated_dos_loaded
@@ -12,8 +13,9 @@ from effmass.analysis import _check_poly_order
 
 
 def plot_segments(Data, Settings, segments):
-    """Plots bandstructure with the DFT-calculated points for each Segment
-    instance overlaid.
+    """Plots bandstructure overlaid with the DFT-calculated points for each Segment
+    instance. Each Segment is labelled with it's direction in reciprocal space
+    and index number from the segments argument.
 
     Args:
         Data (Data): instance of the :class:`Data` class.
@@ -26,20 +28,14 @@ def plot_segments(Data, Settings, segments):
     Notes:
         The x-axis of the plot is not to scale.
     """
-
+   
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111)
 
-    for i in range(len(Data.energies)):
-        ax.plot(range(len(Data.energies[i])), Data.energies[i] - Data.VBM)
-    for i in range(len(segments)):
-        ax.scatter(segments[i].kpoint_indices, segments[i].energies - Data.VBM)
-        ax.annotate(
-            segments[i].direction,
-            xy=(segments[i].kpoint_indices[-1],
-                segments[i].energies[-1] - Data.VBM),
-            xytext=(segments[i].kpoint_indices[-1] + 1,
-                    segments[i].energies[-1] - Data.VBM + 0.1))
+    [ax.plot(range(len(Data.energies[i])), Data.energies[i] - Data.VBM) for i in range(len(Data.energies))]
+    points = [ax.scatter(segments[i].kpoint_indices, segments[i].energies - Data.VBM) for i in range(len(segments))]
+    texts = [ax.text(segments[i].kpoint_indices[-1], segments[i].energies[-1] - Data.VBM, str(i)+", "+str(np.round(segments[i].direction,3))) for i in range(len(segments))]    
+    adjust_text(texts, arrowprops=dict(arrowstyle='->', color='red'), autoalign='x', force_text=(0.01,0.025))
 
     ax.set_ylim([
         -(Settings.extrema_search_depth + Settings.energy_range + 1),
@@ -48,7 +44,7 @@ def plot_segments(Data, Settings, segments):
     ])
 
     return fig, ax
-
+    
 
 def plot_integrated_dos(Data):
     """Plots integrated density of states (states/unit-cell) against energy
