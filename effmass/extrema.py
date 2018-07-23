@@ -333,7 +333,6 @@ def generate_segments(Settings, Data, truncate_dir_change=True):
     """Generates a list of Segment objects.
 
     Args:
-        extrema_array (array(int)): A 2-dimensional array of size (number of extrema, 2). Each row corresponds to an extrema and contains [:attr:`~effmass.inputs.Data.bands` index, :attr:`~effmass.inputs.Data.kpoints` index]. See :func:`find_extrema_indices`.
         Settings (Settings): instance of the :class:`Settings` class.
         Data (Data): instance of the :class:`Data` class.
         truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.
