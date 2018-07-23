@@ -43,13 +43,13 @@ it may be that one of the packages listed below will suit your needs better.
 
 Effective mass calculations are implemented in a number of other packages:
 
-[vasppy](https://github.com/bjmorgan/vasppy/): This is installed as a dependancy of `effmass`. Calculates the effective mass using a least-squares quadratic fit for parabolic dispersions. 
+[vasppy](https://github.com/bjmorgan/vasppy/) [@Morgan2018]: This is installed as a dependancy of `effmass`. Calculates the effective mass using a least-squares quadratic fit for parabolic dispersions. 
 
 [sumo](https://github.com/SMTG-UCL/sumo): Calculates the effective mass using a least-squares fit for parabolic and non-parabolic dispersions. 
 
 [emc](https://github.com/afonari/emc): Calculates the effective mass *tensor* using a finite-difference method for parabolic dispersions.
 
-[pymatgen](http://pymatgen.org/): This is installed as a dependancy of `effmass`. Calculates an average effective mass *tensor* for non-parabolic dispersions with multiple bands and extrema. Also calculates the Seebeck effective mass as defined [here](https://perso.uclouvain.be/geoffroy.hautier/wp-content/papercite-data/pdf/gibbs2017.pdf).
+[pymatgen](http://pymatgen.org/) [@Ong2013]: This is installed as a dependancy of `effmass`. Calculates an average effective mass *tensor* for non-parabolic dispersions with multiple bands and extrema. Also calculates the Seebeck effective mass as defined [here](https://perso.uclouvain.be/geoffroy.hautier/wp-content/papercite-data/pdf/gibbs2017.pdf).
 
 If you have an update to the information above then please use the Github [issue tracker](https://github.com/lucydot/effmass/issues/). 
 
