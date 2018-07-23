@@ -1,5 +1,13 @@
 #! /usr/bin/env python3
 
+"""
+A module for finding the band structure extrema and instantiating 
+a :class:`Segment` object for each extrema point.
+
+The extrema are found within an energy range given by the :class:`Settings` class.
+Each `Segment` object contains data for kpoints within an energy range given by the :class:`Settings` class. 
+"""
+
 import warnings
 import numpy as np
 import numpy.ma as ma

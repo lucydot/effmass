@@ -1,4 +1,9 @@
 #! /usr/bin/env python3
+"""
+A module for analysing the data contained in a :class:`Segment` object.
+
+Contains the :class:`Segment` class and methods for calculating various definitions of the effective mass.
+"""
 
 import warnings
 import numpy as np

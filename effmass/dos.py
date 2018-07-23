@@ -1,4 +1,8 @@
 #! /usr/bin/env python3
+"""
+A module for analysing DOSCAR data.
+"""
+
 import numpy as np
 
 

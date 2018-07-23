@@ -1,4 +1,10 @@
 #! /usr/bin/env python3
+
+"""
+A module for plotting and summarising segments information, 
+density-of-states information and effective mass analysis.
+
+"""
 import matplotlib
 matplotlib.use('Agg')
 

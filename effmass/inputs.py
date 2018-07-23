@@ -1,5 +1,13 @@
 #! /usr/bin/env python3
 
+"""
+A module for storing electronic structure data and user settings.
+
+The module contains a :class:`Data` class which parses OUTCAR and PROCAR files using the `vasppy <https://github.com/bjmorgan/vasppy>`_ package. 
+A function for parsing DOSCAR files is also provided. 
+A :class:`Settings` class stores analysis parameters set by the user.
+
+"""
 from vasppy import procar, outcar
 from effmass import extrema
 import math
