@@ -6,7 +6,7 @@ density-of-states information and effective mass analysis.
 
 """
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg',warn=False)
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -111,7 +111,7 @@ def print_results(segment, data, settings, polyfit_order=6):
 
     _check_poly_order(polyfit_order)
 
-    print(segment.ptype, segment.direction)
+    print(segment.band_type, segment.direction)
     print("3-point finite difference mass is {:.2f}".format(
         segment.finite_difference_effmass()))
     print("3-point parabolic mass is {:.2f}".format(
