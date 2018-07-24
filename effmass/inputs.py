@@ -104,6 +104,11 @@ class Data():
         vasp_data = procar.Procar()
         vasp_data.read_from_file(procar_path)
 
+        if vasp_data.calculation['spin_polarised']: # to account for the change in PROCAR format for calculations with 2 spin channels (1 k-point block ---> 2 k-point blocks)
+            blocks = 2
+        else:
+            blocks = 1
+
         self.spin_channels = vasp_data.spin_channels
         self.number_of_kpoints = vasp_data.number_of_k_points - ignore
         self.number_of_bands = vasp_data.number_of_bands
@@ -112,11 +117,11 @@ class Data():
         self.energies = vasp_data.bands[self.number_of_bands *
                                         ignore:, 1:].reshape(
                                             self.number_of_kpoints,
-                                            self.number_of_bands).T
+                                            self.number_of_bands*blocks).T
         self.occupancy = vasp_data.occupancy[self.number_of_bands *
                                              ignore:, 1:].reshape(
                                                  self.number_of_kpoints,
-                                                 self.number_of_bands).T
+                                                 self.number_of_bands*blocks).T
         self.reciprocal_lattice = reciprocal_lattice * 2 * math.pi
         self.CBM = extrema._calc_CBM(self.occupancy, self.energies)
         self.VBM = extrema._calc_VBM(self.occupancy, self.energies)
