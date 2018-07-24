@@ -6,7 +6,7 @@ import numpy as np
 import math
 
 def test_check_poly_order():
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         analysis._check_poly_order(1)
 
 def test_check_kanefit_points(toy_segments):
