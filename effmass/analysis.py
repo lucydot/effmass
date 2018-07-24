@@ -272,7 +272,7 @@ class Segment:
             bandedge_energy = Data.CBM
         elif self.band_type == "unknown":
             print(
-                "cannot determine the band edge energy as band type unknown. Please set Segment.band_type."
+                "Cannot determine the band edge energy as band type unknown. Please set Segment.band_type manually (options are \"conduction_band\" or \"valence_band\")."
             )
             bandedge_energy = None
 
