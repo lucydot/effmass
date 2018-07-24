@@ -5,11 +5,11 @@ import numpy as np
 
 def test_calc_CBM(toy_data_object):
     
-    assert extrema.calc_CBM(toy_data_object.occupancy,toy_data_object.energies) == 1
+    assert extrema._calc_CBM(toy_data_object.occupancy,toy_data_object.energies) == 1
 
 def test_calc_VBM(toy_data_object):
 
-    assert extrema.calc_VBM(toy_data_object.occupancy,toy_data_object.energies) == 0.5
+    assert extrema._calc_VBM(toy_data_object.occupancy,toy_data_object.energies) == 0.5
 
 def test_calculate_direction(toy_data_object):
    

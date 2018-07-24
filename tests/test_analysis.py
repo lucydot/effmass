@@ -19,10 +19,10 @@ def test_solve_quadratic():
 	c = [-21,-40]
 	assert np.allclose(np.array(analysis._solve_quadratic(a,b,c)),np.array([1.5,2.5]))
 
-def test_fermi_function(MAPI_soc_segment_object_hole):
-	assert math.isclose(MAPI_soc_segment_object_hole._fermi_function(0,0),0.5)
-	assert MAPI_soc_segment_object_hole._fermi_function(0,1) < 0.5
-	assert MAPI_soc_segment_object_hole._fermi_function(1,0) > 0.5
+def test_fermi_function(MAPI_soc_segment_object_valence_band):
+	assert math.isclose(MAPI_soc_segment_object_valence_band._fermi_function(0,0),0.5)
+	assert MAPI_soc_segment_object_valence_band._fermi_function(0,1) < 0.5
+	assert MAPI_soc_segment_object_valence_band._fermi_function(1,0) > 0.5
 
 def test_fermi_function_toy(toy_segments):
     online_calc = 1 - 0.999970880324388
@@ -30,16 +30,16 @@ def test_fermi_function_toy(toy_segments):
     online_calc = 1 - 0.999986565914777
     assert math.isclose(toy_segments[0]._fermi_function(0.46,0.75),online_calc,rel_tol=1E-5)
 
-def test_fermi_function(MAPI_soc_segment_object_electron):
-	assert math.isclose(MAPI_soc_segment_object_electron._fermi_function(0,0),0.5)
-	assert MAPI_soc_segment_object_electron._fermi_function(0,1) > 0.5
-	assert MAPI_soc_segment_object_electron._fermi_function(1,0) < 0.5
+def test_fermi_function(MAPI_soc_segment_object_conduction_band):
+	assert math.isclose(MAPI_soc_segment_object_conduction_band._fermi_function(0,0),0.5)
+	assert MAPI_soc_segment_object_conduction_band._fermi_function(0,1) > 0.5
+	assert MAPI_soc_segment_object_conduction_band._fermi_function(1,0) < 0.5
 
-def test_ptype(MAPI_soc_segment_object_hole):
-	assert MAPI_soc_segment_object_hole._ptype() == "hole"
+def test_band_type(MAPI_soc_segment_object_valence_band):
+	assert MAPI_soc_segment_object_valence_band._band_type() == "valence_band"
 
-def test_ptype(MAPI_soc_segment_object_electron):
-	assert MAPI_soc_segment_object_electron._ptype() == "electron"
+def test_band_type(MAPI_soc_segment_object_conduction_band):
+	assert MAPI_soc_segment_object_conduction_band._band_type() == "conduction_band"
 
 def test_bandedge_energy(toy_segments, toy_data_object):
 	assert math.isclose(toy_segments[0]._bandedge_energy(toy_data_object),extrema.calc_VBM(toy_data_object.occupancy,toy_data_object.energies))
@@ -96,8 +96,8 @@ def test_kane_mass_bandedge(toy_segments):
 	toy_segments[0].dE_hartree = np.array([0.00124534733,0.004927169016,0.01089396461,0.01892547876,0.02876732333])
 	assert math.isclose(toy_segments[0].kane_mass_band_edge(polyfit_order=6,truncate=False),4,rel_tol=1E-3)
 
-def test_optical_effmass_kane_dispersion(MAPI_soc_segment_object_electron):
-    effmass_result = MAPI_soc_segment_object_electron.optical_effmass_kane_dispersion(fermi_level = MAPI_soc_segment_object_electron.energies[0], alpha = 2, mass_bandedge = 0.3, upper_limit=0.1)
+def test_optical_effmass_kane_dispersion(MAPI_soc_segment_object_conduction_band):
+    effmass_result = MAPI_soc_segment_object_conduction_band.optical_effmass_kane_dispersion(fermi_level = MAPI_soc_segment_object_conduction_band.energies[0], alpha = 2, mass_bandedge = 0.3, upper_limit=0.1)
     result = 0.3021574193931434
     assert math.isclose(effmass_result, result)
 

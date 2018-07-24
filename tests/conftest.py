@@ -27,12 +27,12 @@ def MAPI_soc_data_object_with_DOSCAR(MAPI_settings_object): # MAPI spin orbit co
 
 
 @pytest.fixture()
-def MAPI_soc_segment_object_hole(MAPI_soc_data_object_with_DOSCAR,MAPI_settings_object):
+def MAPI_soc_segment_object_valence_band(MAPI_soc_data_object_with_DOSCAR,MAPI_settings_object):
     segments = extrema.generate_segments(MAPI_settings_object, MAPI_soc_data_object_with_DOSCAR, truncate_dir_change=False)
     return segments[3]
 
 @pytest.fixture()
-def MAPI_soc_segment_object_electron(MAPI_soc_data_object_with_DOSCAR,MAPI_settings_object):
+def MAPI_soc_segment_object_conduction_band(MAPI_soc_data_object_with_DOSCAR,MAPI_settings_object):
     segments = extrema.generate_segments(MAPI_settings_object, MAPI_soc_data_object_with_DOSCAR, truncate_dir_change=False)
     return segments[-1]
 
