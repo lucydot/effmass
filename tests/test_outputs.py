@@ -4,7 +4,7 @@ from effmass import outputs
 import matplotlib
 
 @pytest.mark.parametrize("data_object,settings_object,segment_object", [
-    (pytest.lazy_fixture('MAPI_soc_data_object_with_DOSCAR'), pytest.lazy_fixture("MAPI_settings_object"),pytest.lazy_fixture("MAPI_soc_segment_object_hole")),
+    (pytest.lazy_fixture('MAPI_soc_data_object_with_DOSCAR'), pytest.lazy_fixture("MAPI_settings_object"),pytest.lazy_fixture("MAPI_soc_segment_object_valence_band")),
 ])
 def test_plot_segments(data_object,settings_object,segment_object):
     fig, ax = outputs.plot_segments(data_object,settings_object,[segment_object])
