@@ -26,7 +26,9 @@ def _check_poly_order(polyfit_order):
     Returns:
         None.
     """
-    assert polyfit_order > 1, "the order of the polynomial must be 2 or higher"
+
+    if polyfit_order < 2:
+        raise ValueError("the order of the polynomial must be 2 or higher")
 
 
 def _solve_quadratic(a, b, c):
@@ -141,7 +143,7 @@ class Segment:
             None.
         """
         idx = self.explosion_index(polyfit_order=polyfit_order)
-        assert idx > 3, "Unable to calculate alpha parameter as inflexion too close to extrema"
+        assert idx > 3,"Unable to calculate alpha parameter as inflexion too close to extrema"
 
     def explosion_index(self, polyfit_order=6):
         r"""
@@ -182,14 +184,15 @@ class Segment:
             float: the probability that the eigenstate is occupied
         
         """
-        assert temp > 0, "temperature must be more than 0K"
+        if temp <= 0:
+            raise ValueError("temperature must be more than 0K")
         fermi_level = self.fermi_energy if fermi_level is None else fermi_level
         if self.band_type == "conduction_band":
             probability = (1 / ((np.exp(
                 (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1)))
         elif self.band_type == "valence_band":
-            probability = 1 - (1 / ((np.exp(
-                (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1)))
+            probability = np.subtract(1,(1 / ((np.exp(
+                (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1))))
         elif self.band_type == "unknown":
             raise ValueError("Unable to calculate fermi function as there is partial occupancy of the bands and the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
         else:
@@ -217,6 +220,8 @@ class Segment:
             self._fermi_function(E, fermi_level=fermi_level, temp=temp)
             for E in self.energies
         ]))
+
+        assert weighting.all() != 0,"Unable to assign a weighting to the dispersion as the Fermi-Dirac distribution at all kpoints is smaller than Python's double precision floats. Calculate band edge values using Segment.five_point_leastsq_effmass() or Segment.finite_difference_effmass()."
 
         return weighting
 
@@ -520,6 +525,8 @@ class Segment:
             mass_bandedge=mass_bandedge,
             temp=temp,
             upper_limit=upper_limit)
+
+        assert top[0] != 0, "Unable to calculate the optical effective mass as the Fermi-Dirac distribution at all kpoints is smaller than Python's double precision floats."
 
         return bottom[0] / top[0]
 
