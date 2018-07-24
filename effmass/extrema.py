@@ -14,7 +14,7 @@ import numpy.ma as ma
 from effmass import analysis
 
 
-def check_partial_occupancy(occupancy):
+def _check_partial_occupancy(occupancy):
     """Raises warning if there is partial occupancy of bands.
 
     Args:
@@ -25,11 +25,12 @@ def check_partial_occupancy(occupancy):
     """
     if occupancy.any() not in [0, 1, 2]:
         warnings.warn(
-            "You have partial occupation numbers in Data.occupancy. Anything with occupation > 0.2 will be considered part of the valence band, anything with occupation < 0.8 will be considered part of the conduction band."
+            "You have partial occupation numbers in Data.occupancy. Any eigenstate with an occupancy > 0.5 will be considered occupied."+ 
+            " You may wish to set the attributes Data.VBM, Data.CBM and Data.fermi_energy manually."
         )
 
 
-def calc_CBM(occupancy, energy):
+def _calc_CBM(occupancy, energy):
     """Finds the minimum unoccupied energy eigenstate (conduction band minimum)
     .
 
@@ -40,12 +41,12 @@ def calc_CBM(occupancy, energy):
     Returns:
         float: the minimum unoccupied energy (eV)
     """
-    check_partial_occupancy(occupancy)
-    energy_unoccupied = ma.masked_where(occupancy > 0.2, energy)
+    _check_partial_occupancy(occupancy)
+    energy_unoccupied = ma.masked_where(occupancy > 0.5, energy)
     return np.amin(energy_unoccupied)
 
 
-def calc_VBM(occupancy, energy):
+def _calc_VBM(occupancy, energy):
     """Finds the minimum unoccupied energy eigenstate (valence band maximum).
 
     Args:
@@ -55,8 +56,8 @@ def calc_VBM(occupancy, energy):
     Returns:
         float: the minimum unoccupied energy (eV)
     """
-    check_partial_occupancy(occupancy)
-    energy_occupied = ma.masked_where(occupancy < 0.8, energy)
+    _check_partial_occupancy(occupancy)
+    energy_occupied = ma.masked_where(occupancy < 0.5, energy)
     return np.amax(energy_occupied)
 
 
@@ -131,8 +132,8 @@ def find_extrema_indices(Data, Settings):
         array: A 2-dimensional array of size (number of extrema, 2). Each row corresponds to an extrema and contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index].
     """
 
-    energy_unoccupied = ma.masked_where(Data.occupancy > 0.2, Data.energies)
-    energy_occupied = ma.masked_where(Data.occupancy < 0.8, Data.energies)
+    energy_unoccupied = ma.masked_where(Data.occupancy > 0.5, Data.energies)
+    energy_occupied = ma.masked_where(Data.occupancy < 0.5, Data.energies)
 
     # returns array of energies within energy_range
     holes_in_range = ma.masked_where(
