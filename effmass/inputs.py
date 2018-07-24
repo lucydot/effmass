@@ -78,7 +78,7 @@ class Data():
         reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
         CBM (float): the conduction band minimum energy in eV.
         VBM (float): the valence band maximum in eV.
-        fermi_energy (float): the fermi energy in eV. 
+        fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM. 
         dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. 
         integrated_dos: 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].
     """
@@ -118,8 +118,8 @@ class Data():
                                                  self.number_of_kpoints,
                                                  self.number_of_bands).T
         self.reciprocal_lattice = reciprocal_lattice * 2 * math.pi
-        self.CBM = extrema.calc_CBM(self.occupancy, self.energies)
-        self.VBM = extrema.calc_VBM(self.occupancy, self.energies)
+        self.CBM = extrema._calc_CBM(self.occupancy, self.energies)
+        self.VBM = extrema._calc_VBM(self.occupancy, self.energies)
         self.fermi_energy = (self.CBM + self.VBM) / 2
         self.dos = []
         self.integrated_dos = []

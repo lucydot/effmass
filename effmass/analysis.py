@@ -71,7 +71,7 @@ class Segment:
         dE_hartree (array(float)): 1-dimensional array which contains the difference in energy (eV) between each kpoint and the extrema.
         occupancy (array(float)): 2-dimensional array. Each row contains occupation number of the eigenstates for a particular band. A slice of :attr:`effmass.inputs.Data.occupancy`.
         direction (array): 1-dimensional array with length 3. The direction between kpoints in the segment.
-        ptype (str): The quasi particle type, determined by occupancy of the eigenstate.
+        band_type (str): The band type, determined by occupancy of the eigenstate. Argument choices are "conduction_band", "valence_band" or "unknown". If set to "unknown", some class methods will raise a warning and return None. 
         bandedge_energy: The enery of the VBM (if Segment instance is in valence band) or CBM (if Segment instance is in conduction band). Units are eV.
         fermi_energy (float): the fermi energy in eV.
         dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. A slice of :attr:`effmass.inputs.Data.dos`.
@@ -111,7 +111,7 @@ class Segment:
             [Data.occupancy[band, k] for k in kpoint_indices])
         self.direction = extrema.calculate_direction(self.kpoints[1],
                                                      self.kpoints[2])
-        self.ptype = self._ptype()
+        self.band_type = self._band_type()
         self.bandedge_energy = self._bandedge_energy(Data)
         self.fermi_energy = Data.fermi_energy
         self.dos = self._dos(Data)
@@ -184,18 +184,16 @@ class Segment:
         """
         assert temp > 0, "temperature must be more than 0K"
         fermi_level = self.fermi_energy if fermi_level is None else fermi_level
-        if self.ptype == "electron":
+        if self.band_type == "conduction_band":
             probability = (1 / ((np.exp(
                 (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1)))
-        if self.ptype == "hole":
+        elif self.band_type == "valence_band":
             probability = 1 - (1 / ((np.exp(
                 (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1)))
-        if self.ptype == "unknown":
-            print(
-                "unable to calculate fermi function as particle type unknown (partial occupancy, please set Segment.type)"
-            )
-            probability = None
-
+        elif self.band_type == "unknown":
+            raise ValueError("Unable to calculate fermi function as there is partial occupancy of the bands and the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
+        else:
+            raise ValueError("Please set the Segment.band_type attribute (options are \"valence_band\" or \"conduction_band\")")
         return probability
 
     def weighting(self, fermi_level=None, temp=300):
@@ -222,39 +220,39 @@ class Segment:
 
         return weighting
 
-    def _ptype(self):
-        """Identifies the quasi particle, determined by the occupancy of the
+    def _band_type(self):
+        """Identifies the band type, determined by the occupancy of the
         first k-point in the segment.
 
-        An occupancy of 1.0 or 2.0 returns "hole" (as :class:`~effmass.analysis.Segment` is in the valence band).
-        An occupancy of 0.0 returns "electron" (as :class:`~effmass.analysis.Segment` is in the conduction band).
+        An occupancy of 1.0 or 2.0 returns "valence_band" (as :class:`~effmass.analysis.Segment` is in the valence band).
+        An occupancy of 0.0 returns "conduction_band" (as :class:`~effmass.analysis.Segment` is in the conduction band).
         In the case of partial occupancy, "unknown" is returned.
 
         Args:
             None
 
         Returns:
-            str: the particle type of the segment, either "hole", "electron" or "unknown".
+            str: the band type of the segment, either "valence_band", "conduction_band" or "unknown".
         """
 
         if self.occupancy[0] == 1.0 or self.occupancy[0] == 2.0:
-            particle = "hole"
+            band_type = "valence_band"
         elif self.occupancy[0] == 0.0:
-            particle = "electron"
+            band_type = "conduction_band"
         else:
             print(
-                "partial occupancy, particle type unknown. Please set Segment.ptype manually."
+                "There is partial occupancy of the band, so the band type unknown. Please set the Segment.band_type attribute manually."
             )
-            particle = "unknown"
-        return particle
+            band_type = "unknown"
+        return band_type
 
     def _bandedge_energy(self, Data):
         """Identifies the bandedge energy of the
         :class:`~effmass.analysis.Segment`, determined by the occupancy of the
         first k-point.
 
-        If :attr:`~effmass.analysis.Segment._ptype` is "hole", function returns the Data.VBM (as :class:`~effmass.analysis.Segment` is in the valence band).
-        an :attr:`~effmass.analysis.Segment._ptype` is "electron", function returns Data.CBM (as :class:`~effmass.analysis.Segment` is in the conduction band).
+        If :attr:`~effmass.analysis.Segment._band_type` is "valence_band", function returns the Data.VBM (as :class:`~effmass.analysis.Segment` is in the valence band).
+        an :attr:`~effmass.analysis.Segment._band_type` is "conduction_band", function returns Data.CBM (as :class:`~effmass.analysis.Segment` is in the conduction band).
 
         Args:
             Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.
@@ -263,13 +261,13 @@ class Segment:
             float: the bandedge energy of the segment (eV).
         """
 
-        if self.ptype == "hole":
+        if self.band_type == "valence_band":
             bandedge_energy = Data.VBM
-        elif self.ptype == "electron":
+        elif self.band_type == "conduction_band":
             bandedge_energy = Data.CBM
-        elif self.ptype == "unknown":
+        elif self.band_type == "unknown":
             print(
-                "cannot determine bandedge energy as particle type unknown. Please set Segment.ptype."
+                "cannot determine the band edge energy as band type unknown. Please set Segment.band_type."
             )
             bandedge_energy = None
 
@@ -387,19 +385,18 @@ class Segment:
            
         """
         assert temp > 0, "temperature must be more than 0K"
-        if self.ptype == "electron":
+        if self.band_type == "conduction_band":
             return (1 / ((np.exp((self.energies[0] + self._kane_dispersion(
                 k, alpha, mass_bandedge) - fermi_level) / (
                     (boltzmann * temp) / q))) + 1))
-        if self.ptype == "hole":
+        elif self.band_type == "valence_band":
             return 1 - (1 / ((np.exp((self.energies[0] + self._kane_dispersion(
                 k, alpha, mass_bandedge) - fermi_level) / (
                     (boltzmann * temp) / q))) + 1))
-        if self.ptype == "unknown":
-            print(
-                "unable to calculate fermi function as particle type unknown (partial occupancy, please set Segment.ptype)"
-            )
-            return
+        elif self.band_type == "unknown":
+            raise ValueError("Unable to calculate fermi function as there is partial occupancy of the bands and the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
+        else:
+            raise ValueError("Please set the Segment.band_type attribute (options are \"valence_band\" or \"conduction_band\")")
 
     def _kane_dispersion(self, k, alpha, mass_bandedge):
         """Helper function for :meth:`~effmass.analysis.Segment.fd`.
@@ -500,13 +497,13 @@ class Segment:
         fermi_level = self.fermi_energy if fermi_level is None else fermi_level
 
         if ((fermi_level) > (self.energies[self.explosion_index()])):
-            if (self.ptype == "electron"):
+            if (self.band_type == "conduction_band"):
                 print(
                     "Fermi level {} is beyond the energy range where the Kane dispersion is valid.".
                     format(fermi_level))
 
         if (fermi_level) < (self.energies[self.explosion_index()]):
-            if self.ptype == "hole":
+            if self.band_type == "valence_band":
                 print(
                     "Fermi level {} is beyond the energy range where the Kane dispersion is valid.".
                     format(fermi_level))
