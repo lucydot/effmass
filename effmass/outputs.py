@@ -107,37 +107,49 @@ def plot_dos(Data):
     return fig, ax
 
 
-def print_results(segment, data, settings, polyfit_order=6):
-
+def print_results(segment, data, settings, polyfit_order=None):
+    
+    polyfit_order = settings.degree_bandfit if polyfit_order is None else polyfit_order
     _check_poly_order(polyfit_order)
+
 
     print(segment.band_type, segment.direction)
     print("3-point finite difference mass is {:.2f}".format(
         segment.finite_difference_effmass()))
     print("3-point parabolic mass is {:.2f}".format(
         segment.five_point_leastsq_effmass()))
-    print("weighted parabolic mass is {:.2f}".format(
-        segment.weighted_leastsq_effmass()))
+    try: 
+        print("weighted parabolic mass is {:.2f}".format(
+            segment.weighted_leastsq_effmass()))
+    except AssertionError as e:
+        print ("----------\n")
+        print (e)
+        print ("\n-----------")
 
-    if segment.alpha(polyfit_order=polyfit_order) is not None:
+    try:
         print("alpha is {:.2f} 1/eV".format(
             segment.alpha(polyfit_order=polyfit_order) * ev_to_hartree))
         print("kane mass at bandedge is {:.2f}".format(
             segment.kane_mass_band_edge(polyfit_order=polyfit_order)))
-    else:
-        print("no kane parameters calculated")
-    if segment.explosion_index(polyfit_order=polyfit_order) == len(
-            segment.dE_eV):
-        print(
-            "the Kane quasi linear approximation is valid for the whole segment"
-        )
+        if segment.explosion_index(polyfit_order=polyfit_order) == len(
+                segment.dE_eV):
+            print(
+                "the Kane quasi linear approximation is valid for the whole segment"
+            )
+        else:
+            print("the Kane quasi-linear approximation is valid until {:.2f} eV".
+                  format(segment.dE_eV[segment.explosion_index(
+                      polyfit_order=polyfit_order)]))
+    except AssertionError as e:
+        print ("----------\n")
+        print (e)
+        print ("\n-----------")
 
-    else:
-        print("the Kane quasi-linear approximation is valid until {:.2f} eV".
-              format(segment.dE_eV[segment.explosion_index(
-                  polyfit_order=polyfit_order)]))
-    print("optical mass at band edge (assuming the Kane dispersion) is {:.2f}".
-          format(segment.optical_effmass_kane_dispersion()))
+    try:
+        print("optical mass at band edge (assuming the Kane dispersion) is {:.2f}".
+              format(segment.optical_effmass_kane_dispersion()))
+    except AssertionError:
+        pass
 
     plt.figure(figsize=(8, 8))
     plt.plot(
@@ -161,14 +173,18 @@ def print_results(segment, data, settings, polyfit_order=6):
         marker="p",
         ms=5,
         label="five point parabolic")
-    plt.plot(
-        np.linspace(segment.dk_angs[0], segment.dk_angs[-1], 100),
-        np.divide(segment.weighted_leastsq_fit(), ev_to_hartree),
-        marker=">",
-        ms=5,
-        label="weighted parabolic")
 
-    if segment.kane_fit(polyfit_order=polyfit_order) is not None:
+    try:
+        plt.plot(
+            np.linspace(segment.dk_angs[0], segment.dk_angs[-1], 100),
+            np.divide(segment.weighted_leastsq_fit(), ev_to_hartree),
+            marker=">",
+            ms=5,
+            label="weighted parabolic")
+    except AssertionError:
+        pass
+
+    try:
         plt.plot(
             np.linspace(segment.dk_angs[0], segment.dk_angs[-1], 100),
             np.divide(
@@ -176,6 +192,9 @@ def print_results(segment, data, settings, polyfit_order=6):
             marker="o",
             ms=5,
             label="Kane quasi-linear")
+    except AssertionError as e:
+        pass
+
     plt.xlabel(r"k ($ \AA^{-1} $)")
     plt.ylabel("energy (eV)")
     plt.scatter(segment.dk_angs, segment.dE_eV, marker="x", s=200, label="DFT")
