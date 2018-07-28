@@ -25,7 +25,7 @@ def _check_partial_occupancy(occupancy):
     """
     if not np.all(np.in1d(occupancy,([0, 1, 2]))):
         warnings.warn(
-            "You have partial occupation numbers in Data.occupancy. Any eigenstate with an occupancy > 0.5 will be considered occupied. You should check that the attributes Data.VBM, Data.CBM and Data.fermi_energy are correct, and if not, set them manually."
+            "You have partial occupation numbers in Data.occupancy. You should check that the attributes Data.VBM, Data.CBM and Data.fermi_energy are correct, and if not, set them manually."
         )
 
 
