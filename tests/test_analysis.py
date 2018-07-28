@@ -41,11 +41,6 @@ def test_band_type(MAPI_soc_segment_object_valence_band):
 def test_band_type(MAPI_soc_segment_object_conduction_band):
 	assert MAPI_soc_segment_object_conduction_band._band_type() == "conduction_band"
 
-def test_bandedge_energy(toy_segments, toy_data_object):
-	assert math.isclose(toy_segments[0]._bandedge_energy(toy_data_object),extrema._calc_VBM(toy_data_object.occupancy,toy_data_object.energies))
-	assert math.isclose(toy_segments[1]._bandedge_energy(toy_data_object),extrema._calc_CBM(toy_data_object.occupancy,toy_data_object.energies))
-	assert math.isclose(toy_segments[2]._bandedge_energy(toy_data_object),extrema._calc_CBM(toy_data_object.occupancy,toy_data_object.energies))
-
 def test_weighting(toy_segments):
     weighting_1 = (1-0.999955005754945) # by hand
     weighting_2 = (1-0.999983701573141)
