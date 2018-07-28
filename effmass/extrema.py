@@ -23,10 +23,9 @@ def _check_partial_occupancy(occupancy):
     Returns:
         None.
     """
-    if occupancy.any() not in [0, 1, 2]:
+    if np.all(np.in1d(occupancy,([0, 1, 2]))) is not True:
         warnings.warn(
-            "You have partial occupation numbers in Data.occupancy. Any eigenstate with an occupancy > 0.5 will be considered occupied."+ 
-            " You may wish to set the attributes Data.VBM, Data.CBM and Data.fermi_energy manually."
+            "You have partial occupation numbers in Data.occupancy. Any eigenstate with an occupancy > 0.5 will be considered occupied. You may wish to set the attributes Data.VBM, Data.CBM and Data.fermi_energy manually."
         )
 
 
@@ -132,28 +131,28 @@ def find_extrema_indices(Data, Settings):
         array: A 2-dimensional array of size (number of extrema, 2). Each row corresponds to an extrema and contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index].
     """
 
-    energy_unoccupied = ma.masked_where(Data.occupancy > 0.5, Data.energies)
-    energy_occupied = ma.masked_where(Data.occupancy < 0.5, Data.energies)
+    energy_CB = ma.masked_where(Data.energies < Data.CBM, Data.energies)
+    energy_VB = ma.masked_where(Data.energies > Data.VBM, Data.energies)
 
     # returns array of energies within energy_range
     holes_in_range = ma.masked_where(
-        np.absolute(energy_occupied - Data.VBM) >
-        Settings.extrema_search_depth, energy_occupied)
-    hole_maxima = ma.masked_where(
+        np.absolute(energy_VB - Data.VBM) >
+        Settings.extrema_search_depth, energy_VB)
+    VB_maxima = ma.masked_where(
         _mark_maxima(holes_in_range) == 0, holes_in_range)
 
     # returns array of energies within energy_range
     electrons_in_range = ma.masked_where(
-        np.absolute(energy_unoccupied - Data.CBM) >
-        Settings.extrema_search_depth, energy_unoccupied)
-    electron_minima = ma.masked_where(
+        np.absolute(energy_CB - Data.CBM) >
+        Settings.extrema_search_depth, energy_CB)
+    CB_minima = ma.masked_where(
         _mark_minima(electrons_in_range) == 0, electrons_in_range)
 
     # Returns a 2D array of band numbers and k-points for extrema in the correct energy range.
     # At a given k-point there may be multiple bands with highest energy
     extrema_position = np.append(
-        np.argwhere(hole_maxima.mask == 0),
-        np.argwhere(electron_minima.mask == 0),
+        np.argwhere(VB_maxima.mask == 0),
+        np.argwhere(CB_minima.mask == 0),
         axis=0)
     return extrema_position
 

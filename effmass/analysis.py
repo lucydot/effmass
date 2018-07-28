@@ -74,10 +74,11 @@ class Segment:
         occupancy (array(float)): 2-dimensional array. Each row contains occupation number of the eigenstates for a particular band. A slice of :attr:`effmass.inputs.Data.occupancy`.
         direction (array): 1-dimensional array with length 3. The direction between kpoints in the segment.
         band_type (str): The band type, determined by occupancy of the eigenstate. Argument choices are "conduction_band", "valence_band" or "unknown". If set to "unknown", some class methods will raise a warning and return None. 
-        bandedge_energy: The enery of the VBM (if Segment instance is in valence band) or CBM (if Segment instance is in conduction band). Units are eV.
         fermi_energy (float): the fermi energy in eV.
         dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. A slice of :attr:`effmass.inputs.Data.dos`.
         integrated_dos (array): 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of :attr:`effmass.inputs.Data.integrated_dos`.
+           
+
     """
 
     def __init__(self, Data, band, kpoint_indices):
@@ -113,12 +114,12 @@ class Segment:
             [Data.occupancy[band, k] for k in kpoint_indices])
         self.direction = extrema.calculate_direction(self.kpoints[1],
                                                      self.kpoints[2])
-        self.band_type = self._band_type()
-        self.bandedge_energy = self._bandedge_energy(Data)
         self.fermi_energy = Data.fermi_energy
         self.dos = self._dos(Data)
         self.integrated_dos = self._integrated_dos(Data)
         self._VBM = Data.VBM
+        self._CBM = Data.CBM
+        self.band_type = self._band_type()
 
     def __str__(self):
         """
@@ -193,10 +194,8 @@ class Segment:
         elif self.band_type == "valence_band":
             probability = np.subtract(1,(1 / ((np.exp(
                 (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1))))
-        elif self.band_type == "unknown":
-            raise ValueError("Unable to calculate fermi function as there is partial occupancy of the bands and the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
         else:
-            raise ValueError("Please set the Segment.band_type attribute (options are \"valence_band\" or \"conduction_band\")")
+            raise ValueError("Unable to calculate fermi function as the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
         return probability
 
     def weighting(self, fermi_level=None, temp=300):
@@ -240,43 +239,16 @@ class Segment:
             str: the band type of the segment, either "valence_band", "conduction_band" or "unknown".
         """
 
-        if self.occupancy[0] == 1.0 or self.occupancy[0] == 2.0:
+        if self.energies[0] <= self._VBM:
             band_type = "valence_band"
-        elif self.occupancy[0] == 0.0:
+        elif self.energies[0] >= self._CBM:
             band_type = "conduction_band"
         else:
             print(
-                "There is partial occupancy of the band, so the band type unknown. Please set the Segment.band_type attribute manually."
+                "The band type unknown. Please set the Segment.band_type attribute manually."
             )
             band_type = "unknown"
         return band_type
-
-    def _bandedge_energy(self, Data):
-        """Identifies the bandedge energy of the
-        :class:`~effmass.analysis.Segment`, determined by the occupancy of the
-        first k-point.
-
-        If :attr:`~effmass.analysis.Segment._band_type` is "valence_band", function returns the Data.VBM (as :class:`~effmass.analysis.Segment` is in the valence band).
-        an :attr:`~effmass.analysis.Segment._band_type` is "conduction_band", function returns Data.CBM (as :class:`~effmass.analysis.Segment` is in the conduction band).
-
-        Args:
-            Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.
-
-        Returns:
-            float: the bandedge energy of the segment (eV).
-        """
-
-        if self.band_type == "valence_band":
-            bandedge_energy = Data.VBM
-        elif self.band_type == "conduction_band":
-            bandedge_energy = Data.CBM
-        elif self.band_type == "unknown":
-            print(
-                "Cannot determine the band edge energy as band type unknown. Please set Segment.band_type manually (options are \"conduction_band\" or \"valence_band\")."
-            )
-            bandedge_energy = None
-
-        return bandedge_energy
 
     def _dos(self, Data):
         """Returns slice of :attr:`effmass.Data.dos` corresponding to the
