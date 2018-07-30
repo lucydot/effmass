@@ -104,24 +104,39 @@ class Data():
         vasp_data = procar.Procar()
         vasp_data.read_from_file(procar_path)
 
-        if vasp_data.calculation['spin_polarised']: # to account for the change in PROCAR format for calculations with 2 spin channels (1 k-point block ---> 2 k-point blocks)
-            blocks = 2
-        else:
-            blocks = 1
-
         self.spin_channels = vasp_data.spin_channels
         self.number_of_kpoints = vasp_data.number_of_k_points - ignore
         self.number_of_bands = vasp_data.number_of_bands
         self.number_of_ions = vasp_data.number_of_ions
-        self.kpoints = vasp_data.k_points[ignore:]
-        self.energies = vasp_data.bands[self.number_of_bands *
-                                        ignore:, 1:].reshape(
+
+        if vasp_data.calculation['spin_polarised']: # to account for the change in PROCAR format for calculations with 2 spin channels (1 k-point block ---> 2 k-point blocks)
+            energies = np.zeros([self.number_of_bands*2,self.number_of_kpoints]) # This is a very ugly way to slice 'n' dice. Should avoid creating new array and use array methods instead. But it does the job so will keep for now.
+            for i in range(self.number_of_bands):
+                energies[i] = vasp_data.bands[:, 1:].reshape(
+                                            self.number_of_kpoints*2,  # factor or 2 for each kpoint block
+                                            self.number_of_bands).T[i][:284]
+                energies[20+i] = vasp_data.bands[:, 1:].reshape(
+                                            self.number_of_kpoints*2,
+                                            self.number_of_bands).T[i][284:]
+            occupancy = np.zeros([self.number_of_bands*2,self.number_of_kpoints])
+            for i in range(self.number_of_bands):
+                occupancy[i] = vasp_data.occupancy[:, 1:].reshape(
+                                                 self.number_of_kpoints*2,
+                                                 self.number_of_bands).T[i][:284]
+                occupancy[20+i] = vasp_data.occupancy[:, 1:].reshape(
+                                                 self.number_of_kpoints*2,
+                                                 self.number_of_bands).T[i][284:]
+        else:
+            energies = vasp_data.bands[:, 1:].reshape(
                                             self.number_of_kpoints,
-                                            self.number_of_bands*blocks).T
-        self.occupancy = vasp_data.occupancy[self.number_of_bands *
-                                             ignore:, 1:].reshape(
+                                            self.number_of_bands).T
+            occupancy = vasp_data.occupancy[:, 1:].reshape(
                                                  self.number_of_kpoints,
-                                                 self.number_of_bands*blocks).T
+                                                 self.number_of_bands).T
+
+        self.energies = np.delete(energies,list(range(ignore)),1)
+        self.occupancy = np.delete(occupancy,list(range(ignore)),1)
+        self.kpoints = vasp_data.k_points[ignore:vasp_data.number_of_k_points] 
         self.reciprocal_lattice = reciprocal_lattice * 2 * math.pi
         self.CBM = extrema._calc_CBM(self.occupancy, self.energies)
         self.VBM = extrema._calc_VBM(self.occupancy, self.energies)
