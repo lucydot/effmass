@@ -114,18 +114,18 @@ class Data():
             for i in range(self.number_of_bands):
                 energies[i] = vasp_data.bands[:, 1:].reshape(
                                             number_of_kpoints*2,  # factor or 2 for each kpoint block
-                                            self.number_of_bands).T[i][:284]
+                                            self.number_of_bands).T[i][:number_of_kpoints]
                 energies[20+i] = vasp_data.bands[:, 1:].reshape(
                                             number_of_kpoints*2,
-                                            self.number_of_bands).T[i][284:]
+                                            self.number_of_bands).T[i][number_of_kpoints:]
             occupancy = np.zeros([self.number_of_bands*2,number_of_kpoints])
             for i in range(self.number_of_bands):
                 occupancy[i] = vasp_data.occupancy[:, 1:].reshape(
                                                  number_of_kpoints*2,
-                                                 self.number_of_bands).T[i][:284]
+                                                 self.number_of_bands).T[i][:number_of_kpoints]
                 occupancy[20+i] = vasp_data.occupancy[:, 1:].reshape(
                                                  number_of_kpoints*2,
-                                                 self.number_of_bands).T[i][284:]
+                                                 self.number_of_bands).T[i][number_of_kpoints:]
         else:
             energies = vasp_data.bands[:, 1:].reshape(
                                             number_of_kpoints,
