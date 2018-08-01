@@ -11,12 +11,15 @@ def MAPI_settings_object():
 	return inputs.Settings(extrema_search_depth=0.025, energy_range=0.25)
 
 @pytest.fixture()
-def MAPI_soc_data_object(): # MAPI collinear calculation data
+def MAPI_soc_data_object(): # MAPI SoC calculation data
 	return inputs.Data(os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_PROCAR'), ignore=216)
 
+@pytest.fixture()
+def Ge_SP_data_object(): # Ge spin-polarised calculation from Adam Jackson
+ 	return inputs.Data(os.path.join(os.path.dirname(__file__), 'data/Ge_SP_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/Ge_SP_PROCAR'))
 
 @pytest.fixture()
-def MAPI_cl_data_object(): # MAPI spin obrit coupling calculation data
+def MAPI_cl_data_object(): # MAPI cl calculation data
 	return inputs.Data(os.path.join(os.path.dirname(__file__), 'data/MAPI_cl_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_cl_PROCAR'), ignore=216)
 
 @pytest.fixture()
