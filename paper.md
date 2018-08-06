@@ -25,7 +25,7 @@ This makes the effective mass a critical parameter in models for the optical and
 
 The effective mass has a number of definitions, depending on the perturbation under consideration. 
 The conventional definition of effective mass is inversely proportional to the second derivative of electron energy with respect to electron momentum [@Ashcroft1976, p. 227]. 
-This allows the effective mass to be easily calculated from *ab-initio* band structures, and there are existing codes which have implemented this [@Fornari2012 ; @Morgan2018].
+This allows the effective mass to be easily calculated from *ab-initio* band structures, and there are existing codes which have implemented this (see section ``Related packages'' below).
 
 We must approximate the band structure with a parabola for the previous definition to be valid [@Ariel2012]. 
 However, this approximation breaks down when there is a high concentration of electrons in the material - when, for example, the material is doped or excited under a laser. 
