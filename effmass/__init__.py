@@ -8,4 +8,4 @@ q= 1.60217662E-19
 boltzmann= 1.38064852E-23
 
 __all__ = ['inputs','outputs','extrema','analysis','dos']
-__version__ = '1.0.b3'
+__version__ = '1.0.0'
