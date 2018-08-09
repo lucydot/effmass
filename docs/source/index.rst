@@ -36,6 +36,8 @@ Details
    :target: https://zenodo.org/record/1285137#.Wx6QdFMvxBw
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://opensource.org/licenses/MIT
+.. image:: http://joss.theoj.org/papers/10.21105/joss.00797/status.svg
+   :target: https://doi.org/10.21105/joss.00797
 
 Documentation
 -------------
