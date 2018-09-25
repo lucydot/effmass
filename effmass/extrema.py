@@ -337,18 +337,22 @@ def get_kpoints_after(band_index,
     return kpoints_after
 
 
-def generate_segments(Settings, Data, truncate_dir_change=True):
+def generate_segments(Settings, Data, kb=None, truncate_dir_change=True):
     """Generates a list of Segment objects.
 
     Args:
         Settings (Settings): instance of the :class:`Settings` class.
         Data (Data): instance of the :class:`Data` class.
         truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.
-
-    Returns:
+        kb (list(int)): To manually set an extrema point, in format [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index]. Defaults to None.
+   
+   Returns:
         list(Segments): A list of :class:`Segment` objects.
     """
-    extrema_array = find_extrema_indices(Data, Settings)
+    if kb:
+        extrema_array = kb
+    else:
+        extrema_array = find_extrema_indices(Data, Settings)
     kpoints_list = []
     band_list = []
     for band, kpoint in extrema_array:
