@@ -337,7 +337,7 @@ def get_kpoints_after(band_index,
     return kpoints_after
 
 
-def generate_segments(Settings, Data, kb=None, truncate_dir_change=True):
+def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
     """Generates a list of Segment objects.
 
     Args:
@@ -349,7 +349,7 @@ def generate_segments(Settings, Data, kb=None, truncate_dir_change=True):
    Returns:
         list(Segments): A list of :class:`Segment` objects.
     """
-    if kb:
+    if bk:
         extrema_array = bk
     else:
         extrema_array = find_extrema_indices(Data, Settings)
