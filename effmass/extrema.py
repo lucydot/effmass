@@ -344,13 +344,13 @@ def generate_segments(Settings, Data, kb=None, truncate_dir_change=True):
         Settings (Settings): instance of the :class:`Settings` class.
         Data (Data): instance of the :class:`Data` class.
         truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.
-        kb (list(int)): To manually set an extrema point, in format [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index]. Defaults to None.
+        bk (list(int)): To manually set an extrema point, in format [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index]. Defaults to None.
    
    Returns:
         list(Segments): A list of :class:`Segment` objects.
     """
     if kb:
-        extrema_array = kb
+        extrema_array = bk
     else:
         extrema_array = find_extrema_indices(Data, Settings)
     kpoints_list = []
