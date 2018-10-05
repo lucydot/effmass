@@ -15,9 +15,9 @@ it may be that one of the packages listed below will suit your needs better.
 
 If you have an update to the information above then please use the Github `issue tracker <https://github.com/lucydot/effmass/issues/>`_. 
 
-=================================================
+===================================================
 Which features are unique to the `effmass` package?
-=================================================
+===================================================
 
 To our knowledge, the following features are unique to `effmass`:
 
