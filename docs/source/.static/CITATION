@@ -1,8 +1,0 @@
-@misc{Whalley_Zenodo2018a,
-  author       = {Lucy D. Whalley},
-  title        = {effmass: 0.1.0},
-  month        = jun,
-  year         = 2018,
-  doi          = {10.5281/zenodo.1285137},
-  url          = {http://dx.doi.org/10.5281/zenodo.1285137}
-}
