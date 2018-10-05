@@ -22,7 +22,7 @@ Details
 :Authors: Lucy Whalley
 :Contact: lucywhalley@gmail.com
 :GitHub: https://github.com/lucydot
-:Citation: :download:`bibtex<.static/Whalley2018_CITATION>`
+:Citation: :download:`bibtex<.static/Whalley2018_CITATION.bib>`
 
 .. image:: https://badge.fury.io/py/effmass.svg
    :target: https://pypi.org/project/effmass/0.1.0/  
