@@ -95,7 +95,7 @@ Whalley, Lucy D. (2018). *effmass - an effective mass package*. The Journal of O
 ### Bibtex
 
 ```
-@misc{Whalley_Zenodo2018a,
+@misc{Whalley_JOSS2018,
   author       = {Lucy D. Whalley},
   title        = {effmass: An effective mass package},
   volume       = {3},
