@@ -1,0 +1,35 @@
+SYSTEM = Hybrid non self-consistent (band structure) calculation with SoC
+ 
+ICORELEVEL = 1
+ISTART = 1
+
+PREC = Accurate (Precision level for FFT grid)
+ENMAX = 500.00 (Plane-wave cutoff)
+EDIFF = 1E-06 (SCF convergence criteria)
+LREAL = False
+NELMIN   = 5          (Min number of SCF steps)
+
+EDIFFG = -0.005
+NSW = 0 (Max ionic steps)
+IBRION = 1
+ISIF = 3
+ISMEAR = 0  (Gaussian smearing)
+SIGMA  = 0.01 (Smearing value in eV)
+ISYM = 0 (Turn off symmetry for SoC calculations)
+
+LORBIT = 10
+LSORBIT=.TRUE.
+NBANDS = 112
+NPAR   = 24        (Max is no. cores)
+KPAR   = 32
+
+LHFCALC = .TRUE. (Activate HF)
+PRECFOCK = Fast   (HF FFT grid)
+ALGO = All    (SCF Combo; ALGO=58)
+HFSCREEN = 0.207  (Screened exchange; e.g. HSE06)
+AEXX = 0.25   (25% HF exchange; e.g. PBE0)
+
+
+
+
+

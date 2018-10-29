@@ -1,0 +1,52 @@
+SYSTEM = Name
+!Start Parameters
+ ISTART     = 1     (Read existing wavefunction, if present)
+ !!INIWAV     = 1     (Random initial wavefunction)
+ ICORELEVEL = 1     (Print core levels in OUTCAR)
+ ICHARG   =  11   (Non-selfconsistent: band structures)
+ !!NELECT   = 352   (Number of electrons: charged cells)
+ !!NBANDS   = 468   (Increase number of bands)
+
+!Electronic Relaxation
+ PREC   = Accurate    (Precision level for FFT grid)
+LREAL  = False       (Projection operators: automatic)
+!! LREAL  = False        (Projection operators: small cell false)
+!! ALGO   = Normal      (Electronic minimisation algorithm: 38/48)
+ ENMAX  = 500.00 eV   (Plane-wave cutoff)
+!! NELM   = 35          (Max number of SCF steps)
+ EDIFF  = 1E-06       (SCF convergence criteria)
+ GGA    =  PS         (PBEsol exchange-correlation)
+ AMIN   = 0.01
+
+!Ionic Relaxation
+ EDIFFG =      -0.005 (Ionic convergence criteria, eV/AA)
+ NSW    =      0    (Max ionic steps)
+ IBRION =      2      (Ions: 0-MD, 1-Quasi-New, 2-CG)
+ ISIF   =      3      (Stress/Relaxation: 2-Ions, 3-Shape/Ions/Vol, 7-Vol)
+ ISYM   =      2      (Symmetry: Use all, 0: none)
+ ISMEAR =      0      (Gaussian smearing, Metals:1, MP)
+ SIGMA  =      0.01   (Smearing value in eV, Metals:0.2)
+
+!Miscellaneous
+ LORBIT    =   10     (PAW radii for projected DOS)\\
+ !!LOPTICS = .TRUE.   (Output OPTIC file)
+ !!NEDOS    =  1000    (Increase DOSCAR points)
+ !!LVHAR   = .TRUE.   (Output electrostatic potential)
+ !!LELF    = .TRUE.   (Output electron localization function)
+
+!! NBNB THESE PARAMETERS MUST BE SET BY THE USER, THEY WILL BE USED FOR EVERY CALCULATION
+NPAR   = 4        (Max is no. nodes)
+ KPAR   = 4
+ ISPIN     =  1      (Closed shell: 1, Spin Polarised: 2)
+ !!MAGMOM  = 5 0     (Initial magnetic mom each ion)
+ !!NUPDOWN = -1      (Enforce spin multiplet)
+ !!LSORBIT = .TRUE.  (Spin-orbit coupling)
+
+!DFT+U Calculations
+ !!LDAU     = .TRUE.   (Activate DFT+U)
+ !!LDATYPE  = 2        (Dudarev, only U-J matters)
+ !!LDAUL    = 2 -1     (Orbital for each species)
+ !!LDAUU    = 2  0     (U for each species)
+ !!LDAUJ    = 0  0     (J for each species)
+ !!LMAXMIX    =  4       (Mixing cutoff: 4-d,6-f)
+
