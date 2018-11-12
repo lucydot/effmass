@@ -138,6 +138,11 @@ class Data():
         self.energies = np.delete(energies,list(range(ignore)),1)
         self.occupancy = np.delete(occupancy,list(range(ignore)),1)
         self.number_of_kpoints = number_of_kpoints - ignore
+        
+        # handle negative occupancy values
+        if np.any(self.occupancy < 0):
+            warnings.warn("One or more occupancies in your PROCAR file are negative. All negative occupancies will be set to zero.")
+            self.occupancy[ self.occupancy < 0 ] = 0.0
 
         self.kpoints = vasp_data.k_points[ignore:vasp_data.number_of_k_points] 
         self.reciprocal_lattice = reciprocal_lattice * 2 * math.pi
