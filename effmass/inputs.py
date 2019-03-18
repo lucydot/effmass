@@ -63,7 +63,7 @@ class Settings:
         ), "The bandfit degree must be a positive integer greater than 1"
 
 
-class Data_Vasp():
+class Data():
     r"""
     Class for parsing and storing data from a vasp calculation.
 
