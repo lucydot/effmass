@@ -3,8 +3,8 @@
 """
 A module for storing electronic structure data and user settings.
 
-The module contains a :class:`Data` class which parses OUTCAR and PROCAR files using the `vasppy <https://github.com/bjmorgan/vasppy>`_ package. 
-A function for parsing DOSCAR files is also provided. 
+The module contains a :class:`Data` class which parses OUTCAR and PROCAR files using the `vasppy <https://github.com/bjmorgan/vasppy>`_ package.
+A function for parsing DOSCAR files is also provided.
 A :class:`Settings` class stores analysis parameters set by the user.
 
 """
@@ -63,7 +63,7 @@ class Settings:
         ), "The bandfit degree must be a positive integer greater than 1"
 
 
-class Data():
+class Data_Vasp():
     r"""
     Class for parsing and storing data from a vasp calculation.
 
@@ -73,13 +73,13 @@ class Data():
         number_of_bands (int): the number of bands.
         number_of_ions (int): the number of ions.
         kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
-        energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band. 
-        occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).     
+        energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
+        occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
         reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
         CBM (float): the conduction band minimum energy in eV.
         VBM (float): the valence band maximum in eV.
-        fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM. 
-        dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. 
+        fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.
+        dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)].
         integrated_dos: 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].
     """
 
@@ -91,8 +91,8 @@ class Data():
             outcar_path (str): The path to the OUTCAR file
             procar_path (str): The path to the PROCAR file
             ignore (int): The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).
-        
-        Returns: 
+
+        Returns:
             None.
         """
         assert (type(outcar_path) == str), "The OUTCAR path must be a string"
@@ -133,18 +133,18 @@ class Data():
             occupancy = vasp_data.occupancy[:, 1:].reshape(
                                                  number_of_kpoints,
                                                  self.number_of_bands).T
-        
+
         # remove values which are from the self-consistent calculation prior to the bandstructure calculation (workflow for hybrid functionals)
         self.energies = np.delete(energies,list(range(ignore)),1)
         self.occupancy = np.delete(occupancy,list(range(ignore)),1)
         self.number_of_kpoints = number_of_kpoints - ignore
-        
+
         # handle negative occupancy values
         if np.any(self.occupancy < 0):
             warnings.warn("One or more occupancies in your PROCAR file are negative. All negative occupancies will be set to zero.")
             self.occupancy[ self.occupancy < 0 ] = 0.0
 
-        self.kpoints = vasp_data.k_points[ignore:vasp_data.number_of_k_points] 
+        self.kpoints = vasp_data.k_points[ignore:vasp_data.number_of_k_points]
         self.reciprocal_lattice = reciprocal_lattice * 2 * math.pi
         self.CBM = extrema._calc_CBM(self.occupancy, self.energies)
         self.VBM = extrema._calc_VBM(self.occupancy, self.energies)
@@ -222,3 +222,252 @@ class Data():
         else:
             print("problem parsing DOSCAR")
         return
+
+
+class Data_Aims():
+    r"""
+    Class for parsing and storing data from a FHI-AIMS calculation.
+
+    Attributes:
+        spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).
+        number_of_kpoints (int): the number of k-points per band.
+        number_of_bands (int): the number of bands.
+        number_of_ions (int): the number of ions.
+        kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
+        energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
+        occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
+        reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
+        CBM (float): the conduction band minimum energy in eV.
+        VBM (float): the valence band maximum in eV.
+        fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.
+    """
+
+    def __init__(self, file_path):
+        r"""
+        Initialises an instance of the :class:`~effmass.inputs.Data_Aims` class and checks data using :meth:`check_data`.
+
+        Args:
+            file_path (str): The path to the directory containing output, geometry.in, control.in and bandstructure files
+            ignore (int): The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).
+
+        Returns:
+            None.
+        """
+        assert (type(file_path) == str), "The file path must be a string"
+
+        "Finding reciprocal lattice vectors"
+
+        latvec = []
+
+        for line in open("{}/geometry.in".format(file_path)):
+            line = line.split("\t")[0]
+            words = line.split()
+            if len(words) == 0:
+                continue
+            if words[0] == "lattice_vector":
+                if len(words) != 4:
+                    raise Exception("geometry.in: Syntax error in line '"+line+"'")
+                latvec.append(np.array(words[1:4]))
+
+        if len(latvec) != 3:
+            raise Exception("geometry.in: Must contain exactly 3 lattice vectors")
+
+        latvec = np.asarray(latvec)
+        latvec = latvec.astype(np.float)
+
+        #Calculate reciprocal lattice vectors
+        rlatvec = []
+        volume = (np.dot(latvec[0,:],np.cross(latvec[1,:],latvec[2,:])))
+        rlatvec.append(np.array(2*math.pi*np.cross(latvec[1,:],latvec[2,:])/volume))
+        rlatvec.append(np.array(2*math.pi*np.cross(latvec[2,:],latvec[0,:])/volume))
+        rlatvec.append(np.array(2*math.pi*np.cross(latvec[0,:],latvec[1,:])/volume))
+
+        reciprocal_lattice = np.asarray(rlatvec)
+        self.reciprocal_lattice = reciprocal_lattice
+
+
+        "Finding spin channels"
+
+        spin_channels = 0
+
+        for line in open("{}/control.in".format(file_path)):
+            line = line.split("\t")[0]
+            words = line.split()
+            if len(words) == 0:
+                continue
+            if words[0] == "spin" and words[1] == "none":
+                spin_channels = 1
+            elif words[0] == "spin" and words[1] == "collinear":
+                spin_channels = 2
+            elif words[0] == "include_spin_orbit":
+                spin_channels = 4
+
+        self.spin_channels = spin_channels
+
+        "Finding number of bands"
+
+        number_of_bands = 0
+
+        for line in open("{}/calculation.out".format(file_path)):
+            line = line.split("\t")[0]
+            if "Number of states" in line:
+                words = line.split()
+                number_of_bands = int(words[-1])
+
+                break
+
+        if spin_channels == 2: #Doubling for spin-polarised calculation
+            number_of_bands = 2*number_of_bands
+
+        self.number_of_bands = number_of_bands
+
+        "Finding number of ions"
+
+        number_of_ions = 0
+
+        for line in open("{}/calculation.out".format(file_path)):
+            line = line.split("\t")[0]
+            if "Number of atoms" in line:
+                words = line.split()
+                number_of_ions = int(words[-1])
+
+                break
+
+        self.number_of_ions = number_of_ions
+
+        "Finding number of kpoints and determining number of BZ paths"
+
+        number_of_kpoints = 0
+        number_of_BZ_paths = 0
+        path_list = []
+
+        for line in open("{}/control.in".format(file_path)):
+            line = line.split("\t")[0]
+            if not line.startswith("#") and "output band" in line:
+                words = line.split()
+                path_list.append(int(words[8]))
+                number_of_BZ_paths += 1
+
+        number_of_kpoints = sum(path_list)
+
+        "Reading out bandstructure files to determine kpoint, energy and occupation matrices"
+
+        kpoints = np.zeros([number_of_kpoints,3])
+        energies = np.zeros([number_of_bands,number_of_kpoints])
+        occupancy = np.zeros([number_of_bands,number_of_kpoints])
+        path_counter = 0
+
+        if spin_channels == 1 or spin_channels == 4:
+            kpoint_counter = 0
+            while path_counter<number_of_BZ_paths:
+                kpoint_counter = sum(path_list[:path_counter])
+                for line in open("{}/band1{:03d}.out".format(file_path, path_counter+1)):
+                    line = line.split("\t")[0]
+                    words = line.split()
+                    kpoints[kpoint_counter,0] = float(words[1])
+                    kpoints[kpoint_counter,1] = float(words[2])
+                    kpoints[kpoint_counter,2] = float(words[3])
+                    for i in range(number_of_bands):
+                        energies[i,kpoint_counter] = float(words[5+2*i])
+                        occupancy[i,kpoint_counter] = float(words[4+2*i])
+                    kpoint_counter += 1
+                path_counter +=1
+
+        if spin_channels == 2:
+            while path_counter<number_of_BZ_paths:
+                kpoint_counter = sum(path_list[:path_counter])
+                for line in open("{}/band1{:03d}.out".format(file_path, path_counter+1)):
+                    line = line.split("\t")[0]
+                    words = line.split()
+                    kpoints[kpoint_counter,0] = float(words[1])
+                    kpoints[kpoint_counter,1] = float(words[2])
+                    kpoints[kpoint_counter,2] = float(words[3])
+                    for i in range(number_of_bands//2):
+                        energies[i,kpoint_counter] = float(words[5+2*i])
+                        occupancy[i,kpoint_counter] = float(words[4+2*i])
+                    kpoint_counter += 1
+                kpoint_counter = sum(path_list[:path_counter])
+                for line in open("{}/band2{:03d}.out".format(file_path, path_counter+1)):
+                    line = line.split("\t")[0]
+                    words = line.split()
+                    for i in range(number_of_bands//2):
+                        energies[number_of_bands//2+i,kpoint_counter] = float(words[5+2*i])
+                        occupancy[number_of_bands//2+i,kpoint_counter] = float(words[4+2*i])
+                    kpoint_counter += 1
+                path_counter += 1
+
+        "Delete double kpoints at path edges"
+
+        index_count = len(kpoints)
+        index = 0
+        while index < index_count-1:
+            if np.array_equal(kpoints[index],kpoints[index+1]):
+                kpoints = np.delete(kpoints,index+1,axis=0)
+                energies = np.delete(energies,index+1,axis=1)
+                occupancy = np.delete(occupancy,index+1,axis=1)
+                index_count = len(kpoints)
+            index += 1
+
+        self.number_of_kpoints = len(kpoints)
+
+
+        self.CBM = extrema._calc_CBM(occupancy, energies)
+        self.VBM = extrema._calc_VBM(occupancy, energies)
+        self.fermi_energy = (self.CBM + self.VBM) / 2
+
+        "Cutting energy values in a range of 30 eV above and below the Fermi level. FHI AIMS is all electron, but not all states are needed for a meaningful effmass calculation"
+
+        index_count = len(occupancy)
+        index = 0
+        while index < index_count-1:
+            if all(item < self.fermi_energy - 30 for item in energies[index]):
+                energies = np.delete(energies, index, axis = 0)
+                occupancy = np.delete(occupancy, index, axis = 0)
+                index_count = len(occupancy)
+            elif all(item > self.fermi_energy + 30 for item in energies[index]):
+                energies = np.delete(energies, index, axis = 0)
+                occupancy = np.delete(occupancy, index, axis = 0)
+                index_count = len(occupancy)
+            else:
+                index += 1
+
+        self.energies = energies
+        self.occupancy = occupancy
+        self.kpoints = kpoints
+        self.dos = []
+        self.integrated_dos = []
+        self.check_data()
+
+    def check_data(self):
+        """Check that data class attributes are sane.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Notes:
+            There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
+        """
+        assert (
+            ((self.spin_channels == 1) | (self.spin_channels == 2) |
+             (self.spin_channels == 4)) is True
+        ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
+        assert (type(self.number_of_kpoints) == int
+                and self.number_of_kpoints > 0
+                ), "The number of kpoints is not a positive integer"
+        assert (type(self.number_of_bands) == int and self.number_of_bands > 0
+                ), "The number of bands is not a positive integer"
+        assert (type(self.number_of_ions) == int and self.number_of_ions > 0
+                ), "The number of ions is not a positive integer"
+        assert (self.CBM >
+                self.VBM), "The CBM energy is lower than than the VBM energy"
+        if self.fermi_energy < self.VBM:
+            warnings.warn("The fermi energy is lower than the VBM")
+        if self.fermi_energy > self.CBM:
+            warnings.warn("The fermi energy is higher than the CBM")
+        if ((self.occupancy == 0) | (self.occupancy == 1) |
+            (self.occupancy == 2)).all() is False:
+            warnings.warn("You have partial occupancy of bands")
+
