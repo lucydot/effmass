@@ -14,7 +14,8 @@ Examples are provided in a Jupyter notebook [here](https://nbviewer.jupyter.org/
 API documentation is [here](https://effmass.readthedocs.io/en/latest/).
 Source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
 
-The [paper](https://github.com/lucydot/effmass/paper) directory contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for an academic paper (to be published).
+The [paper](https://github.com/lucydot/effmass/paper) directory contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for an academic paper using this software: *Impact of nonparabolic electronic band structure on the optical and transport properties of photovoltaic materials*  
+Phys. Rev. B **99** (8), 085207 - also avaiable on [arXiv](https://arxiv.org/pdf/1811.02281.pdf)..
 
 ## Features
 
