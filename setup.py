@@ -20,7 +20,7 @@ config = {
     'url': 'https://github.com/lucydot/effmass',
     'download_url': "https://github.com/lucydot/effmass/archive/%s.tar.gz" % (__version__),
     'version': __version__,
-    'install_requires': [ 'vasppy', 
+    'install_requires': [ 'vasppy>=0.5.0.0', 
 			  'scipy',
 			  'numpy', 
                           'matplotlib',

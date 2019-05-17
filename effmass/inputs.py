@@ -83,26 +83,31 @@ class Data():
         integrated_dos: 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].
     """
 
-    def __init__(self, outcar_path, procar_path, ignore=0):
+    def __init__(self, outcar_path, procar_path, ignore=0, **kwargs):
         r"""
         Initialises an instance of the :class:`~effmass.inputs.Data` class and checks data using :meth:`check_data`.
 
         Args:
             outcar_path (str): The path to the OUTCAR file
-            procar_path (str): The path to the PROCAR file
+            procar_path (:obj:`str` or :obj:`list`): The path(s) to one or more PROCAR files.
+            
             ignore (int): The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).
-        
+            **kwargs: Additional keyword arguments for reading the PROCAR file(s). 
+ 
         Returns: 
             None.
         """
         assert (type(outcar_path) == str), "The OUTCAR path must be a string"
-        assert (type(procar_path) == str), "The PROCAR path must be a string"
         assert (type(ignore) == int and ignore >= 0
                 ), "The number of kpoints to ignore must be a positive integer"
 
         reciprocal_lattice = outcar.reciprocal_lattice_from_outcar(outcar_path)
-        vasp_data = procar.Procar()
-        vasp_data.read_from_file(procar_path)
+        if isinstance(procar_path, list):
+            vasp_data = Procar.from_files(procar_path, **kwargs)
+        elif isinstance(procar_path, str):
+            vasp_data = Procar.from_file,(procar_path, **kwargs)
+        else:
+            raise TypeError('procar_path must be a string or list of strings')
 
         self.spin_channels = vasp_data.spin_channels
         self.number_of_bands = vasp_data.number_of_bands
