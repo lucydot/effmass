@@ -144,7 +144,8 @@ class Data():
             warnings.warn("One or more occupancies in your PROCAR file are negative. All negative occupancies will be set to zero.")
             self.occupancy[ self.occupancy < 0 ] = 0.0
 
-        self.kpoints = vasp_data.k_points[ignore:vasp_data.number_of_k_points] 
+        self.kpoints = np.array( [ kp.fractional_coordinates 
+            for kp in vasp_data.k_points[ignore:vasp_data.number_of_k_points] ] )
         self.reciprocal_lattice = reciprocal_lattice * 2 * math.pi
         self.CBM = extrema._calc_CBM(self.occupancy, self.energies)
         self.VBM = extrema._calc_VBM(self.occupancy, self.energies)
