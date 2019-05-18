@@ -15,6 +15,7 @@ except ImportError:
 config = {
     'description': 'An effective mass package',
     'long_description': long_description,
+    'long_description_content_type': 'text/markdown',
     'author': 'Lucy Whalley',
     'author_email': 'lucywhalley@gmail.com',
     'url': 'https://github.com/lucydot/effmass',
