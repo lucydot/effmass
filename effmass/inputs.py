@@ -83,54 +83,61 @@ class Data():
         integrated_dos: 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].
     """
 
-    def __init__(self, outcar_path, procar_path, ignore=0):
+    def __init__(self, outcar_path, procar_path, ignore=0, **kwargs):
         r"""
         Initialises an instance of the :class:`~effmass.inputs.Data` class and checks data using :meth:`check_data`.
 
         Args:
             outcar_path (str): The path to the OUTCAR file
-            procar_path (str): The path to the PROCAR file
+            procar_path (:obj:`str` or :obj:`list`): The path(s) to one or more PROCAR files.
+            
             ignore (int): The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).
-        
+            **kwargs: Additional keyword arguments for reading the PROCAR file(s). 
+ 
         Returns: 
             None.
         """
         assert (type(outcar_path) == str), "The OUTCAR path must be a string"
-        assert (type(procar_path) == str), "The PROCAR path must be a string"
         assert (type(ignore) == int and ignore >= 0
                 ), "The number of kpoints to ignore must be a positive integer"
 
         reciprocal_lattice = outcar.reciprocal_lattice_from_outcar(outcar_path)
-        vasp_data = procar.Procar()
-        vasp_data.read_from_file(procar_path)
+        if isinstance(procar_path, list):
+            vasp_data = procar.Procar.from_files(procar_path, **kwargs)
+        elif isinstance(procar_path, str):
+            vasp_data = procar.Procar.from_file(procar_path, **kwargs)
+        else:
+            raise TypeError('procar_path must be a string or list of strings')
 
         self.spin_channels = vasp_data.spin_channels
         self.number_of_bands = vasp_data.number_of_bands
         self.number_of_ions = vasp_data.number_of_ions
 
         number_of_kpoints = vasp_data.number_of_k_points
+        vasp_data_energies = np.array( [ band.energy for band in np.ravel( vasp_data.bands ) ] )
+        vasp_data_occupancies = np.array( [ band.occupancy for band in np.ravel( vasp_data.bands ) ] )
         if vasp_data.calculation['spin_polarised']: # to account for the change in PROCAR format for calculations with 2 spin channels (1 k-point block ---> 2 k-point blocks)
             energies = np.zeros([self.number_of_bands*2,number_of_kpoints]) # This is a very ugly way to slice 'n' dice. Should avoid creating new array and use array methods instead. But it does the job so will keep for now.
             for i in range(self.number_of_bands):
-                energies[i] = vasp_data.bands[:, 1:].reshape(
-                                            number_of_kpoints*2,  # factor or 2 for each kpoint block
+                energies[i] = vasp_data_energies.reshape(
+                                            number_of_kpoints*2,  # factor of 2 for each kpoint block
                                             self.number_of_bands).T[i][:number_of_kpoints]
-                energies[self.number_of_bands+i] = vasp_data.bands[:, 1:].reshape(
+                energies[self.number_of_bands+i] = vasp_data_energies.reshape(
                                             number_of_kpoints*2,
                                             self.number_of_bands).T[i][number_of_kpoints:]
             occupancy = np.zeros([self.number_of_bands*2,number_of_kpoints])
             for i in range(self.number_of_bands):
-                occupancy[i] = vasp_data.occupancy[:, 1:].reshape(
+                occupancy[i] = vasp_data_occupancies.reshape(
                                                  number_of_kpoints*2,
                                                  self.number_of_bands).T[i][:number_of_kpoints]
-                occupancy[self.number_of_bands+i] = vasp_data.occupancy[:, 1:].reshape(
+                occupancy[self.number_of_bands+i] = vasp_data_occupancies.reshape(
                                                  number_of_kpoints*2,
                                                  self.number_of_bands).T[i][number_of_kpoints:]
         else:
-            energies = vasp_data.bands[:, 1:].reshape(
+            energies = vasp_data_energies.reshape(
                                             number_of_kpoints,
                                             self.number_of_bands).T
-            occupancy = vasp_data.occupancy[:, 1:].reshape(
+            occupancy = vasp_data_occupancies.reshape(
                                                  number_of_kpoints,
                                                  self.number_of_bands).T
         
@@ -144,7 +151,8 @@ class Data():
             warnings.warn("One or more occupancies in your PROCAR file are negative. All negative occupancies will be set to zero.")
             self.occupancy[ self.occupancy < 0 ] = 0.0
 
-        self.kpoints = vasp_data.k_points[ignore:vasp_data.number_of_k_points] 
+        self.kpoints = np.array( [ kp.frac_coords 
+            for kp in vasp_data.k_points[ignore:vasp_data.number_of_k_points] ] )
         self.reciprocal_lattice = reciprocal_lattice * 2 * math.pi
         self.CBM = extrema._calc_CBM(self.occupancy, self.energies)
         self.VBM = extrema._calc_VBM(self.occupancy, self.energies)
