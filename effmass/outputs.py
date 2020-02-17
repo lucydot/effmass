@@ -116,7 +116,7 @@ def print_results(segment, data, settings, polyfit_order=None):
     print(segment.band_type, segment.direction)
     print("3-point finite difference mass is {:.2f}".format(
         segment.finite_difference_effmass()))
-    print("3-point parabolic mass is {:.2f}".format(
+    print("5-point parabolic mass is {:.2f}".format(
         segment.five_point_leastsq_effmass()))
     try: 
         print("weighted parabolic mass is {:.2f}".format(
