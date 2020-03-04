@@ -148,7 +148,6 @@ class Segment:
 
     def explosion_index(self, polyfit_order=6):
         r"""
-        This will find the index at which there is a change in sign of the second derivative. 
         This will find the index at which there is a change in sign of the second derivative.
 
         In the region of this point the first derivative will pass through zero and so the transport mass (:math:`\frac{1}{\delta E \delta k}`) will explode.
