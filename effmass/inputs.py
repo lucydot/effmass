@@ -343,10 +343,11 @@ class Data_Aims():
 
         for line in open("{}/control.in".format(file_path)):
             line = line.split("\t")[0]
-            if not line.startswith("#") and "output band" in line:
-                words = line.split()
-                path_list.append(int(words[8]))
-                number_of_BZ_paths += 1
+            if not line.startswith("#") and "output" in line:
+                if "bands" in line:
+                   words = line.split()
+                   path_list.append(int(words[8]))
+                   number_of_BZ_paths += 1
 
         number_of_kpoints = sum(path_list)
 
