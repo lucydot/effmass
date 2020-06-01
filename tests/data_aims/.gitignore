@@ -1,0 +1,15 @@
+build/
+dist/
+effmass.egg-info/
+**.ipynb_checkpoints
+**.DS_Store
+**.bbl
+**.blg
+**.log
+**Notes.bib
+**.pyc
+**.aux
+**.dvi
+__pycache__/
+docs/build/
+**/.pytest_cache
