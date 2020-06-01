@@ -11,7 +11,7 @@ effmass.egg-info/
 **.aux
 **.dvi
 **.out
-!tests/data_aims
+!tests/data_aims/**
 __pycache__/
 docs/build/
 **/.pytest_cache
