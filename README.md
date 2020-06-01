@@ -8,13 +8,16 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![JOSS status](http://joss.theoj.org/papers/389754561f0710b756514b8cb9ac0e6a/status.svg)](http://joss.theoj.org/papers/389754561f0710b756514b8cb9ac0e6a)
 
+** Please note that I am on maternity leave until Oct 2020 and may not be able to respond to issue requests etc. Feel free to raise an issue and someone else may be able to respond (or I *may* be able to find time...) **
+
 `effmass` is a Python 3 package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
 Examples are provided in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb).
 API documentation is [here](https://effmass.readthedocs.io/en/latest/).
 Source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
 
-The [paper](https://github.com/lucydot/effmass/paper) directory contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for an academic paper (to be published).
+The [paper](https://github.com/lucydot/effmass/paper) directory contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for an academic paper using this software: *Impact of nonparabolic electronic band structure on the optical and transport properties of photovoltaic materials*  
+Phys. Rev. B **99** (8), 085207 - also avaiable on [arXiv](https://arxiv.org/pdf/1811.02281.pdf)..
 
 ## Features
 

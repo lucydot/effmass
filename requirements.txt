@@ -1,4 +1,4 @@
-vasppy
+vasppy>=0.5.0.0
 scipy
 numpy
 matplotlib
