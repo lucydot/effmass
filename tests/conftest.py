@@ -23,6 +23,18 @@ def MAPI_cl_data_object(): # MAPI cl calculation data
 	return inputs.Data(os.path.join(os.path.dirname(__file__), 'data/MAPI_cl_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_cl_PROCAR'), ignore=216)
 
 @pytest.fixture()
+def Ge_nsp_aims_data_object(): # Ge non spin-polarised calculation done with FHI-Aims
+        return inputs.DataAims(os.path.join(os.path.dirname(__file__), 'data_aims/Ge_nsp_aims'))
+
+@pytest.fixture()
+def Ge_sp_aims_data_object(): # Ge spin-polarised calculation done with FHI-Aims
+        return inputs.DataAims(os.path.join(os.path.dirname(__file__), 'data_aims/Ge_sp_aims'))
+
+@pytest.fixture()
+def Ge_soc_aims_data_object(): # Ge spin-orbit coupling calculation done with FHI-Aims
+        return inputs.DataAims(os.path.join(os.path.dirname(__file__), 'data_aims/Ge_soc_aims'))
+
+@pytest.fixture()
 def MAPI_soc_data_object_with_DOSCAR(MAPI_settings_object): # MAPI spin orbit coupling calculation data with doscar loaded
     data = inputs.Data(os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_PROCAR'), ignore=216)
     data.parse_DOSCAR(os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_DOSCAR'))

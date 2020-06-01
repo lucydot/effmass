@@ -224,7 +224,7 @@ class Data():
         return
 
 
-class Data_Aims():
+class DataAims():
     r"""
     Class for parsing and storing data from a FHI-AIMS calculation.
 
@@ -290,17 +290,15 @@ class Data_Aims():
 
         spin_channels = 0
 
-        for line in open("{}/control.in".format(file_path)):
+        for line in open("{}/calculation.out".format(file_path)):
             line = line.split("\t")[0]
-            words = line.split()
-            if len(words) == 0:
-                continue
-            if words[0] == "spin" and words[1] == "none":
-                spin_channels = 1
-            elif words[0] == "spin" and words[1] == "collinear":
-                spin_channels = 2
-            elif words[0] == "include_spin_orbit":
-                spin_channels = 4
+            if "include_spin_orbit" in line:
+               spin_channels = 4
+               break
+            elif "Number of spin channels" in line:
+               words = line.split()
+               spin_channels = int(words[-1])
+               break
 
         self.spin_channels = spin_channels
 
@@ -341,13 +339,14 @@ class Data_Aims():
         number_of_BZ_paths = 0
         path_list = []
 
-        for line in open("{}/control.in".format(file_path)):
+        for line in open("{}/calculation.out".format(file_path)):
             line = line.split("\t")[0]
             if not line.startswith("#") and "output" in line:
-                if "bands" in line:
+                if "band" in line:
                    words = line.split()
-                   path_list.append(int(words[8]))
-                   number_of_BZ_paths += 1
+                   if words[0]=="output" and words[1]=="band":
+                     path_list.append(int(words[8]))
+                     number_of_BZ_paths += 1
 
         number_of_kpoints = sum(path_list)
 
@@ -365,12 +364,12 @@ class Data_Aims():
                 for line in open("{}/band1{:03d}.out".format(file_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
-                    kpoints[kpoint_counter,0] = float(words[1])
-                    kpoints[kpoint_counter,1] = float(words[2])
-                    kpoints[kpoint_counter,2] = float(words[3])
+                    kpoints[int(kpoint_counter),0] = float(words[1])
+                    kpoints[int(kpoint_counter),1] = float(words[2])
+                    kpoints[int(kpoint_counter),2] = float(words[3])
                     for i in range(number_of_bands):
-                        energies[i,kpoint_counter] = float(words[5+2*i])
-                        occupancy[i,kpoint_counter] = float(words[4+2*i])
+                        energies[i,int(kpoint_counter)] = float(words[5+2*i])
+                        occupancy[i,int(kpoint_counter)] = float(words[4+2*i])
                     kpoint_counter += 1
                 path_counter +=1
 
@@ -380,12 +379,12 @@ class Data_Aims():
                 for line in open("{}/band1{:03d}.out".format(file_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
-                    kpoints[kpoint_counter,0] = float(words[1])
-                    kpoints[kpoint_counter,1] = float(words[2])
-                    kpoints[kpoint_counter,2] = float(words[3])
+                    kpoints[int(kpoint_counter),0] = float(words[1])
+                    kpoints[int(kpoint_counter),1] = float(words[2])
+                    kpoints[int(kpoint_counter),2] = float(words[3])
                     for i in range(number_of_bands//2):
-                        energies[i,kpoint_counter] = float(words[5+2*i])
-                        occupancy[i,kpoint_counter] = float(words[4+2*i])
+                        energies[i,int(kpoint_counter)] = float(words[5+2*i])
+                        occupancy[i,int(kpoint_counter)] = float(words[4+2*i])
                     kpoint_counter += 1
                 kpoint_counter = sum(path_list[:path_counter])
                 for line in open("{}/band2{:03d}.out".format(file_path, path_counter+1)):
@@ -440,35 +439,34 @@ class Data_Aims():
         self.check_data()
 
     def check_data(self):
-        """Check that data class attributes are sane.
+       """Check that data class attributes are sane.
 
-        Args:
-            None.
+       Args:
+           None.
 
-        Returns:
-            None.
+       Returns:
+           None.
 
-        Notes:
-            There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
-        """
-        assert (
-            ((self.spin_channels == 1) | (self.spin_channels == 2) |
-             (self.spin_channels == 4)) is True
-        ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
-        assert (type(self.number_of_kpoints) == int
-                and self.number_of_kpoints > 0
-                ), "The number of kpoints is not a positive integer"
-        assert (type(self.number_of_bands) == int and self.number_of_bands > 0
-                ), "The number of bands is not a positive integer"
-        assert (type(self.number_of_ions) == int and self.number_of_ions > 0
-                ), "The number of ions is not a positive integer"
-        assert (self.CBM >
-                self.VBM), "The CBM energy is lower than than the VBM energy"
-        if self.fermi_energy < self.VBM:
-            warnings.warn("The fermi energy is lower than the VBM")
-        if self.fermi_energy > self.CBM:
-            warnings.warn("The fermi energy is higher than the CBM")
-        if ((self.occupancy == 0) | (self.occupancy == 1) |
-            (self.occupancy == 2)).all() is False:
-            warnings.warn("You have partial occupancy of bands")
-
+       Notes:
+           There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
+       """
+       assert (
+           ((self.spin_channels == 1) | (self.spin_channels == 2) |
+            (self.spin_channels == 4)) is True
+       ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
+       assert (type(self.number_of_kpoints) == int
+               and self.number_of_kpoints > 0
+               ), "The number of kpoints is not a positive integer"
+       assert (type(self.number_of_bands) == int and self.number_of_bands > 0
+               ), "The number of bands is not a positive integer"
+       assert (type(self.number_of_ions) == int and self.number_of_ions > 0
+               ), "The number of ions is not a positive integer"
+       assert (self.CBM >
+               self.VBM), "The CBM energy is lower than than the VBM energy"
+       if self.fermi_energy < self.VBM:
+           warnings.warn("The fermi energy is lower than the VBM")
+       if self.fermi_energy > self.CBM:
+           warnings.warn("The fermi energy is higher than the CBM")
+       if ((self.occupancy == 0) | (self.occupancy == 1) |
+           (self.occupancy == 2)).all() is False:
+           warnings.warn("You have partial occupancy of bands")#
