@@ -42,9 +42,11 @@ Selected bandstructure segments and approximations to the dispersion (assuming a
 The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiarity with Python. Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed [here](https://effmass.readthedocs.io/en/latest/Related%20packages.html) will suit your needs better.
 
-## Development
+## Questions, bug reports, feature requests
 
-Please use the Github [issue tracker](https://github.com/lucydot/effmass/issues/) for feature requests and bug reports. 
+Please use the Github [issue tracker](https://github.com/lucydot/effmass/issues/) for any questions, feature requests or bug reports. Please do not contact the developers via email unless there is a specific reason you do not want the conversation to be public.
+
+## Development
 
 If you would like to contribute please do so via a pull request. All contributors must read and respect the [code of conduct](https://github.com/lucydot/effmass/blob/master/CODE_OF_CONDUCT.md). In particular, we welcome contributions which would extend `effmass` so that it is able to parse output from other electronic structure codes. 
 
