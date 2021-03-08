@@ -43,7 +43,7 @@ def _solve_quadratic(a, b, c):
 
     Returns:
         list(float): the root of the equation for each value of c.
-    
+
     """
     det = [b**2 - 4 * a * item for item in c]
     x = []
@@ -73,11 +73,11 @@ class Segment:
         dE_hartree (array(float)): 1-dimensional array which contains the difference in energy (eV) between each kpoint and the extrema.
         occupancy (array(float)): 2-dimensional array. Each row contains occupation number of the eigenstates for a particular band. A slice of :attr:`effmass.inputs.Data.occupancy`.
         direction (array): 1-dimensional array with length 3. The direction between kpoints in the segment.
-        band_type (str): The band type, determined by occupancy of the eigenstate. Argument choices are "conduction_band", "valence_band" or "unknown". If set to "unknown", some class methods will raise a warning and return None. 
+        band_type (str): The band type, determined by occupancy of the eigenstate. Argument choices are "conduction_band", "valence_band" or "unknown". If set to "unknown", some class methods will raise a warning and return None.
         fermi_energy (float): the fermi energy in eV.
         dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. A slice of :attr:`effmass.inputs.Data.dos`.
         integrated_dos (array): 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of :attr:`effmass.inputs.Data.integrated_dos`.
-           
+
 
     """
 
@@ -148,7 +148,7 @@ class Segment:
 
     def explosion_index(self, polyfit_order=6):
         r"""
-        This will find the index at which there is a change in sign of the second derivative. 
+        This will find the index at which there is a change in sign of the second derivative.
 
         In the region of this point the first derivative will pass through zero and so the transport mass (:math:`\frac{1}{\delta E \delta k}`) will explode.
 
@@ -172,7 +172,7 @@ class Segment:
         return cutoff
 
     def _fermi_function(self, eigenvalue, fermi_level=None, temp=300):
-        r""" 
+        r"""
         Calculates the probability that an eigenstate is occupied using Fermi-Dirac statistics:
             ..math::
                 p=\frac{1}{e^{\frac{Delta E}{kT}+1}
@@ -183,7 +183,7 @@ class Segment:
 
         Returns:
             float: the probability that the eigenstate is occupied
-        
+
         """
         if temp <= 0:
             raise ValueError("temperature must be more than 0K")
@@ -192,8 +192,8 @@ class Segment:
             probability = (1 / ((np.exp(
                 (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1)))
         elif self.band_type == "valence_band":
-            probability = np.subtract(1,(1 / ((np.exp(
-                (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1))))
+            probability = 1 - (1 / ((np.exp(
+                (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1)))
         else:
             raise ValueError("Unable to calculate fermi function as the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
         return probability
@@ -359,7 +359,7 @@ class Segment:
             float: The probability that the eigenstate is occupied.
         Note:
             The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.
-           
+
         """
         assert temp > 0, "temperature must be more than 0K"
         if self.band_type == "conduction_band":
@@ -415,7 +415,7 @@ class Segment:
             float: A normalisation factor for :meth:`~effmass.analysis.Segment.mass_integration`.
         Note:
             The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.
-       
+
         """
         alpha = self.alpha() if alpha is None else alpha
         mass_bandedge = self.kane_mass_band_edge(
@@ -456,7 +456,7 @@ class Segment:
                 \frac{\hbar ^2}{2m_{tb}} = E(1+\alpha E)
 
         where the transport mass at bandedge (:math:`m_{tb}`) is calculated using :meth:`effmass.analysis.Segment.kane_mass_band_edge` and the alpha parameter is calculated using :meth:`effmass.analysis.Segment.alpha`.
-        
+
         Args:
             fermi_level (float, optional ): Fermi level (eV) to be used in Fermi-dirac statistics. Defaults to :attr:`~effmass.analysis.Segment.fermi_energy`.
             temp (float, optional): The temperature (K) to be used in Fermi-Dirac statistics. Defaults to 300.
@@ -589,10 +589,10 @@ class Segment:
                 \frac{1}{m_o} = \frac{\sum_i f(E_i) g(k_i) \frac{\delta^2 E}{\delta k^2}|_i}{\sum f(E_i) g(k_i)}
 
         where the sum is over eigenstates i contained withing the :class:`~effmass.analysis.Segment`. :math:`f_(E_i)` is the probability of occupation (Fermi-Dirac statistics) and :math:`g(k_i)` is the density of states at that k-point.
-        
+
         Args:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
-        
+
         Returns:
             float: The optical effective mass (units of electron mass) of the :class:`~effmass.analysis.Segment`.
         """
@@ -614,7 +614,7 @@ class Segment:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
             dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate second order derivatives. Defaults to 100 points evenly distributed across the whole segment.
             polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.
-        
+
         Returns:
             array(float). 1d array containing the conductivity effective mass (in units of electron rest mass) evaluated at the points specified in dk.
         """
@@ -636,7 +636,7 @@ class Segment:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
             dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate first order derivatives. Defaults to 100 points evenly distributed across the whole segment.
             polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.
-           
+
         Returns:
             array(float). 1d array containing the transport effective mass (in units of electron rest mass) evaluated at the points specified in dk.
         """
@@ -654,7 +654,7 @@ class Segment:
     def alpha(self, polyfit_order=6, truncate=True):
         r"""
         The transport mass (:math:`\frac{k}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The gradient of this line determines the alpha parameter which is used in the kane dispersion.
-        
+
         See :meth:`effmass.analysis.Segment.transport_effmass`.
 
         Args:
@@ -683,13 +683,13 @@ class Segment:
     def kane_mass_band_edge(self, polyfit_order=6, truncate=True):
         r"""
         The transport mass (:math:`\frac{1}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The intercept of this line with the y-axis gives a transport mass at bandedge which is used as a parameter in the kane dispersion.
-        
+
         See :meth:`effmass.analysis.Segment.transport_effmass`.
 
         Args:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
             truncate (bool, optional): If True, data only up to :meth:`effmass.analysis.Segment.explosion_index` is used. If False, alpha is calculated using data for the whole segment. Defaults to True.
-        
+
         Returns:
             float: transport mass at bandedge (in units of electron mass).
         """
@@ -712,7 +712,7 @@ class Segment:
         r"""
         Calculate the Kane quasi-linear dispersion parameters, then evaluates at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.
 
-        The Kane quasi-linear dispersion is described by 
+        The Kane quasi-linear dispersion is described by
             ..math::
                 \frac{\hbar ^2 k^2}{2m_{tb}} = E(1+\alpha E)
 
@@ -724,7 +724,7 @@ class Segment:
 
         Args:
             polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.
- 
+
         Returns:
             array: 1d array containing energies (hartree).
         """
@@ -766,7 +766,7 @@ class Segment:
             None
 
         Returns:
-            list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr` using the quadratic approximation. 
+            list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr` using the quadratic approximation.
         """
         m_bandedge = self.finite_difference_effmass()
         values = [((k**2) / (2 * m_bandedge))

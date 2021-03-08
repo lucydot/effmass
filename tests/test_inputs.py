@@ -16,7 +16,10 @@ def test_settings(settings_object,extrema_search_depth,energy_range):
 @pytest.mark.parametrize("data_object,CBM,VBM,fermi_energy", [
 	(pytest.lazy_fixture('MAPI_cl_data_object'), 3.28781692, 1.2556844599999999,(3.28781692+1.2556844599999999)/2 ),
 	(pytest.lazy_fixture('MAPI_soc_data_object'), 2.29063902, 1.4189758400000001,(2.29063902 +1.4189758400000001)/2),
-    (pytest.lazy_fixture('Ge_SP_data_object'),5.50690368,5.23191533,(5.23191533+5.50690368)/2)
+        (pytest.lazy_fixture('Ge_SP_data_object'),5.50690368,5.23191533,(5.23191533+5.50690368)/2),
+        (pytest.lazy_fixture('Ge_sp_aims_data_object'), 0.00082, -0.0027, (0.00082-0.0027)/2),
+        (pytest.lazy_fixture('Ge_nsp_aims_data_object'), 0.02619, 0.01512, (0.02619+0.01512)/2),
+        (pytest.lazy_fixture('Ge_soc_aims_data_object'), 0.00531, -0.01667, (0.00531-0.01667)/2)
 ])
 
 def test_data(data_object,CBM,VBM,fermi_energy):
