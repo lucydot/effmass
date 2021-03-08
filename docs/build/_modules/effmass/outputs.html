@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>effmass.outputs &mdash; effmass 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> effmass
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API%20documentation.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Implementation.html">Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Related%20packages.html">Related packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">effmass</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>effmass.outputs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for effmass.outputs</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A module for plotting and summarising segments information, </span>
+<span class="sd">density-of-states information and effective mass analysis.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">adjustText</span> <span class="kn">import</span> <span class="n">adjust_text</span>
+
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">ev_to_hartree</span>
+<span class="kn">from</span> <span class="nn">effmass.dos</span> <span class="kn">import</span> <span class="n">_check_integrated_dos_loaded</span>
+<span class="kn">from</span> <span class="nn">effmass.dos</span> <span class="kn">import</span> <span class="n">_check_dos_loaded</span>
+<span class="kn">from</span> <span class="nn">effmass.analysis</span> <span class="kn">import</span> <span class="n">_check_poly_order</span>
+
+
+<div class="viewcode-block" id="plot_segments"><a class="viewcode-back" href="../../outputs.html#effmass.outputs.plot_segments">[docs]</a><span class="k">def</span> <span class="nf">plot_segments</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">segments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plots bandstructure overlaid with the DFT-calculated points for each Segment</span>
+<span class="sd">    instance. Each Segment is labelled with it&#39;s direction in reciprocal space</span>
+<span class="sd">    and index number from the segments argument.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Data (Data): instance of the :class:`Data` class.</span>
+<span class="sd">        Settings (Settings): instance of the :class:`Settings` class.</span>
+<span class="sd">        segments (list(Segment)): A list of instances of the :class:`Segment` class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure &lt;https://matplotlib.org/api/figure_api.html&gt;`_ class and `matplotlib.pyplot.axes &lt;https://matplotlib.org/api/axes_api.html&gt;`_ class.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The x-axis of the plot is not to scale.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+   
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+    <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span> <span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">))]</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">kpoint_indices</span><span class="p">,</span> <span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">energies</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">))]</span>
+    <span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">kpoint_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;, &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">))]</span>    
+    <span class="n">adjust_text</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">),</span> <span class="n">autoalign</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">force_text</span><span class="o">=</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.025</span><span class="p">))</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span>
+        <span class="o">-</span><span class="p">(</span><span class="n">Settings</span><span class="o">.</span><span class="n">extrema_search_depth</span> <span class="o">+</span> <span class="n">Settings</span><span class="o">.</span><span class="n">energy_range</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">CBM</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span><span class="p">)</span> <span class="o">+</span>
+        <span class="p">(</span><span class="n">Settings</span><span class="o">.</span><span class="n">extrema_search_depth</span> <span class="o">+</span> <span class="n">Settings</span><span class="o">.</span><span class="n">energy_range</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+    
+
+<div class="viewcode-block" id="plot_integrated_dos"><a class="viewcode-back" href="../../outputs.html#effmass.outputs.plot_integrated_dos">[docs]</a><span class="k">def</span> <span class="nf">plot_integrated_dos</span><span class="p">(</span><span class="n">Data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plots integrated density of states (states/unit-cell) against energy</span>
+<span class="sd">    (eV).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Data (Data): instance of the :class:`Data` class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure &lt;https://matplotlib.org/api/figure_api.html&gt;`_ class and `matplotlib.pyplot.axes &lt;https://matplotlib.org/api/axes_api.html&gt;`_ class.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The valence band maximum is set to 0 eV.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_integrated_dos_loaded</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Data</span><span class="o">.</span><span class="n">integrated_dos</span><span class="p">]</span>
+    <span class="n">dos_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Data</span><span class="o">.</span><span class="n">integrated_dos</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">dos_data</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Energy, eV&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Integrated DOS, states / unit cell&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">CBM</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="plot_dos"><a class="viewcode-back" href="../../outputs.html#effmass.outputs.plot_dos">[docs]</a><span class="k">def</span> <span class="nf">plot_dos</span><span class="p">(</span><span class="n">Data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plots density of states (states/unit-cell) against energy (eV).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Data (Data): instance of the :class:`Data` class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure &lt;https://matplotlib.org/api/figure_api.html&gt;`_ class and `matplotlib.pyplot.axes &lt;https://matplotlib.org/api/axes_api.html&gt;`_ class.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The valence band maximum is set to 0 eV.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_dos_loaded</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Data</span><span class="o">.</span><span class="n">dos</span><span class="p">]</span>
+    <span class="n">dos</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Data</span><span class="o">.</span><span class="n">dos</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">dos</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Energy, eV&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;DOS&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">CBM</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    
+    <span class="n">polyfit_order</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">degree_bandfit</span> <span class="k">if</span> <span class="n">polyfit_order</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">polyfit_order</span>
+    <span class="n">_check_poly_order</span><span class="p">(</span><span class="n">polyfit_order</span><span class="p">)</span>
+
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">band_type</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3-point finite difference mass is </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">segment</span><span class="o">.</span><span class="n">finite_difference_effmass</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;5-point parabolic mass is </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">segment</span><span class="o">.</span><span class="n">five_point_leastsq_effmass</span><span class="p">()))</span>
+    <span class="k">try</span><span class="p">:</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;weighted parabolic mass is </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">segment</span><span class="o">.</span><span class="n">weighted_leastsq_effmass</span><span class="p">()))</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;----------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">-----------&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;alpha is </span><span class="si">{:.2f}</span><span class="s2"> 1/eV&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">segment</span><span class="o">.</span><span class="n">alpha</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span> <span class="o">*</span> <span class="n">ev_to_hartree</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;kane mass at bandedge is </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">segment</span><span class="o">.</span><span class="n">kane_mass_band_edge</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">segment</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">segment</span><span class="o">.</span><span class="n">dE_eV</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;the Kane quasi linear approximation is valid for the whole segment&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;the Kane quasi-linear approximation is valid until </span><span class="si">{:.2f}</span><span class="s2"> eV&quot;</span><span class="o">.</span>
+                  <span class="nb">format</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">dE_eV</span><span class="p">[</span><span class="n">segment</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">(</span>
+                      <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)]))</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;----------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">-----------&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;optical mass at band edge (assuming the Kane dispersion) is </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span>
+              <span class="nb">format</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">optical_effmass_kane_dispersion</span><span class="p">()))</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+            <span class="n">segment</span><span class="o">.</span><span class="n">poly_fit</span><span class="p">(</span>
+                <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span> <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="n">ev_to_hartree</span><span class="p">),</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+        <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;polynomial order </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polyfit_order</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">finite_difference_fit</span><span class="p">(),</span> <span class="n">ev_to_hartree</span><span class="p">),</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span>
+        <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;finite diff parabolic&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">five_point_leastsq_fit</span><span class="p">(),</span> <span class="n">ev_to_hartree</span><span class="p">),</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;p&quot;</span><span class="p">,</span>
+        <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;five point parabolic&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">weighted_leastsq_fit</span><span class="p">(),</span> <span class="n">ev_to_hartree</span><span class="p">),</span>
+            <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span>
+            <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;weighted parabolic&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+                <span class="n">segment</span><span class="o">.</span><span class="n">kane_fit</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">),</span> <span class="n">ev_to_hartree</span><span class="p">),</span>
+            <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+            <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Kane quasi-linear&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;k ($ \AA^{-1} $)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;energy (eV)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">dE_eV</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DFT&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plot_segments</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="p">[</span><span class="n">segment</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">segment</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">segment</span><span class="o">.</span><span class="n">transport_effmass</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span>
+            <span class="n">dk</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">,</span>
+            <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
+             <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span>
+                     <span class="n">segment</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                     <span class="n">segment</span><span class="o">.</span><span class="n">transport_effmass</span><span class="p">(</span>
+                         <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span>
+                         <span class="n">dk</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">,</span>
+                         <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span>
+                 <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="n">idx</span><span class="p">]]))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;transport mass&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;energy (hartree)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="n">idx</span><span class="p">]])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2018, Lucy Whalley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

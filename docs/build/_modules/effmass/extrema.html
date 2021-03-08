@@ -1,0 +1,593 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>effmass.extrema &mdash; effmass 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> effmass
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API%20documentation.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Implementation.html">Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Related%20packages.html">Related packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">effmass</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>effmass.extrema</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for effmass.extrema</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A module for finding the band structure extrema and instantiating </span>
+<span class="sd">a :class:`Segment` object for each extrema point.</span>
+
+<span class="sd">The extrema are found within an energy range given by the :class:`Settings` class.</span>
+<span class="sd">Each `Segment` object contains data for kpoints within an energy range given by the :class:`Settings` class. </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">analysis</span>
+
+
+<span class="k">def</span> <span class="nf">_check_partial_occupancy</span><span class="p">(</span><span class="n">occupancy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raises warning if there is partial occupancy of bands.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        occupancy (array): Array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised). See :attr:`effmass.inputs.Data.occupancy`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;You have partial occupation numbers in Data.occupancy. You should check that the attributes Data.VBM, Data.CBM and Data.fermi_energy are correct, and if not, set them manually.&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_CBM</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">energy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the minimum unoccupied energy eigenstate (conduction band minimum)</span>
+<span class="sd">    .</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        occupancy (array): occupancy of eigenstates with shape (number_of_kpoints, number_of_bands)</span>
+<span class="sd">        energy (array): energy (eV) of eigenstates with shape (number_of_kpoints, number_of_bands)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: the minimum unoccupied energy (eV)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_partial_occupancy</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
+    <span class="n">energy_unoccupied</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">occupancy</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">energy</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">energy_unoccupied</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_VBM</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">energy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the minimum unoccupied energy eigenstate (valence band maximum).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        occupancy (array): occupancy of eigenstates with shape (number_of_kpoints, number_of_bands)</span>
+<span class="sd">        energy (array): energy (eV) of eigenstates with shape (number_of_kpoints, number_of_bands)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: the minimum unoccupied energy (eV)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_partial_occupancy</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
+    <span class="n">energy_occupied</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">occupancy</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">energy</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">energy_occupied</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="calculate_direction"><a class="viewcode-back" href="../../extrema.html#effmass.extrema.calculate_direction">[docs]</a><span class="k">def</span> <span class="nf">calculate_direction</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates the direction vector between two points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        a (list): the position vector of point a.</span>
+<span class="sd">        b (list): the position vector of point b.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array: The (unnormalised) direction vector between points a and b. The smallest magnitude of an element is 1 (eg: [1,1,2]).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The two k-points are equal&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># we need to find the smallest non-zero value within a-b</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">direction_masked</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_equal</span><span class="p">(</span>
+        <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># return array with invalid entries where values are equal</span>
+    <span class="n">direction_filled</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span>
+        <span class="n">direction_masked</span><span class="p">,</span> <span class="mi">10</span>
+        <span class="o">**</span><span class="mi">6</span><span class="p">)</span>  <span class="c1"># fill invalid elements of array with a large number s</span>
+    <span class="n">direction_absolute</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span>
+        <span class="n">direction_filled</span><span class="p">)</span>  <span class="c1"># return absolute values of each element</span>
+    <span class="n">smallest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">direction_absolute</span><span class="p">)</span>
+    <span class="n">direction</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="n">smallest</span>  <span class="c1"># use the minimum absolute value as a divisor a-b</span>
+    <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">direction</span><span class="p">:</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">direction</span></div>
+
+
+<div class="viewcode-block" id="change_direction"><a class="viewcode-back" href="../../extrema.html#effmass.extrema.change_direction">[docs]</a><span class="k">def</span> <span class="nf">change_direction</span><span class="p">(</span><span class="n">kpoints</span><span class="p">,</span> <span class="n">kpoint_indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the index of the kpoint (if any) where there is a change of</span>
+<span class="sd">    direction in reciprocal space.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        kpoints (array): array of kpoints with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz]. See :attr:`effmass.inputs.Data.kpoints`.</span>
+<span class="sd">        kpoint_indices (list (int)): the kpoint indices over which to check for change in direction</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: the index of the kpoint where there is a change of direction. If there is no change of direction, returns None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_direction</span> <span class="o">=</span> <span class="n">calculate_direction</span><span class="p">(</span><span class="n">kpoints</span><span class="p">[</span><span class="n">kpoint_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                                        <span class="n">kpoints</span><span class="p">[</span><span class="n">kpoint_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">change_index</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kpoint_indices</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">old_direction</span> <span class="o">=</span> <span class="n">new_direction</span>
+        <span class="n">new_direction</span> <span class="o">=</span> <span class="n">calculate_direction</span><span class="p">(</span><span class="n">kpoints</span><span class="p">[</span><span class="n">kpoint_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
+                                            <span class="n">kpoints</span><span class="p">[</span><span class="n">kpoint_indices</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">new_direction</span> <span class="o">-</span> <span class="n">old_direction</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.005</span><span class="p">:</span>
+            <span class="n">change_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">change_index</span></div>
+
+
+<div class="viewcode-block" id="find_extrema_indices"><a class="viewcode-back" href="../../extrema.html#effmass.extrema.find_extrema_indices">[docs]</a><span class="k">def</span> <span class="nf">find_extrema_indices</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">Settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the kpoint index and band index of the minimum/maximum energy</span>
+<span class="sd">    turning points within :attr:`effmass.inputs.Settings.energy_range` of the</span>
+<span class="sd">    conduction band minimum (:attr:`effmass.inputs.Data.CBM`) / valence band</span>
+<span class="sd">    maximum (:attr:`effmass.inputs.Data.VBM`).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Data (Data): instance of the :class:`Data` class.</span>
+<span class="sd">        Settings (Settings): instance of the :class:`Settings` class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array: A 2-dimensional array of size (number of extrema, 2). Each row corresponds to an extrema and contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">energy_CB</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span> <span class="o">&lt;</span> <span class="n">Data</span><span class="o">.</span><span class="n">CBM</span><span class="p">,</span> <span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">)</span>
+    <span class="n">energy_VB</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span> <span class="o">&gt;</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span><span class="p">,</span> <span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">)</span>
+
+    <span class="c1"># returns array of energies within energy_range</span>
+    <span class="n">holes_in_range</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">energy_VB</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span><span class="p">)</span> <span class="o">&gt;</span>
+        <span class="n">Settings</span><span class="o">.</span><span class="n">extrema_search_depth</span><span class="p">,</span> <span class="n">energy_VB</span><span class="p">)</span>
+    <span class="n">VB_maxima</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span>
+        <span class="n">_mark_maxima</span><span class="p">(</span><span class="n">holes_in_range</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">holes_in_range</span><span class="p">)</span>
+
+    <span class="c1"># returns array of energies within energy_range</span>
+    <span class="n">electrons_in_range</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">energy_CB</span> <span class="o">-</span> <span class="n">Data</span><span class="o">.</span><span class="n">CBM</span><span class="p">)</span> <span class="o">&gt;</span>
+        <span class="n">Settings</span><span class="o">.</span><span class="n">extrema_search_depth</span><span class="p">,</span> <span class="n">energy_CB</span><span class="p">)</span>
+    <span class="n">CB_minima</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span>
+        <span class="n">_mark_minima</span><span class="p">(</span><span class="n">electrons_in_range</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">electrons_in_range</span><span class="p">)</span>
+
+    <span class="c1"># Returns a 2D array of band numbers and k-points for extrema in the correct energy range.</span>
+    <span class="c1"># At a given k-point there may be multiple bands with highest energy</span>
+    <span class="n">extrema_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">VB_maxima</span><span class="o">.</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">CB_minima</span><span class="o">.</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">extrema_position</span></div>
+
+
+<span class="k">def</span> <span class="nf">_mark_maxima</span><span class="p">(</span><span class="n">holes_array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function which takes an array of hole energies and returns an</span>
+<span class="sd">    array for masking those which are not maxima.&quot;&quot;&quot;</span>
+    <span class="c1"># create array to append to</span>
+    <span class="n">not_maxima</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">holes_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">holes_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># handle edge cases</span>
+    <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">holes_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">holes_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+            <span class="n">not_maxima</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">band</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">holes_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">holes_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">not_maxima</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">band</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># find the bands where numbers either side aren&#39;t bigger (the maxima)</span>
+    <span class="c1"># will also include inflexion but needed to get HSP&#39;s</span>
+    <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">holes_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">holes_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                    <span class="ow">or</span> <span class="n">holes_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">holes_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span><span class="p">]):</span>
+                <span class="n">not_maxima</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+
+    <span class="c1"># Need to assign false after inspection</span>
+    <span class="c1"># or it screws with the algorithm</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">not_maxima</span><span class="p">:</span>
+        <span class="n">holes_array</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># returns matrix with all non-maxima marked false</span>
+    <span class="k">return</span> <span class="n">holes_array</span>
+
+
+<span class="k">def</span> <span class="nf">_mark_minima</span><span class="p">(</span><span class="n">electrons_array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function which takes an array of electron energies and returns an</span>
+<span class="sd">    array for masking those which are not minima.&quot;&quot;&quot;</span>
+    <span class="c1"># create array to append to</span>
+    <span class="n">not_minima</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">electrons_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">electrons_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># handle edge cases</span>
+    <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">electrons_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">electrons_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+            <span class="n">not_minima</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">band</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">electrons_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">electrons_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">not_minima</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">band</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># find the bands where numbers either side aren&#39;t bigger (the maxima)</span>
+    <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">electrons_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">electrons_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="ow">or</span>
+                    <span class="n">electrons_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">electrons_array</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span><span class="p">]):</span>
+                <span class="n">not_minima</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+
+    <span class="c1"># Need to assign false after inspection</span>
+    <span class="c1"># or it screws with the algorithm</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">not_minima</span><span class="p">:</span>
+        <span class="n">electrons_array</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># returns matrix with all non-maxima marked false</span>
+    <span class="k">return</span> <span class="n">electrons_array</span>
+
+
+<span class="k">def</span> <span class="nf">_within</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span> <span class="n">kpoint_index</span><span class="p">,</span> <span class="n">trial_kpoint_index</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">Data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function which checks whether trial_kpoint_index is less than</span>
+<span class="sd">    :attr:`effmass.inputs.Settings.energy_range`.</span>
+
+<span class="sd">    away from kpoint_index for a given band</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">band_index</span><span class="p">,</span> <span class="n">trial_kpoint_index</span><span class="p">]</span> <span class="o">-</span>
+                    <span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">band_index</span><span class="p">,</span> <span class="n">kpoint_index</span><span class="p">])</span>
+        <span class="p">)</span> <span class="o">&lt;</span> <span class="n">Settings</span><span class="o">.</span><span class="n">energy_range</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_kpoints_after</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span> <span class="n">kpoint_index</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">Data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function that returns eigenstates which are 1) on the same band</span>
+<span class="sd">    2) before the given kpoint in the bandstructure route and 3) within</span>
+<span class="sd">    :attr:`effmass.inputs.Settings.energy_range`.&quot;&quot;&quot;</span>
+    <span class="n">trial_kpoint_index</span> <span class="o">=</span> <span class="n">kpoint_index</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">kpoint_after</span> <span class="o">=</span> <span class="p">[</span><span class="n">kpoint_index</span><span class="p">]</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">trial_kpoint_index</span> <span class="o">&lt;</span> <span class="n">Data</span><span class="o">.</span><span class="n">number_of_kpoints</span>
+           <span class="ow">and</span> <span class="n">_within</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span> <span class="n">kpoint_index</span><span class="p">,</span> <span class="n">trial_kpoint_index</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span>
+                       <span class="n">Data</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="n">kpoint_after</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial_kpoint_index</span><span class="p">)</span>
+        <span class="n">trial_kpoint_index</span> <span class="o">=</span> <span class="n">trial_kpoint_index</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">kpoint_after</span>
+
+
+<span class="k">def</span> <span class="nf">_kpoints_before</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span> <span class="n">kpoint_index</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">Data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function that returns eigenstates which are 1) on the same band</span>
+<span class="sd">    2) before the given eigenstate in the route through reciprocal space 3)</span>
+<span class="sd">    within :attr:`effmass.inputs.Settings.energy_range`.&quot;&quot;&quot;</span>
+    <span class="n">trial_kpoint_index</span> <span class="o">=</span> <span class="n">kpoint_index</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">kpoint_before</span> <span class="o">=</span> <span class="p">[</span><span class="n">kpoint_index</span><span class="p">]</span>
+    <span class="k">while</span> <span class="n">trial_kpoint_index</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">_within</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span> <span class="n">kpoint_index</span><span class="p">,</span>
+                                              <span class="n">trial_kpoint_index</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span>
+                                              <span class="n">Data</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">kpoint_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial_kpoint_index</span><span class="p">)</span>
+        <span class="n">trial_kpoint_index</span> <span class="o">=</span> <span class="n">trial_kpoint_index</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">kpoint_before</span>
+
+
+<div class="viewcode-block" id="get_kpoints_before"><a class="viewcode-back" href="../../extrema.html#effmass.extrema.get_kpoints_before">[docs]</a><span class="k">def</span> <span class="nf">get_kpoints_before</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span>
+                       <span class="n">kpoint_index</span><span class="p">,</span>
+                       <span class="n">Settings</span><span class="p">,</span>
+                       <span class="n">Data</span><span class="p">,</span>
+                       <span class="n">truncate_dir_change</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For a given eigenstate, finds eigenstates which 1) belong to the same</span>
+<span class="sd">    band 2) come before the given eigenstate in the route through reciprocal</span>
+<span class="sd">    space 3) are within :attr:`effmass.inputs.Settings.energy_range`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        band_index (int): index of :attr:`effmass.inputs.Data.bands`.</span>
+<span class="sd">        kpoint_index (int): index of :attr:`effmass.inputs.Data.kpoints`.</span>
+<span class="sd">        Settings (Settings): instance of the :class:`Settings` class.</span>
+<span class="sd">        Data (Data): instance of the :class:`Data` class.</span>
+<span class="sd">        truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list(int): indices of :attr:`effmass.inputs.Data.kpoints`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kpoints_before</span> <span class="o">=</span> <span class="n">_kpoints_before</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span> <span class="n">kpoint_index</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">Data</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpoints_before</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">change_index</span> <span class="o">=</span> <span class="n">change_direction</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">kpoints</span><span class="p">,</span> <span class="n">kpoints_before</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">change_index</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">truncate_dir_change</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">kpoints_before</span> <span class="o">=</span> <span class="n">kpoints_before</span><span class="p">[:</span><span class="n">change_index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpoints_before</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">kpoints_before</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kpoints_before</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">kpoints_before</span></div>
+
+
+<div class="viewcode-block" id="get_kpoints_after"><a class="viewcode-back" href="../../extrema.html#effmass.extrema.get_kpoints_after">[docs]</a><span class="k">def</span> <span class="nf">get_kpoints_after</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span>
+                      <span class="n">kpoint_index</span><span class="p">,</span>
+                      <span class="n">Settings</span><span class="p">,</span>
+                      <span class="n">Data</span><span class="p">,</span>
+                      <span class="n">truncate_dir_change</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For a given eigenstate, finds eigenstates which 1) belong to the same</span>
+<span class="sd">    band 2) come after the given eigenstate in the route through reciprocal</span>
+<span class="sd">    space 3) are within :attr:`effmass.inputs.Settings.energy_range`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        band_index (int): index of :attr:`effmass.inputs.Data.bands`.</span>
+<span class="sd">        kpoint_index (int): index of :attr:`effmass.inputs.Data.kpoints`.</span>
+<span class="sd">        Settings (Settings): instance of the :class:`Settings` class.</span>
+<span class="sd">        Data (Data): instance of the :class:`Data` class.</span>
+<span class="sd">        truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list(int): indices of :attr:`effmass.inputs.Data.kpoints`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kpoints_after</span> <span class="o">=</span> <span class="n">_kpoints_after</span><span class="p">(</span><span class="n">band_index</span><span class="p">,</span> <span class="n">kpoint_index</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">Data</span><span class="p">)</span>
+
+    <span class="c1"># now make sure that there is not a change in direction for this set of kpoints and that long enough</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpoints_after</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">change_index</span> <span class="o">=</span> <span class="n">change_direction</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">kpoints</span><span class="p">,</span> <span class="n">kpoints_after</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">change_index</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">truncate_dir_change</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">kpoints_after</span> <span class="o">=</span> <span class="n">kpoints_after</span><span class="p">[:</span><span class="n">change_index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpoints_after</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">kpoints_after</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kpoints_after</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">kpoints_after</span></div>
+
+
+<div class="viewcode-block" id="generate_segments"><a class="viewcode-back" href="../../extrema.html#effmass.extrema.generate_segments">[docs]</a><span class="k">def</span> <span class="nf">generate_segments</span><span class="p">(</span><span class="n">Settings</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">bk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">truncate_dir_change</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a list of Segment objects.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Settings (Settings): instance of the :class:`Settings` class.</span>
+<span class="sd">        Data (Data): instance of the :class:`Data` class.</span>
+<span class="sd">        truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.</span>
+<span class="sd">        bk (list(int)): To manually set an extrema point, in format [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index]. Defaults to None.</span>
+<span class="sd">   </span>
+<span class="sd">   Returns:</span>
+<span class="sd">        list(Segments): A list of :class:`Segment` objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bk</span><span class="p">:</span>
+        <span class="n">extrema_array</span> <span class="o">=</span> <span class="n">bk</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">extrema_array</span> <span class="o">=</span> <span class="n">find_extrema_indices</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">Settings</span><span class="p">)</span>
+    <span class="n">kpoints_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">band_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">band</span><span class="p">,</span> <span class="n">kpoint</span> <span class="ow">in</span> <span class="n">extrema_array</span><span class="p">:</span>
+        <span class="n">kpoints_before</span> <span class="o">=</span> <span class="n">get_kpoints_before</span><span class="p">(</span>
+            <span class="n">band</span><span class="p">,</span>
+            <span class="n">kpoint</span><span class="p">,</span>
+            <span class="n">Settings</span><span class="p">,</span>
+            <span class="n">Data</span><span class="p">,</span>
+            <span class="n">truncate_dir_change</span><span class="o">=</span><span class="n">truncate_dir_change</span><span class="p">)</span>
+        <span class="n">kpoints_after</span> <span class="o">=</span> <span class="n">get_kpoints_after</span><span class="p">(</span>
+            <span class="n">band</span><span class="p">,</span>
+            <span class="n">kpoint</span><span class="p">,</span>
+            <span class="n">Settings</span><span class="p">,</span>
+            <span class="n">Data</span><span class="p">,</span>
+            <span class="n">truncate_dir_change</span><span class="o">=</span><span class="n">truncate_dir_change</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kpoints_before</span><span class="p">:</span>
+            <span class="n">kpoints_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kpoints_before</span><span class="p">)</span>
+            <span class="n">band_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">band</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kpoints_after</span><span class="p">:</span>
+            <span class="n">kpoints_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kpoints_after</span><span class="p">)</span>
+            <span class="n">band_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">band</span><span class="p">)</span>
+    <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">analysis</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">band</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">band</span><span class="p">,</span> <span class="n">kpoints</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">band_list</span><span class="p">,</span> <span class="n">kpoints_list</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">segments</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2018, Lucy Whalley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

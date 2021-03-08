@@ -1,0 +1,260 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Implementation &mdash; effmass 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Related packages" href="Related%20packages.html" />
+    <link rel="prev" title="effmass.outputs" href="outputs.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> effmass
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Supported%20codes.html">Supported Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="API%20documentation.html">API documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Implementation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#methods-for-calculating-the-curvature-effective-mass">Methods for calculating the curvature effective mass</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Related%20packages.html">Related packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">effmass</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Implementation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/Implementation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="implementation">
+<h1>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="methods-for-calculating-the-curvature-effective-mass">
+<h2>Methods for calculating the curvature effective mass<a class="headerlink" href="#methods-for-calculating-the-curvature-effective-mass" title="Permalink to this headline">¶</a></h2>
+<p>Three methods are used to calculate the curvature effective mass (Eqn.1 in the main text).</p>
+<ul>
+<li><p><strong>Finite difference</strong></p>
+<p>We use a three point forward finite difference equation to calculate the curvature at point i:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial^2E}{\partial k^2} = \frac{E_{i+2} - 2E_{i+1} + E_{i}}{\left|k_{i+1} - k_i\right|},\]</div>
+<p>where <span class="math notranslate nohighlight">\(E_i\)</span> is the energy eigenvalue at position <span class="math notranslate nohighlight">\(k_i\)</span> in reciprocal space.</p>
+</li>
+<li><p><strong>Unweighted least-squares fit</strong></p>
+<p>To obtain estimates for the coefficient of a parabolic dispersion</p>
+<div class="math notranslate nohighlight">
+\[E = ck^2,\]</div>
+<p>we use the least-squares method as implemented in the NumPy Python library to minimise the summed square of residuals</p>
+<div class="math notranslate nohighlight">
+\[\sum^{5}_{i=1}(ck_i^2 - E_i)^2.\]</div>
+<p>We fit to five points; three points from the DFT-calculated dispersion plus two from the symmetry of the dispersion (<span class="math notranslate nohighlight">\(E(k)=E(-k)\)</span>).</p>
+</li>
+<li><p><strong>Weighted least-squares fit</strong></p>
+<p>To obtain estimates for the coefficients of the dispersion</p>
+<div class="math notranslate nohighlight">
+\[E = {c}k^2,\]</div>
+<p>we use the least-squares method as implemented in the NumPy Python library to minimise the summed square of residuals</p>
+<div class="math notranslate nohighlight">
+\[\sum^{n}_{i=1}W_i(ck_i^2 - E_i)^2.\]</div>
+<p>The summation is over all points up to an energy of <span class="math notranslate nohighlight">\(0.25\,eV\)</span>, including points generated from the symmetry of the dispersion, <span class="math notranslate nohighlight">\(E(k)=E(-k)\)</span>.
+<span class="math notranslate nohighlight">\(W_i\)</span> is given by</p>
+<div class="math notranslate nohighlight">
+\[W_i(E_i,T) = \frac{1}{\exp\left(\frac{E_i-E_f}{k_BT}\right)+1}.\]</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="Related%20packages.html" class="btn btn-neutral float-right" title="Related packages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="outputs.html" class="btn btn-neutral float-left" title="effmass.outputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2018, Lucy Whalley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

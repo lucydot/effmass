@@ -1,0 +1,668 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>effmass.inputs &mdash; effmass 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="effmass.extrema" href="extrema.html" />
+    <link rel="prev" title="API documentation" href="API%20documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> effmass
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Supported%20codes.html">Supported Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="API%20documentation.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">effmass.inputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extrema.html">effmass.extrema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dos.html">effmass.dos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html">effmass.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html">effmass.outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Implementation.html">Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Related%20packages.html">Related packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">effmass</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="API%20documentation.html">API documentation</a> &raquo;</li>
+        
+      <li>effmass.inputs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/inputs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-effmass.inputs">
+<span id="effmass-inputs"></span><h1>effmass.inputs<a class="headerlink" href="#module-effmass.inputs" title="Permalink to this headline">¶</a></h1>
+<p>A module for storing electronic structure data and user settings. Currently supported codes are VASP and FHI-Aims (with limited functionality).</p>
+<p>The module contains a <a class="reference internal" href="#effmass.inputs.Data" title="effmass.inputs.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a> class which parses OUTCAR and PROCAR files using the <a class="reference external" href="https://github.com/bjmorgan/vasppy">vasppy</a> package.
+A function for parsing DOSCAR files is also provided.</p>
+<p>The module contains a <a class="reference internal" href="#effmass.inputs.DataAims" title="effmass.inputs.DataAims"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAims</span></code></a> class which parses and stores the <cite>geometry.in</cite>/<cite>calculation.out</cite> files generated for/from a FHI-AIMS calculation.</p>
+<p>A <a class="reference internal" href="#effmass.inputs.Settings" title="effmass.inputs.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> class stores analysis parameters set by the user.</p>
+<dl class="py class">
+<dt id="effmass.inputs.Data">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">Data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outcar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for parsing and storing data from a vasp calculation.</p>
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.spin_channels">
+<code class="sig-name descname"><span class="pre">spin_channels</span></code><a class="headerlink" href="#effmass.inputs.Data.spin_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.number_of_kpoints">
+<code class="sig-name descname"><span class="pre">number_of_kpoints</span></code><a class="headerlink" href="#effmass.inputs.Data.number_of_kpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>the number of k-points per band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.number_of_bands">
+<code class="sig-name descname"><span class="pre">number_of_bands</span></code><a class="headerlink" href="#effmass.inputs.Data.number_of_bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>the number of bands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.number_of_ions">
+<code class="sig-name descname"><span class="pre">number_of_ions</span></code><a class="headerlink" href="#effmass.inputs.Data.number_of_ions" title="Permalink to this definition">¶</a></dt>
+<dd><p>the number of ions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.kpoints">
+<code class="sig-name descname"><span class="pre">kpoints</span></code><a class="headerlink" href="#effmass.inputs.Data.kpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.energies">
+<code class="sig-name descname"><span class="pre">energies</span></code><a class="headerlink" href="#effmass.inputs.Data.energies" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.occupancy">
+<code class="sig-name descname"><span class="pre">occupancy</span></code><a class="headerlink" href="#effmass.inputs.Data.occupancy" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.reciprocal_lattice">
+<code class="sig-name descname"><span class="pre">reciprocal_lattice</span></code><a class="headerlink" href="#effmass.inputs.Data.reciprocal_lattice" title="Permalink to this definition">¶</a></dt>
+<dd><p>the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom <span class="math notranslate nohighlight">\(^{-1}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.CBM">
+<code class="sig-name descname"><span class="pre">CBM</span></code><a class="headerlink" href="#effmass.inputs.Data.CBM" title="Permalink to this definition">¶</a></dt>
+<dd><p>the conduction band minimum energy in eV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.VBM">
+<code class="sig-name descname"><span class="pre">VBM</span></code><a class="headerlink" href="#effmass.inputs.Data.VBM" title="Permalink to this definition">¶</a></dt>
+<dd><p>the valence band maximum in eV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.fermi_energy">
+<code class="sig-name descname"><span class="pre">fermi_energy</span></code><a class="headerlink" href="#effmass.inputs.Data.fermi_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.dos">
+<code class="sig-name descname"><span class="pre">dos</span></code><a class="headerlink" href="#effmass.inputs.Data.dos" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional array. Each row contains density of states data (units “number of states / unit cell”)  at a given energy: [energy(float),dos(float)].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.Data.integrated_dos">
+<code class="sig-name descname"><span class="pre">integrated_dos</span></code><a class="headerlink" href="#effmass.inputs.Data.integrated_dos" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="effmass.inputs.Data.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outcar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Data.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises an instance of the <a class="reference internal" href="#effmass.inputs.Data" title="effmass.inputs.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a> class and checks data using <a class="reference internal" href="#effmass.inputs.check_data" title="effmass.inputs.check_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_data()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outcar_path</strong> (<em>str</em>) – The path to the OUTCAR file</p></li>
+<li><p><strong>procar_path</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – The path(s) to one or more PROCAR files.</p></li>
+<li><p><strong>ignore</strong> (<em>int</em>) – The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments for reading the PROCAR file(s).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="effmass.inputs.Data.parse_DOSCAR">
+<code class="sig-name descname"><span class="pre">parse_DOSCAR</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./DOSCAR'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Data.parse_DOSCAR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data.parse_DOSCAR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the DOS and integrated DOS from a vasp DOSCAR file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – The location and filename of the DOSCAR to read in. Defaults to <cite>‘./DOSCAR’</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If the DOS has been sampled at more than 10000 points then this function will break at the expression for <cite>num_data_points</cite>.
+In this case, edit your DOSCAR file so that in the header there is a space preceding the number of points.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="effmass.inputs.DataAims">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">DataAims</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataAims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataAims" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for parsing and storing data from a FHI-AIMS calculation.</p>
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.spin_channels">
+<code class="sig-name descname"><span class="pre">spin_channels</span></code><a class="headerlink" href="#effmass.inputs.DataAims.spin_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.number_of_kpoints">
+<code class="sig-name descname"><span class="pre">number_of_kpoints</span></code><a class="headerlink" href="#effmass.inputs.DataAims.number_of_kpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>the number of k-points per band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.number_of_bands">
+<code class="sig-name descname"><span class="pre">number_of_bands</span></code><a class="headerlink" href="#effmass.inputs.DataAims.number_of_bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>the number of bands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.number_of_ions">
+<code class="sig-name descname"><span class="pre">number_of_ions</span></code><a class="headerlink" href="#effmass.inputs.DataAims.number_of_ions" title="Permalink to this definition">¶</a></dt>
+<dd><p>the number of ions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.kpoints">
+<code class="sig-name descname"><span class="pre">kpoints</span></code><a class="headerlink" href="#effmass.inputs.DataAims.kpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.energies">
+<code class="sig-name descname"><span class="pre">energies</span></code><a class="headerlink" href="#effmass.inputs.DataAims.energies" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.occupancy">
+<code class="sig-name descname"><span class="pre">occupancy</span></code><a class="headerlink" href="#effmass.inputs.DataAims.occupancy" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.reciprocal_lattice">
+<code class="sig-name descname"><span class="pre">reciprocal_lattice</span></code><a class="headerlink" href="#effmass.inputs.DataAims.reciprocal_lattice" title="Permalink to this definition">¶</a></dt>
+<dd><p>the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom <span class="math notranslate nohighlight">\(^{-1}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.CBM">
+<code class="sig-name descname"><span class="pre">CBM</span></code><a class="headerlink" href="#effmass.inputs.DataAims.CBM" title="Permalink to this definition">¶</a></dt>
+<dd><p>the conduction band minimum energy in eV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.VBM">
+<code class="sig-name descname"><span class="pre">VBM</span></code><a class="headerlink" href="#effmass.inputs.DataAims.VBM" title="Permalink to this definition">¶</a></dt>
+<dd><p>the valence band maximum in eV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="effmass.inputs.DataAims.fermi_energy">
+<code class="sig-name descname"><span class="pre">fermi_energy</span></code><a class="headerlink" href="#effmass.inputs.DataAims.fermi_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="effmass.inputs.DataAims.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataAims.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataAims.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises an instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data_Aims</span></code> class and checks data using <a class="reference internal" href="#effmass.inputs.check_data" title="effmass.inputs.check_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_data()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – The path to the directory containing output, geometry.in, control.in and bandstructure files</p></li>
+<li><p><strong>ignore</strong> (<em>int</em>) – The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="effmass.inputs.DataAims.check_data">
+<code class="sig-name descname"><span class="pre">check_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataAims.check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataAims.check_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that data class attributes are sane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None.</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>There is a <cite>sanity_check</cite> method which runs automatically when reading data in using the <a class="reference external" href="http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar">vasppy.procar</a> module.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id0">
+<code class="sig-name descname"><span class="pre">fermi_energy</span></code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cutting energy values in a range of 30 eV above and below the Fermi level. FHI AIMS is all electron, but not all states are needed for a meaningful effmass calculation</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id1">
+<code class="sig-name descname"><span class="pre">number_of_bands</span></code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finding number of ions</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id2">
+<code class="sig-name descname"><span class="pre">number_of_ions</span></code><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finding number of kpoints and determining number of BZ paths</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id3">
+<code class="sig-name descname"><span class="pre">reciprocal_lattice</span></code><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finding spin channels</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id4">
+<code class="sig-name descname"><span class="pre">spin_channels</span></code><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finding number of bands</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="effmass.inputs.Settings">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">Settings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrema_search_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandfit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for setting analysis parameters.</p>
+<p>Attributes:     energy_range (float): energy in kT over which the
+segment extends.     extrema_search_depth (float): energy in kT from
+bandedge over which to search for extrema.     degree_bandfit (int):
+the degree of the polynomial which is used to fit to dispersion data
+when calculating the transport mass.</p>
+<dl class="py method">
+<dt id="effmass.inputs.Settings.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrema_search_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandfit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Settings.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Settings.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises an instance of the Settings class and checks input using
+<a class="reference internal" href="#effmass.inputs.Settings.check_settings" title="effmass.inputs.Settings.check_settings"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_settings()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy_range</strong> (<em>float</em>) – energy in eV over which the segment extends. Defaults to 0.25 eV.</p></li>
+<li><p><strong>extrema_search_depth</strong> (<em>float</em>) – energy in eV from bandedge over which to search for extrema. Defaults to 0.025 eV.</p></li>
+<li><p><strong>degree_bandfit</strong> (<em>int</em>) – the degree of the polynomial which is used to fit to dispersion data when calculating the transport mass.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="effmass.inputs.Settings.check_settings">
+<code class="sig-name descname"><span class="pre">check_settings</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Settings.check_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Settings.check_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that Settings class attributes are sane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None.</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.inputs.check_data">
+<code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">check_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_kpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_bands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_ions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CBM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">VBM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fermi_energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occupancy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.check_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that input data class attributes are sane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None.</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>There is a <cite>sanity_check</cite> method which runs automatically when reading data in using the <a class="reference external" href="http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar">vasppy.procar</a> module.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="extrema.html" class="btn btn-neutral float-right" title="effmass.extrema" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="API%20documentation.html" class="btn btn-neutral float-left" title="API documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2018, Lucy Whalley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

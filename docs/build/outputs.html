@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>effmass.outputs &mdash; effmass 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Implementation" href="Implementation.html" />
+    <link rel="prev" title="effmass.analysis" href="analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> effmass
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Supported%20codes.html">Supported Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="API%20documentation.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="inputs.html">effmass.inputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extrema.html">effmass.extrema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dos.html">effmass.dos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html">effmass.analysis</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">effmass.outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Implementation.html">Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Related%20packages.html">Related packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">effmass</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="API%20documentation.html">API documentation</a> &raquo;</li>
+        
+      <li>effmass.outputs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/outputs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-effmass.outputs">
+<span id="effmass-outputs"></span><h1>effmass.outputs<a class="headerlink" href="#module-effmass.outputs" title="Permalink to this headline">¶</a></h1>
+<p>A module for plotting and summarising segments information,
+density-of-states information and effective mass analysis.</p>
+<dl class="py function">
+<dt id="effmass.outputs.plot_dos">
+<code class="sig-prename descclassname"><span class="pre">effmass.outputs.</span></code><code class="sig-name descname"><span class="pre">plot_dos</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/outputs.html#plot_dos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.outputs.plot_dos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots density of states (states/unit-cell) against energy (eV).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>Data</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Data" title="effmass.inputs.Data"><em>Data</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code> class.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple containing instance of the <a class="reference external" href="https://matplotlib.org/api/figure_api.html">matplotlib.pyplot.figure</a> class and <a class="reference external" href="https://matplotlib.org/api/axes_api.html">matplotlib.pyplot.axes</a> class.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Figure, Axes</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The valence band maximum is set to 0 eV.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.outputs.plot_integrated_dos">
+<code class="sig-prename descclassname"><span class="pre">effmass.outputs.</span></code><code class="sig-name descname"><span class="pre">plot_integrated_dos</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/outputs.html#plot_integrated_dos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.outputs.plot_integrated_dos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots integrated density of states (states/unit-cell) against energy
+(eV).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>Data</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Data" title="effmass.inputs.Data"><em>Data</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code> class.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing instance of the <a class="reference external" href="https://matplotlib.org/api/figure_api.html">matplotlib.pyplot.figure</a> class and <a class="reference external" href="https://matplotlib.org/api/axes_api.html">matplotlib.pyplot.axes</a> class.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Figure, Axes</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The valence band maximum is set to 0 eV.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.outputs.plot_segments">
+<code class="sig-prename descclassname"><span class="pre">effmass.outputs.</span></code><code class="sig-name descname"><span class="pre">plot_segments</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/outputs.html#plot_segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.outputs.plot_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots bandstructure overlaid with the DFT-calculated points for each Segment
+instance. Each Segment is labelled with it’s direction in reciprocal space
+and index number from the segments argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Data</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Data" title="effmass.inputs.Data"><em>Data</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code> class.</p></li>
+<li><p><strong>Settings</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Settings" title="effmass.inputs.Settings"><em>Settings</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.</p></li>
+<li><p><strong>segments</strong> (<em>list</em><em>(</em><a class="reference internal" href="analysis.html#effmass.analysis.Segment" title="effmass.analysis.Segment"><em>Segment</em></a><em>)</em>) – A list of instances of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Segment</span></code> class.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing instance of the <a class="reference external" href="https://matplotlib.org/api/figure_api.html">matplotlib.pyplot.figure</a> class and <a class="reference external" href="https://matplotlib.org/api/axes_api.html">matplotlib.pyplot.axes</a> class.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Figure, Axes</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The x-axis of the plot is not to scale.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="Implementation.html" class="btn btn-neutral float-right" title="Implementation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="analysis.html" class="btn btn-neutral float-left" title="effmass.analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2018, Lucy Whalley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,1083 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>effmass.analysis &mdash; effmass 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> effmass
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API%20documentation.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Implementation.html">Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Related%20packages.html">Related packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">effmass</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>effmass.analysis</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for effmass.analysis</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A module for analysing the data contained in a :class:`Segment` object.</span>
+
+<span class="sd">Contains the :class:`Segment` class and methods for calculating various definitions of the effective mass.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">integrate</span>
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">extrema</span>
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">angstrom_to_bohr</span>
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">ev_to_hartree</span>
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">boltzmann</span>
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">q</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_poly_order</span><span class="p">(</span><span class="n">polyfit_order</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raises an AssertionError if the order of the polynomial is less than 2.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        polyfit_order (int): the order of the polynomial fit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">polyfit_order</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;the order of the polynomial must be 2 or higher&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_solve_quadratic</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solves quadratic equation of the form :math:`ax^2+bx+c=0` for multiple values of c.</span>
+<span class="sd">    If the determinant is more than 0 (two solutions), it always returns the larger root.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        a (float): the coefficient of :math:`x^2`.</span>
+<span class="sd">        b (float): the coefficient of :math:`x^1`.</span>
+<span class="sd">        c (list(float)): a list of coefficients of :math:`x^0`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list(float): the root of the equation for each value of c.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">c</span><span class="p">]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">det</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<div class="viewcode-block" id="Segment"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment">[docs]</a><span class="k">class</span> <span class="nc">Segment</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class for segments of the bandstructure. A Segment contains data for a</span>
+<span class="sd">    particular region of reciprocal space and particular band.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        band (int): The band number of the segment (counting starts from 0).</span>
+<span class="sd">        kpoint_indices (list(int)): The indices of :attr:`effmass.inputs.Data.kpoints` from which this Segment is formed.</span>
+<span class="sd">        kpoints (array(float)): 2-dimensional array. Each row contains the fractional coordinates of a kpoint [kx,ky,kz]. A slice of :attr:`effmass.inputs.Data.kpoints`.</span>
+<span class="sd">        cartesian_kpoints (array(float)): 2-dimensional array. Each row contains the cartesian coordinates (angstrom :math:`^{-1}`) of a kpoint.</span>
+<span class="sd">        dk_angs (array(float)): 1-dimensional array which contains the distance (angstrom :math:`^{-1}`) between each kpoint and the extrema.</span>
+<span class="sd">        dk_bohr (array(float)): 1-dimensional array which contains the distance (bohr :math:`^{-1}`) between each kpoint and the extrema.</span>
+<span class="sd">        energies (array(float)): 1-dimensional array which contains the energy (eV) of each eigenstate. A slice of :attr:`effmass.inputs.Data.energies`.</span>
+<span class="sd">        dE_eV (array(float)): 1-dimensional array which contains the difference in energy (hartree) between each kpoint and the extrema.</span>
+<span class="sd">        dE_hartree (array(float)): 1-dimensional array which contains the difference in energy (eV) between each kpoint and the extrema.</span>
+<span class="sd">        occupancy (array(float)): 2-dimensional array. Each row contains occupation number of the eigenstates for a particular band. A slice of :attr:`effmass.inputs.Data.occupancy`.</span>
+<span class="sd">        direction (array): 1-dimensional array with length 3. The direction between kpoints in the segment.</span>
+<span class="sd">        band_type (str): The band type, determined by occupancy of the eigenstate. Argument choices are &quot;conduction_band&quot;, &quot;valence_band&quot; or &quot;unknown&quot;. If set to &quot;unknown&quot;, some class methods will raise a warning and return None.</span>
+<span class="sd">        fermi_energy (float): the fermi energy in eV.</span>
+<span class="sd">        dos (array): 2-dimensional array. Each row contains density of states data (units &quot;number of states / unit cell&quot;)  at a given energy: [energy(float),dos(float)]. A slice of :attr:`effmass.inputs.Data.dos`.</span>
+<span class="sd">        integrated_dos (array): 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of :attr:`effmass.inputs.Data.integrated_dos`.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Segment.__init__"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">band</span><span class="p">,</span> <span class="n">kpoint_indices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise an instance of the Segment class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Data (Data): Data instance initialised from the bandstructure which contains the segment</span>
+<span class="sd">            band (int): the band number of the segment</span>
+<span class="sd">            kpoint_indices (list(int)): the kpoint indices of the segment</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">band</span> <span class="o">=</span> <span class="n">band</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kpoint_indices</span> <span class="o">=</span> <span class="n">kpoint_indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">Data</span><span class="o">.</span><span class="n">kpoints</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kpoint_indices</span>
+                                 <span class="p">])</span>  <span class="c1"># in units 2*pi/angstrom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cartesian_kpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">Data</span><span class="o">.</span><span class="n">reciprocal_lattice</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span>
+        <span class="p">])</span>  <span class="c1"># in units 1/Angstrom. Reciprocal lattice includes factor 2*pi.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dk_angs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cartesian_kpoints</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartesian_kpoints</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dk_angs</span><span class="p">,</span> <span class="n">angstrom_to_bohr</span>
+        <span class="p">)</span>  <span class="c1"># divide as we are in reciprocal space --&gt; units in inverse length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kpoint_indices</span><span class="p">])</span>  <span class="c1"># in units eV</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dE_eV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                      <span class="n">ev_to_hartree</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Data</span><span class="o">.</span><span class="n">occupancy</span><span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kpoint_indices</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">extrema</span><span class="o">.</span><span class="n">calculate_direction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                                     <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">fermi_energy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dos</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integrated_dos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_integrated_dos</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_VBM</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_CBM</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">CBM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_type</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Segment string method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A string containing the energy of the Segment extrema (referenced to the VBM) and the start- and end- points of the Segment in reciprocal space.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">energy_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_VBM</span><span class="p">)</span>
+        <span class="n">start_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">end_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="mi">3</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">energy_str</span><span class="o">+</span><span class="s2">&quot; eV; &quot;</span><span class="o">+</span><span class="n">start_str</span><span class="o">+</span><span class="s2">&quot;--&gt;&quot;</span><span class="o">+</span><span class="n">end_str</span>
+
+    <span class="k">def</span> <span class="nf">_check_kanefit_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raises an AssertionError if there are not enough data points to fit</span>
+<span class="sd">        a Kane dispersion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">,</span><span class="s2">&quot;Unable to calculate alpha parameter as inflexion too close to extrema&quot;</span>
+
+<div class="viewcode-block" id="Segment.explosion_index"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.explosion_index">[docs]</a>    <span class="k">def</span> <span class="nf">explosion_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This will find the index at which there is a change in sign of the second derivative.</span>
+
+<span class="sd">        In the region of this point the first derivative will pass through zero and so the transport mass (:math:`\frac{1}{\delta E \delta k}`) will explode.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            This marks the point at which the Kane dispersion is definitely not valid, although it may be that the Kane dispersion is a poor approximation prior to this.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dedk</span><span class="p">,</span> <span class="n">d2edk2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poly_derivatives</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span>
+            <span class="n">dk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">,</span>
+            <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">d2edk2</span><span class="p">)</span>
+        <span class="n">signchange</span> <span class="o">=</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">sign</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">sign</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">signchange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">signchange</span><span class="p">:</span>
+            <span class="n">cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">signchange</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cutoff</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_eV</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">cutoff</span></div>
+
+    <span class="k">def</span> <span class="nf">_fermi_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eigenvalue</span><span class="p">,</span> <span class="n">fermi_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the probability that an eigenstate is occupied using Fermi-Dirac statistics:</span>
+<span class="sd">            ..math::</span>
+<span class="sd">                p=\frac{1}{e^{\frac{Delta E}{kT}+1}</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            eigenvalue (float): the energy (eV) of the eigenstate.</span>
+<span class="sd">            fermi_level (float): the fermi level (eV).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: the probability that the eigenstate is occupied</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">temp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;temperature must be more than 0K&quot;</span><span class="p">)</span>
+        <span class="n">fermi_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="k">if</span> <span class="n">fermi_level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fermi_level</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;conduction_band&quot;</span><span class="p">:</span>
+            <span class="n">probability</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">eigenvalue</span> <span class="o">-</span> <span class="n">fermi_level</span><span class="p">)</span> <span class="o">/</span> <span class="p">(((</span><span class="n">boltzmann</span> <span class="o">*</span> <span class="n">temp</span><span class="p">)</span> <span class="o">/</span> <span class="n">q</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;valence_band&quot;</span><span class="p">:</span>
+            <span class="n">probability</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">eigenvalue</span> <span class="o">-</span> <span class="n">fermi_level</span><span class="p">)</span> <span class="o">/</span> <span class="p">(((</span><span class="n">boltzmann</span> <span class="o">*</span> <span class="n">temp</span><span class="p">)</span> <span class="o">/</span> <span class="n">q</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to calculate fermi function as the band type is unknown. Please set the Segment.band_type attribute manually (options are </span><span class="se">\&quot;</span><span class="s2">valence_band</span><span class="se">\&quot;</span><span class="s2"> or </span><span class="se">\&quot;</span><span class="s2">conduction_band</span><span class="se">\&quot;</span><span class="s2">).&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">probability</span>
+
+<div class="viewcode-block" id="Segment.weighting"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.weighting">[docs]</a>    <span class="k">def</span> <span class="nf">weighting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fermi_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates a weighting for each kpoint using the Fermi-Dirac</span>
+<span class="sd">        statistics.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quasi_fermi_level (float, optional): The fermi level to be used in Fermi-Dirac statistics. Defaults to :attr:`effmass.inputs.Segment.fermi_energy`.</span>
+<span class="sd">            temp (float, optional): The temperature (K) to be used in Fermi-Dirac statistics. Defaults to 300.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array(float): A 1-dimensional array which contains the weighting for each k-point.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            The weighting is relative only: constants will cancel out when using to weight least square fits or means.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fermi_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="k">if</span> <span class="n">fermi_level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fermi_level</span>
+        <span class="c1"># weighting is given by the fermi function</span>
+        <span class="n">weighting</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fermi_function</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">fermi_level</span><span class="o">=</span><span class="n">fermi_level</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">E</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span>
+        <span class="p">]))</span>
+
+        <span class="k">assert</span> <span class="n">weighting</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span><span class="s2">&quot;Unable to assign a weighting to the dispersion as the Fermi-Dirac distribution at all kpoints is smaller than Python&#39;s double precision floats. Calculate band edge values using Segment.five_point_leastsq_effmass() or Segment.finite_difference_effmass().&quot;</span>
+
+        <span class="k">return</span> <span class="n">weighting</span></div>
+
+    <span class="k">def</span> <span class="nf">_band_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Identifies the band type, determined by the occupancy of the</span>
+<span class="sd">        first k-point in the segment.</span>
+
+<span class="sd">        An occupancy of 1.0 or 2.0 returns &quot;valence_band&quot; (as :class:`~effmass.analysis.Segment` is in the valence band).</span>
+<span class="sd">        An occupancy of 0.0 returns &quot;conduction_band&quot; (as :class:`~effmass.analysis.Segment` is in the conduction band).</span>
+<span class="sd">        In the case of partial occupancy, &quot;unknown&quot; is returned.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the band type of the segment, either &quot;valence_band&quot;, &quot;conduction_band&quot; or &quot;unknown&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_VBM</span><span class="p">:</span>
+            <span class="n">band_type</span> <span class="o">=</span> <span class="s2">&quot;valence_band&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_CBM</span><span class="p">:</span>
+            <span class="n">band_type</span> <span class="o">=</span> <span class="s2">&quot;conduction_band&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;The band type unknown. Please set the Segment.band_type attribute manually.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">band_type</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+        <span class="k">return</span> <span class="n">band_type</span>
+
+    <span class="k">def</span> <span class="nf">_dos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns slice of :attr:`effmass.Data.dos` corresponding to the</span>
+<span class="sd">        energy range of the segment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list(floats): slice of :attr:`effmass.Data.dos` corresponding to the energy range of the segment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Data</span><span class="o">.</span><span class="n">dos</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="n">dos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dos</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">dos</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">Data</span><span class="o">.</span><span class="n">dos</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">dos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">dos</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">dos</span>
+
+    <span class="k">def</span> <span class="nf">_integrated_dos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns slice of :attr:`effmass.Data.integrated_dos` corresponding</span>
+<span class="sd">        to the energy range of the segment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array: slice of :attr:`effmass.Data.integrated_dos` corresponding to the energy range of the segment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Data</span><span class="o">.</span><span class="n">integrated_dos</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="n">integrated_dos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">integrated_dos</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">integrated_dos</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">Data</span><span class="o">.</span><span class="n">integrated_dos</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">integrated_dos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">integrated_dos</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="k">break</span>
+        <span class="k">return</span> <span class="n">integrated_dos</span>
+
+    <span class="c1"># The collection of methods below calculate the optical effective mass by integrating numerically the analytical</span>
+    <span class="c1"># expression for the second derivative of the Kane dispersion multiplied by a Fermi-Dirac weighting.</span>
+
+<div class="viewcode-block" id="Segment.mass_integration"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.mass_integration">[docs]</a>    <span class="k">def</span> <span class="nf">mass_integration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                         <span class="n">fermi_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                         <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">mass_bandedge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">upper_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Integrates the product of the fermi-dirac distribution, density of</span>
+<span class="sd">        states and second derivative of kane dispersion along the one-</span>
+<span class="sd">        dimensional slice of k-space defined by</span>
+<span class="sd">        :class:`~effmass.analysis.Segment` (up to</span>
+<span class="sd">        :meth:`~effmass.analysis.Segment.explosion_index`).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fermi_level (float, optional): Fermi level (eV) to be used in Fermi-dirac statistics. Defaults to :attr:`~effmass.analysis.Segment.fermi_energy`.</span>
+<span class="sd">            temp (float, optional): The temperature (K) to be used in Fermi-Dirac statistics. Defaults to 300.</span>
+<span class="sd">            alpha (float, optional): The alpha parameter of the Kane dispersion (hartree$^{-1}$)</span>
+<span class="sd">            mass_bandedge: The mass at bandedge parameter of the Kane dispersion (units electron mass).</span>
+<span class="sd">            upper_limit (float, optional): The integration upper limit (bohr$^{-1}$). Defaults to where the Kane quasi-linear dispersion is no longer valide, defined by :meth:`~effmass.analysis.Segment.explosion_index`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The optical effective mass (units of electron mass), defined as the inverse of the second derivative of a kane dispersion, weighted according to occupancy of available eigenstates (the product of density of states and the fermi-dirac distribution).</span>
+<span class="sd">        Note:</span>
+<span class="sd">            The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">()</span> <span class="k">if</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">alpha</span>
+        <span class="n">mass_bandedge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kane_mass_band_edge</span><span class="p">(</span>
+        <span class="p">)</span> <span class="k">if</span> <span class="n">mass_bandedge</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mass_bandedge</span>
+        <span class="n">upper_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">()]</span> <span class="k">if</span> <span class="n">upper_limit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">upper_limit</span>
+        <span class="n">fermi_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="k">if</span> <span class="n">fermi_level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fermi_level</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mass_integrand</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="n">upper_limit</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">fermi_level</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="k">def</span> <span class="nf">_mass_integrand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">fermi_level</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function for</span>
+<span class="sd">        :meth:`~effmass.analysis.Segment.mass_integration`.</span>
+
+<span class="sd">        A function for the weighted mass integrand.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">fermi_level</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_second_derivative_kane_dispersion</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Segment.fd"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.fd">[docs]</a>    <span class="k">def</span> <span class="nf">fd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">fermi_level</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the probability that an eigenstate of momentum k is occupied, using Fermi-Dirac statistics and assuming a Kane dispersion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k: the momentum of the eigenstate (bohr:math:`^{-1}`).</span>
+<span class="sd">            fermi_level (float, optional): Fermi level (eV) to be used in Fermi-dirac statistics. Defaults to :attr:`~effmass.analysis.Segment.fermi_energy`.</span>
+<span class="sd">            temp (float, optional): The temperature (K) to be used in Fermi-Dirac statistics. Defaults to 300.</span>
+<span class="sd">            alpha (float, optional): The alpha parameter of the Kane dispersion (hartree$^{-1}$)</span>
+<span class="sd">            mass_bandedge: The mass at bandedge parameter of the Kane dispersion (units electron mass).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The probability that the eigenstate is occupied.</span>
+<span class="sd">        Note:</span>
+<span class="sd">            The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">temp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;temperature must be more than 0K&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;conduction_band&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kane_dispersion</span><span class="p">(</span>
+                <span class="n">k</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">)</span> <span class="o">-</span> <span class="n">fermi_level</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="n">boltzmann</span> <span class="o">*</span> <span class="n">temp</span><span class="p">)</span> <span class="o">/</span> <span class="n">q</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;valence_band&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kane_dispersion</span><span class="p">(</span>
+                <span class="n">k</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">)</span> <span class="o">-</span> <span class="n">fermi_level</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="n">boltzmann</span> <span class="o">*</span> <span class="n">temp</span><span class="p">)</span> <span class="o">/</span> <span class="n">q</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;unknown&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to calculate fermi function as there is partial occupancy of the bands and the band type is unknown. Please set the Segment.band_type attribute manually (options are </span><span class="se">\&quot;</span><span class="s2">valence_band</span><span class="se">\&quot;</span><span class="s2"> or </span><span class="se">\&quot;</span><span class="s2">conduction_band</span><span class="se">\&quot;</span><span class="s2">).&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please set the Segment.band_type attribute (options are </span><span class="se">\&quot;</span><span class="s2">valence_band</span><span class="se">\&quot;</span><span class="s2"> or </span><span class="se">\&quot;</span><span class="s2">conduction_band</span><span class="se">\&quot;</span><span class="s2">)&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_kane_dispersion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function for :meth:`~effmass.analysis.Segment.fd`.</span>
+
+<span class="sd">        Analytic form of the kane dispersion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># returns in eV</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">_solve_quadratic</span><span class="p">(</span>
+            <span class="n">alpha</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[(</span><span class="o">-</span><span class="n">k</span> <span class="o">*</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">mass_bandedge</span><span class="p">)])[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">ev_to_hartree</span>
+
+    <span class="k">def</span> <span class="nf">_second_derivative_kane_dispersion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function for</span>
+<span class="sd">        :meth:`~effmass.analysis.Segment.mass_integration`.</span>
+
+<span class="sd">        Analytic form of the second derivative of the kane dispersion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># returns in eV</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">mass_bandedge</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">mass_bandedge</span><span class="p">)))</span><span class="o">**</span><span class="p">(</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+
+<div class="viewcode-block" id="Segment.weight_integration"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.weight_integration">[docs]</a>    <span class="k">def</span> <span class="nf">weight_integration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                           <span class="n">fermi_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                           <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">mass_bandedge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">upper_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Integrates the product of the fermi-dirac distribution</span>
+<span class="sd">        along the one-dimensional slice of k-space defined by</span>
+<span class="sd">        :class:`~effmass.analysis.Segment` (up to</span>
+<span class="sd">        :meth:`~effmass.analysis.Segment.explosion_index`).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fermi_level (float, optional ): Fermi level (eV) to be used in Fermi-dirac statistics. Defaults to :attr:`~effmass.analysis.Segment.fermi_energy`.</span>
+<span class="sd">            temp (float, optional): The temperature (K) to be used in Fermi-Dirac statistics. Defaults to 300.</span>
+<span class="sd">            upper_limit (float, optional): The integration upper limit (bohr$^{-1}$). Defaults to where the Kane quasi-linear dispersion is no longer valide, defined by :meth:`~effmass.analysis.Segment.explosion_index`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: A normalisation factor for :meth:`~effmass.analysis.Segment.mass_integration`.</span>
+<span class="sd">        Note:</span>
+<span class="sd">            The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">()</span> <span class="k">if</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">alpha</span>
+        <span class="n">mass_bandedge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kane_mass_band_edge</span><span class="p">(</span>
+        <span class="p">)</span> <span class="k">if</span> <span class="n">mass_bandedge</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mass_bandedge</span>
+        <span class="n">fermi_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="k">if</span> <span class="n">fermi_level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fermi_level</span>
+        <span class="n">upper_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">()]</span> <span class="k">if</span> <span class="n">upper_limit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">upper_limit</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_weight_integrand</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="n">upper_limit</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">fermi_level</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="k">def</span> <span class="nf">_weight_integrand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">fermi_level</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function for</span>
+<span class="sd">        :meth:`~effmass.analysis.Segment.weight_integration`.</span>
+
+<span class="sd">        A function for the weight integrand.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">fermi_level</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mass_bandedge</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Segment.optical_effmass_kane_dispersion"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.optical_effmass_kane_dispersion">[docs]</a>    <span class="k">def</span> <span class="nf">optical_effmass_kane_dispersion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                        <span class="n">fermi_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                                        <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">mass_bandedge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">upper_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the optical effective mass, with the dispersion approximated by a Kane quasi-linear function.</span>
+
+<span class="sd">        This optical effective mass is defined as:</span>
+<span class="sd">            ..math::</span>
+<span class="sd">                \frac{1}{m_o} = \frac{\int f(E_k(k),T) \frac{\delta^2 E_k(k)}{\delta k^2} dk}{\int f(E_k(k),T)  dk}</span>
+
+<span class="sd">        where the integral is along the one-dimensional slice of k-space defined by :class:`~effmass.analysis.Segment` (up to :meth:`~effmass.analysis.Segment.explosion_index`) and :math:`f(E_k,T)` is the Fermi-Dirac distribution. E_k(k) is the Kane dispersion:</span>
+<span class="sd">            ..math::</span>
+<span class="sd">                \frac{\hbar ^2}{2m_{tb}} = E(1+\alpha E)</span>
+
+<span class="sd">        where the transport mass at bandedge (:math:`m_{tb}`) is calculated using :meth:`effmass.analysis.Segment.kane_mass_band_edge` and the alpha parameter is calculated using :meth:`effmass.analysis.Segment.alpha`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fermi_level (float, optional ): Fermi level (eV) to be used in Fermi-dirac statistics. Defaults to :attr:`~effmass.analysis.Segment.fermi_energy`.</span>
+<span class="sd">            temp (float, optional): The temperature (K) to be used in Fermi-Dirac statistics. Defaults to 300.</span>
+<span class="sd">            alpha (float, optional): The alpha parameter of the Kane dispersion (hartree$^{-1}$)</span>
+<span class="sd">            mass_bandedge: The mass at bandedge parameter of the Kane dispersion (units electron mass).</span>
+<span class="sd">            upper_limit (float, optional): The integration upper limit (bohr$^{-1}$). Defaults to where the Kane quasi-linear dispersion is no longer valide, defined by :meth:`~effmass.analysis.Segment.explosion_index`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The optical effective mass (units of electron mass) of the :class:`~effmass.analysis.Segment`.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">           The sign of the alpha parameter and mass_bandedge are important. If these are negative (as would be expected for the valence band), then they must be passed as negative values to the function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fermi_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="k">if</span> <span class="n">fermi_level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fermi_level</span>
+
+        <span class="k">if</span> <span class="p">((</span><span class="n">fermi_level</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">()])):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;conduction_band&quot;</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Fermi level </span><span class="si">{}</span><span class="s2"> is beyond the energy range where the Kane dispersion is valid.&quot;</span><span class="o">.</span>
+                    <span class="nb">format</span><span class="p">(</span><span class="n">fermi_level</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">fermi_level</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">()]):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;valence_band&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Fermi level </span><span class="si">{}</span><span class="s2"> is beyond the energy range where the Kane dispersion is valid.&quot;</span><span class="o">.</span>
+                    <span class="nb">format</span><span class="p">(</span><span class="n">fermi_level</span><span class="p">))</span>
+
+        <span class="n">top</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_integration</span><span class="p">(</span>
+            <span class="n">fermi_level</span><span class="o">=</span><span class="n">fermi_level</span><span class="p">,</span>
+            <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">mass_bandedge</span><span class="o">=</span><span class="n">mass_bandedge</span><span class="p">,</span>
+            <span class="n">upper_limit</span><span class="o">=</span><span class="n">upper_limit</span><span class="p">)</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_integration</span><span class="p">(</span>
+            <span class="n">fermi_level</span><span class="o">=</span><span class="n">fermi_level</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">mass_bandedge</span><span class="o">=</span><span class="n">mass_bandedge</span><span class="p">,</span>
+            <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span>
+            <span class="n">upper_limit</span><span class="o">=</span><span class="n">upper_limit</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">top</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Unable to calculate the optical effective mass as the Fermi-Dirac distribution at all kpoints is smaller than Python&#39;s double precision floats.&quot;</span>
+
+        <span class="k">return</span> <span class="n">bottom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">top</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+    <span class="c1">####</span>
+
+    <span class="k">def</span> <span class="nf">_polynomial_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function which constructs a polynomial function using a least</span>
+<span class="sd">        squares fit to dispersion data.&quot;&quot;&quot;</span>
+        <span class="n">_check_poly_order</span><span class="p">(</span><span class="n">polyfit_order</span><span class="p">)</span>
+        <span class="c1"># we know that there is symmetry between k and -k</span>
+        <span class="n">negative_dk</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">sym_dk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">negative_dk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="n">sym_dE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="k">if</span> <span class="n">polyfit_weighting</span><span class="p">:</span>
+            <span class="c1"># weight to enable a better fit for the values where it is important</span>
+            <span class="n">weighting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighting</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">weighting</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">))</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weighting</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="n">weighting</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>  <span class="c1"># as it needs same dimensions as x and y.</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">W</span><span class="p">))</span>  <span class="c1"># to allow dot product between weight and matrix/y.</span>
+        <span class="c1"># for explanation of the coefficient matrix and least squares fit see https://stackoverflow.com/questions/32260204/numpy-polyfit-passing-through-0</span>
+        <span class="c1"># for how to incorporate weighting see https://stackoverflow.com/questions/27128688/how-to-use-least-squares-with-weight-matrix-in-python</span>
+        <span class="c1"># and https://stackoverflow.com/questions/19624997/understanding-scipys-least-square-function-with-irls</span>
+        <span class="c1"># by eliminating the units matrix of the array we are forcing a zero offset; the fit must pass through 0,0 as is physical</span>
+        <span class="n">coeff_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span>
+            <span class="n">sym_dk</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">polyfit_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="n">polyfit_order</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">])</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">w_coeff_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">coeff_matrix</span><span class="p">)</span>
+        <span class="n">w_sym_dE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sym_dE</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">w_coeff_matrix</span><span class="p">,</span> <span class="n">w_sym_dE</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                          <span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># remember to set zeroth power to 0!</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span>
+        <span class="c1"># function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W)) ----&gt; simple polyfit call for sanity&#39;s sake</span>
+        <span class="k">return</span> <span class="n">function</span>
+
+<div class="viewcode-block" id="Segment.poly_derivatives"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.poly_derivatives">[docs]</a>    <span class="k">def</span> <span class="nf">poly_derivatives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                         <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                         <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">dk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a polynomial function using a least squares fit to</span>
+<span class="sd">        Segment dispersion data, then evaluates first and second order</span>
+<span class="sd">        derivatives.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+<span class="sd">            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.</span>
+<span class="sd">            dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate first and second order derivatives. Defaults to 100 points evenly distributed across the whole segment.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing a 1d array of first derivatives and 1d array of second derivatives, evaluated at dk: ([dedk],[d2edk2])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polynomial_function</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span> <span class="n">polyfit_weighting</span><span class="o">=</span><span class="n">polyfit_weighting</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">dedk</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">deriv</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">dk</span><span class="p">)</span>
+        <span class="n">d2edk2</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">deriv</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">2</span><span class="p">)(</span><span class="n">dk</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dedk</span><span class="p">,</span> <span class="n">d2edk2</span></div>
+
+<div class="viewcode-block" id="Segment.poly_fit"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.poly_fit">[docs]</a>    <span class="k">def</span> <span class="nf">poly_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a polynomial function using a least squares fit to</span>
+<span class="sd">        :class:`~effmass.analysis.Segment` dispersion data, then evaluates at</span>
+<span class="sd">        100 points evenly distributed across</span>
+<span class="sd">        :attr:`~effmass.analysis.Segment.dk_bohr`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+<span class="sd">            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array: 1d array containing energies (hartree).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polynomial_function</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span> <span class="n">polyfit_weighting</span><span class="o">=</span><span class="n">polyfit_weighting</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span>
+            <span class="n">function</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">values</span></div>
+
+<div class="viewcode-block" id="Segment.optical_poly_effmass"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.optical_poly_effmass">[docs]</a>    <span class="k">def</span> <span class="nf">optical_poly_effmass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the optical effective mass with a polynomial approximation to the dispersion</span>
+
+<span class="sd">        This optical effective mass is defined as:</span>
+<span class="sd">            ..math::</span>
+<span class="sd">                \frac{1}{m_o} = \frac{\sum_i f(E_i) g(k_i) \frac{\delta^2 E}{\delta k^2}|_i}{\sum f(E_i) g(k_i)}</span>
+
+<span class="sd">        where the sum is over eigenstates i contained withing the :class:`~effmass.analysis.Segment`. :math:`f_(E_i)` is the probability of occupation (Fermi-Dirac statistics) and :math:`g(k_i)` is the density of states at that k-point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The optical effective mass (units of electron mass) of the :class:`~effmass.analysis.Segment`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inertial_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inertial_effmass</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span> <span class="n">dk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">)</span>
+        <span class="n">weighting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighting</span><span class="p">()</span>
+        <span class="n">optical_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">inertial_mass</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">weighting</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">optical_mass</span></div>
+
+<div class="viewcode-block" id="Segment.inertial_effmass"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.inertial_effmass">[docs]</a>    <span class="k">def</span> <span class="nf">inertial_effmass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                         <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                         <span class="n">dk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the inertial (curvature) effective mass (:math:`\frac{1}{\frac{\delta^2E}{\delta k^2}}`), evaluated at :attr:`~effmass.analysis.Segment.dk_bohr`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+<span class="sd">            dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate second order derivatives. Defaults to 100 points evenly distributed across the whole segment.</span>
+<span class="sd">            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array(float). 1d array containing the conductivity effective mass (in units of electron rest mass) evaluated at the points specified in dk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dedk</span><span class="p">,</span> <span class="n">d2edk2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poly_derivatives</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span>
+            <span class="n">dk</span><span class="o">=</span><span class="n">dk</span><span class="p">,</span>
+            <span class="n">polyfit_weighting</span><span class="o">=</span><span class="n">polyfit_weighting</span><span class="p">)</span>
+        <span class="n">conductivity_mass</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">d2edk2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">conductivity_mass</span></div>
+
+<div class="viewcode-block" id="Segment.transport_effmass"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.transport_effmass">[docs]</a>    <span class="k">def</span> <span class="nf">transport_effmass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                          <span class="n">dk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the transport mass (:math:`\frac{k}{\delta E \delta k}`), evaluated at :attr:`~effmass.analysis.Segment.dk_bohr` .</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+<span class="sd">            dk (array, optional): distance (bohr :math:^{-1}) from extrema in reciprocal space at which to evaluate first order derivatives. Defaults to 100 points evenly distributed across the whole segment.</span>
+<span class="sd">            polyfit_weighting (bool, optional): If True, polyfit will be weighted according to occupation of eigenstates. If False, no weighting will be used.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array(float). 1d array containing the transport effective mass (in units of electron rest mass) evaluated at the points specified in dk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dedk</span><span class="p">,</span> <span class="n">d2edk2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poly_derivatives</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span>
+            <span class="n">dk</span><span class="o">=</span><span class="n">dk</span><span class="p">,</span>
+            <span class="n">polyfit_weighting</span><span class="o">=</span><span class="n">polyfit_weighting</span><span class="p">)</span>
+        <span class="c1"># dk=0 for first term gives discontinuity</span>
+        <span class="k">if</span> <span class="n">dk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">transport_mass</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="o">/</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dk</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">dedk</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span>
+        <span class="n">transport_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]),</span> <span class="n">transport_mass</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">transport_mass</span></div>
+
+<div class="viewcode-block" id="Segment.alpha"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.alpha">[docs]</a>    <span class="k">def</span> <span class="nf">alpha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The transport mass (:math:`\frac{k}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The gradient of this line determines the alpha parameter which is used in the kane dispersion.</span>
+
+<span class="sd">        See :meth:`effmass.analysis.Segment.transport_effmass`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+<span class="sd">            truncate (bool, optional): If True, data only up to :meth:`effmass.analysis.Segment.explosion_index` is used. If False, alpha is calculated using data for the whole segment. Defaults to True.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The alpha parameter (hartree :math:`^{-1}`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">truncate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_kanefit_points</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+        <span class="n">transport_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport_effmass</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span>
+            <span class="n">dk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">,</span>
+            <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">truncate</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+            <span class="n">gradient</span><span class="p">,</span> <span class="n">intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                                             <span class="n">transport_mass</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gradient</span><span class="p">,</span> <span class="n">intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                                             <span class="n">transport_mass</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">gradient</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">intercept</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alpha</span></div>
+
+<div class="viewcode-block" id="Segment.kane_mass_band_edge"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.kane_mass_band_edge">[docs]</a>    <span class="k">def</span> <span class="nf">kane_mass_band_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The transport mass (:math:`\frac{1}{\delta E \delta k}`) is calculated as a function of :attr:`~effmass.analysis.Segment.dk_bohr` and fitted to a straight line. The intercept of this line with the y-axis gives a transport mass at bandedge which is used as a parameter in the kane dispersion.</span>
+
+<span class="sd">        See :meth:`effmass.analysis.Segment.transport_effmass`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+<span class="sd">            truncate (bool, optional): If True, data only up to :meth:`effmass.analysis.Segment.explosion_index` is used. If False, alpha is calculated using data for the whole segment. Defaults to True.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: transport mass at bandedge (in units of electron mass).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">truncate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_kanefit_points</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+        <span class="n">transport_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport_effmass</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">,</span>
+            <span class="n">dk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">,</span>
+            <span class="n">polyfit_weighting</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">truncate</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">explosion_index</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+            <span class="n">gradient</span><span class="p">,</span> <span class="n">intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                                             <span class="n">transport_mass</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gradient</span><span class="p">,</span> <span class="n">intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                                             <span class="n">transport_mass</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">intercept</span>  <span class="c1"># intercept is the band edge transport mass</span></div>
+
+<div class="viewcode-block" id="Segment.kane_fit"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.kane_fit">[docs]</a>    <span class="k">def</span> <span class="nf">kane_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyfit_order</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the Kane quasi-linear dispersion parameters, then evaluates at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.</span>
+
+<span class="sd">        The Kane quasi-linear dispersion is described by</span>
+<span class="sd">            ..math::</span>
+<span class="sd">                \frac{\hbar ^2 k^2}{2m_{tb}} = E(1+\alpha E)</span>
+
+<span class="sd">        where the transport mass at bandedge (:math:`m_{tb}`) and the alpha parameter are calculated by fitting a linear function to the transport mass :math:`m_t` as a function of energy E.</span>
+<span class="sd">            ..math::</span>
+<span class="sd">                m_t = m_{tb}(1+2\alpha E)</span>
+
+<span class="sd">        The transport mass :math:`m_t` is calculated by approximating the dispersion with a polynomial function and taking the first derivative, see :meth:`~effmass.analysis.Segment.transport_effmass`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polyfit_order (int, optional): order of polynomial used to approximate the dispersion. Defaults to 6.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array: 1d array containing energies (hartree).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_kanefit_points</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">(</span><span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+        <span class="n">transport_mass_bandedge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kane_mass_band_edge</span><span class="p">(</span>
+            <span class="n">polyfit_order</span><span class="o">=</span><span class="n">polyfit_order</span><span class="p">)</span>
+        <span class="n">bandedge_energy</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">((</span><span class="n">k</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">transport_mass_bandedge</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">roots</span> <span class="o">=</span> <span class="n">_solve_quadratic</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+                                 <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">ele</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">bandedge_energy</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">roots</span></div>
+
+<div class="viewcode-block" id="Segment.finite_difference_effmass"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.finite_difference_effmass">[docs]</a>    <span class="k">def</span> <span class="nf">finite_difference_effmass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The curvature at the band edge is calculated using a second order</span>
+<span class="sd">        forward finite difference method. This is then inverted to give an</span>
+<span class="sd">        effective mass.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Bandedge effective mass from finite difference (in units of electron mass).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span>
+             <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">x</span>
+        <span class="k">return</span> <span class="n">mass</span></div>
+
+<div class="viewcode-block" id="Segment.finite_difference_fit"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.finite_difference_fit">[docs]</a>    <span class="k">def</span> <span class="nf">finite_difference_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the curvature at the band edge using a finite difference method and then evaluates the corresponding quadratic dispersion along :attr:`~effmass.analysis.Segment.dk_bohr`.</span>
+
+<span class="sd">        See :meth:`effmass.analysis.Segment.finite_difference_effmass`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr` using the quadratic approximation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m_bandedge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">finite_difference_effmass</span><span class="p">()</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[((</span><span class="n">k</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">m_bandedge</span><span class="p">))</span>
+                  <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">values</span></div>
+
+<div class="viewcode-block" id="Segment.weighted_leastsq_effmass"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.weighted_leastsq_effmass">[docs]</a>    <span class="k">def</span> <span class="nf">weighted_leastsq_effmass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fits a parabolic dispersion using the weighted least-squares method</span>
+<span class="sd">        to all points in the segment, plus those from symmetry, E(k)=E(-k).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Curvature effective mass (in units of electron mass)</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            weighting is given by the Fermi-Dirac distribution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># https://stackoverflow.com/questions/19624997/understanding-scipys-least-square-function-with-irls</span>
+        <span class="c1"># https://stackoverflow.com/questions/27128688/how-to-use-least-squares-with-weight-matrix-in-python</span>
+
+        <span class="n">negative_dk</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">sym_dk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">negative_dk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="n">coeff_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">sym_dk</span><span class="o">**</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">weighting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighting</span><span class="p">()</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weighting</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="n">weighting</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>  <span class="c1"># as it needs same dimensions as x and y.</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">W</span><span class="p">))</span>  <span class="c1"># to allow dot product between weight and matrix/y.</span>
+
+        <span class="n">sym_dE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="n">w_sym_dE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sym_dE</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+        <span class="n">w_coeff_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">coeff_matrix</span><span class="p">)</span>
+
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">w_coeff_matrix</span><span class="p">,</span> <span class="n">w_sym_dE</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">mass</span></div>
+
+<div class="viewcode-block" id="Segment.weighted_leastsq_fit"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.weighted_leastsq_fit">[docs]</a>    <span class="k">def</span> <span class="nf">weighted_leastsq_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the curvature effective mass using a weighted least-</span>
+<span class="sd">        squares fit and then evaluates the corresponding parabolic dispersion</span>
+<span class="sd">        along :attr:`~effmass.analysis.Segment.dk_bohr`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">m_bandedge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted_leastsq_effmass</span><span class="p">()</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[((</span><span class="n">k</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">m_bandedge</span><span class="p">))</span>
+                  <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">values</span></div>
+
+<div class="viewcode-block" id="Segment.five_point_leastsq_effmass"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.five_point_leastsq_effmass">[docs]</a>    <span class="k">def</span> <span class="nf">five_point_leastsq_effmass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fits a parabolic dispersion using the least-squares method to 5</span>
+<span class="sd">        points (3 DFT-calculated points + 2 from symmetry).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Curvature effective mass (in units of electron mass).</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            no weighting is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sym_dk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="p">])</span>
+        <span class="n">sym_dE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dE_hartree</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="p">])</span>
+        <span class="n">coeff_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">sym_dk</span><span class="o">**</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">coeff_matrix</span><span class="p">,</span> <span class="n">sym_dE</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">mass</span></div>
+
+<div class="viewcode-block" id="Segment.five_point_leastsq_fit"><a class="viewcode-back" href="../../analysis.html#effmass.analysis.Segment.five_point_leastsq_fit">[docs]</a>    <span class="k">def</span> <span class="nf">five_point_leastsq_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the curvature effective mass using a parabolic least-</span>
+<span class="sd">        squares fit and then evaluates the corresponding parabolic dispersion</span>
+<span class="sd">        along :attr:`~effmass.analysis.Segment.dk_bohr`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list(float): list containing energies (hartree). The energies are calculated at 100 points evenly distributed across :attr:`~effmass.analysis.Segment.dk_bohr`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m_bandedge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">five_point_leastsq_effmass</span><span class="p">()</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[((</span><span class="n">k</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">m_bandedge</span><span class="p">))</span>
+                  <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dk_bohr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">values</span></div></div>
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2018, Lucy Whalley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
