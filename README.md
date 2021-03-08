@@ -38,15 +38,15 @@ Parameters of the Kane quasi-linear dispersion are calculated to quantify the ex
 **Calculate the quasi-fermi level for a given carrier concentration:**
 Using density-of-states data and assuming no thermal smearing, `effmass` can calculate the energy to which states are occupied. This is a useful approximation to the quasi-Fermi level. *Note: this is only supported for VASP and requires the output file `DOSCAR`.* 
 
-## Supported Codes
-
-`effmass` currently supports `VASP` and `FHI-Aims`. We are currently working on interfacing with `Castep` output and, in the near future, hope to play nicely with pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
-
 **Plot fits to the dispersion:**
 Selected bandstructure segments and approximations to the dispersion (assuming a Kane, quadratic, or higher order fit) can be visualised.
 
 The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiarity with Python. Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed [here](https://effmass.readthedocs.io/en/latest/Related%20packages.html) will suit your needs better.
+
+## Supported Codes
+
+`effmass` currently supports `VASP` and `FHI-Aims`. We are currently working on interfacing with `Castep` output and, in the near future, hope to play nicely with pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
 
 ## Questions, bug reports, feature requests
 
