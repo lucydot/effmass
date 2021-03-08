@@ -17,6 +17,40 @@ import math
 import warnings
 import numpy as np
 
+def check_data(spin_channels, number_of_kpoints, number_of_bands, number_of_ions, CBM, 
+                   VBM, fermi_energy, occupancy):
+    """Check that input data class attributes are sane.
+
+    Args:
+        None.
+
+    Returns:
+        None.
+
+    Notes:
+        There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
+    """
+    assert (
+        ((spin_channels == 1) | (spin_channels == 2) |
+         (spin_channels == 4)) is True
+    ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
+    assert (type(number_of_kpoints) == int
+            and number_of_kpoints > 0
+            ), "The number of kpoints is not a positive integer"
+    assert (type(number_of_bands) == int and number_of_bands > 0
+            ), "The number of bands is not a positive integer"
+    assert (type(number_of_ions) == int and number_of_ions > 0
+            ), "The number of ions is not a positive integer"
+    assert (CBM >
+            VBM), "The CBM energy is lower than than the VBM energy"
+    if fermi_energy < VBM:
+        warnings.warn("The fermi energy is lower than the VBM")
+    if fermi_energy > CBM:
+        warnings.warn("The fermi energy is higher than the CBM")
+    if ((occupancy == 0) | (occupancy == 1) |
+        (occupancy == 2)).all() is False:
+        warnings.warn("You have partial occupancy of bands")
+
 
 class Settings:
     """Class for setting analysis parameters.
@@ -162,40 +196,10 @@ class Data():
         self.fermi_energy = (self.CBM + self.VBM) / 2
         self.dos = []
         self.integrated_dos = []
-        self.check_data()
+        check_data(self.spin_channels, self.number_of_kpoints, self.number_of_bands, 
+                   self.number_of_ions, self.CBM, self.VBM, self.fermi_energy, self.occupancy)
 
-    def check_data(self):
-        """Check that data class attributes are sane.
 
-        Args:
-            None.
-
-        Returns:
-            None.
-
-        Notes:
-            There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
-        """
-        assert (
-            ((self.spin_channels == 1) | (self.spin_channels == 2) |
-             (self.spin_channels == 4)) is True
-        ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
-        assert (type(self.number_of_kpoints) == int
-                and self.number_of_kpoints > 0
-                ), "The number of kpoints is not a positive integer"
-        assert (type(self.number_of_bands) == int and self.number_of_bands > 0
-                ), "The number of bands is not a positive integer"
-        assert (type(self.number_of_ions) == int and self.number_of_ions > 0
-                ), "The number of ions is not a positive integer"
-        assert (self.CBM >
-                self.VBM), "The CBM energy is lower than than the VBM energy"
-        if self.fermi_energy < self.VBM:
-            warnings.warn("The fermi energy is lower than the VBM")
-        if self.fermi_energy > self.CBM:
-            warnings.warn("The fermi energy is higher than the CBM")
-        if ((self.occupancy == 0) | (self.occupancy == 1) |
-            (self.occupancy == 2)).all() is False:
-            warnings.warn("You have partial occupancy of bands")
 
     def parse_DOSCAR(self, filename='./DOSCAR'):
         """Parses the DOS and integrated DOS from a vasp DOSCAR file.
@@ -447,7 +451,8 @@ class DataAims():
         self.kpoints = kpoints
         self.dos = []
         self.integrated_dos = []
-        self.check_data()
+        check_data(self.spin_channels, self.number_of_kpoints, self.number_of_bands, 
+                   self.number_of_ions, self.CBM, self.VBM, self.fermi_energy, self.occupancy)
 
     def check_data(self):
        """Check that data class attributes are sane.
