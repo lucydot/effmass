@@ -2,8 +2,6 @@
 Features
 ========
 
-## Features
-
 `effmass` can:
 
 **Read in a bandstructure:**
@@ -27,9 +25,7 @@ Selected bandstructure segments and approximations to the dispersion (assuming a
 The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiarity with Python. Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed [here](https://effmass.readthedocs.io/en/latest/Related%20packages.html) will suit your needs better.
 
-## Supported Codes
 
-`effmass` currently supports `VASP` and `FHI-Aims`. We are currently working on interfacing with `Castep` output and, in the near future, hope to play nicely with pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
 
 
 .. figure:: .static/screenshot.png
