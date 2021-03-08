@@ -1,10 +1,13 @@
 #! /usr/bin/env python3
 
 """
-A module for storing electronic structure data and user settings.
+A module for storing electronic structure data and user settings. Currently supported codes are VASP and FHI-Aims (with limited functionality).
 
 The module contains a :class:`Data` class which parses OUTCAR and PROCAR files using the `vasppy <https://github.com/bjmorgan/vasppy>`_ package. 
 A function for parsing DOSCAR files is also provided. 
+
+The module contains a :class:`DataAims` class which parses and stores the `geometry.in`/`calculation.out` files generated for/from a FHI-AIMS calculation.
+
 A :class:`Settings` class stores analysis parameters set by the user.
 
 """
