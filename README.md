@@ -12,9 +12,12 @@
 
 `effmass` is a Python 3 package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
-Examples are provided in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb).
+Examples are provided in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
 API documentation is [here](https://effmass.readthedocs.io/en/latest/).
 Source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
+
+
+If you use `effmass` for your published research [please cite effmass](##citing-`effmass`).
 
 The [paper](https://github.com/lucydot/effmass/paper) directory contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for an academic paper using this software: *Impact of nonparabolic electronic band structure on the optical and transport properties of photovoltaic materials*  
 Phys. Rev. B **99** (8), 085207 - also avaiable on [arXiv](https://arxiv.org/pdf/1811.02281.pdf)..
@@ -93,7 +96,7 @@ This code has been tested with Python versions 3.6.
 
 ## Documentation
 
-An overview of the features of effmass along with example code is contained in a [Jupyter notebook](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb), which is available in the `paper` directory.
+An overview of the features of effmass along with example code is contained in a [Jupyter notebook](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
 
 API documentation is available [here](https://effmass.readthedocs.io/en/latest/).
 
@@ -102,6 +105,7 @@ API documentation is available [here](https://effmass.readthedocs.io/en/latest/)
 If you use this code in your research, please cite the following paper:
 
 Whalley, Lucy D. (2018). *effmass - an effective mass package*. The Journal of Open Source Software, 3(28) 797.
+Link to paper [here](https://joss.theoj.org/papers/10.21105/joss.00797).
 
 ### Bibtex
 
@@ -118,3 +122,15 @@ Whalley, Lucy D. (2018). *effmass - an effective mass package*. The Journal of O
   url          = {http://joss.theoj.org/papers/10.21105/joss.00797}
 }
 ```
+
+## Contributors
+
+Lead developer: 
+[Lucy Whalley](https://lucydot.github.io), a.k.a [lucydot](https://github.com/lucydot)
+
+Contributors: 
+Matthias Goloumb (Support for FHI-Aims), a.k.a [MatthiasGolomb](https://github.com/MatthiasGolomb)
+Sean Kavanagh (Documentation), a.k.a [kavanase](https://github.com/kavanase)
+Benjamin Morgan (Vasppy compatability), a.k.a [bjmorgan](bjmorgan)
+
+
