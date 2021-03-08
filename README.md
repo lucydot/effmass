@@ -8,6 +8,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![JOSS status](http://joss.theoj.org/papers/389754561f0710b756514b8cb9ac0e6a/status.svg)](http://joss.theoj.org/papers/389754561f0710b756514b8cb9ac0e6a)
 
+*New: Effmass can now read in FHI-Aims output data**
+
 `effmass` is a Python 3 package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
 Examples are provided in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/paper/notebook.ipynb).
@@ -22,7 +24,7 @@ Phys. Rev. B **99** (8), 085207 - also avaiable on [arXiv](https://arxiv.org/pdf
 `effmass` can:
 
 **Read in a bandstructure:**
-This requires the `VASP` output files `PROCAR` and `OUTCAR`. It is assumed you have walked through a 1D slice of the Brillouin Zone, capturing the maxima and minima of interest. `effmass` uses the Python package [vasppy](https://github.com/bjmorgan/vasppy) for parsing `VASP` output.
+It is assumed you have used a DFT calculator to walk through a 1D slice of the Brillouin Zone, capturing the maxima and minima of interest. `effmass` uses the Python package [vasppy](https://github.com/bjmorgan/vasppy) for parsing `VASP` output.
 
 **Locate extrema:**
 These correspond to the valence band maxima and conduction band minima. Maxima and minima within a certain energy range can also be located.
@@ -34,7 +36,11 @@ The curvature (aka inertial) and transport masses are calculated using the deriv
 Parameters of the Kane quasi-linear dispersion are calculated to quantify the extent of non-parabolicity over a given energy range. 
 
 **Calculate the quasi-fermi level for a given carrier concentration:**
-This requires the `VASP` output file `DOSCAR`. Using density-of-states data and assuming no thermal smearing, `effmass` can calculate the energy to which states are occupied. This is a useful approximation to the quasi-Fermi level.
+Using density-of-states data and assuming no thermal smearing, `effmass` can calculate the energy to which states are occupied. This is a useful approximation to the quasi-Fermi level. *Note: this is only supported for VASP and requires the output file `DOSCAR`.* 
+
+## Supported Codes
+
+`effmass` currently supports `VASP` and `FHI-Aims`. We are currently working on interfacing with `Castep` output and, in the near future, hope to play nicely with pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
 
 **Plot fits to the dispersion:**
 Selected bandstructure segments and approximations to the dispersion (assuming a Kane, quadratic, or higher order fit) can be visualised.
