@@ -20,7 +20,7 @@ Details
 -------
 
 :Authors: Lucy Whalley
-:Contact: lucywhalley@gmail.com
+:Contact: l.whalley@northumbria.ac.uk
 :GitHub: https://github.com/lucydot
 :Citation: :download:`bibtex<.static/Whalley2018_CITATION.bib>`
 
