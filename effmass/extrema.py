@@ -116,6 +116,27 @@ def change_direction(kpoints, kpoint_indices):
             break
     return change_index
 
+def calc_CBM_VBM_from_Fermi(Data, CBMVBM_search_depth=4.0):
+    """ This function is used to find the CBM and VBM when there is no occupancy data. It relies upon the Fermi level being in the middle of the band gap.
+    The CBMVBM_search_depth is refereced from the fermi energy.
+    
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+
+    Returns:
+        (float, float): A tuple containing the conduction band minimum and valence band maximum in eV.
+"""
+    Data.CBM = Data.fermi_energy
+    Data.VBM = Data.fermi_energy
+
+    Settings = inputs.Settings(extrema_search_depth=CBMVBM_search_depth)
+    extrema_indices=find_extrema_indices(Data, Settings)
+
+    CBM = Data.energies[extrema_indices[1].min()]
+    VBM = Data.energies[extrema_indices[0].max()]
+
+    return CBM, VBM
+
 
 def find_extrema_indices(Data, Settings):
     """Finds the kpoint index and band index of the minimum/maximum energy

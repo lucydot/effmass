@@ -100,6 +100,41 @@ class Settings:
         ), "The bandfit degree must be a positive integer greater than 1"
 
 
+class DataASE():
+
+    r"""
+    Class for interfacing with ASE bandstructure object.
+
+    Attributes:
+        spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).
+        number_of_kpoints (int): the number of k-points per band.
+        number_of_bands (int): the number of bands.
+        number_of_ions (int): the number of ions.
+        kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
+        energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
+        occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
+        reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
+        CBM (float): the conduction band minimum energy in eV.
+        VBM (float): the valence band maximum in eV.
+        fermi_energy (float): the fermi energy in eV. Determined by the value of ASE.....
+    """
+
+
+    def __init__():
+
+        warnings.warn("The DataASE class does not parse eigenstate occupancy data. The Fermi energy will \
+            be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above \
+            the fermi energy). You should independently confirm that the fermi energy is in the band gap of \
+            your material. Note that you can manually set the DataASE.fermi_energy attribute and find the CBM and VBM using the method `DataASE.find_cbm_vbm`. ")
+
+        self.CBM = None
+        self.VBM = None
+        self.find_cbm_vbm
+
+    def find_cbm_vbm(self)
+        self.CBM, self.VBM = extrema.calc_CBM_VBM_from_Fermi(self,CBMVBM_search_depth=4.0)
+
+
 class Data():
     r"""
     Class for parsing and storing data from a vasp calculation.
