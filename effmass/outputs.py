@@ -52,12 +52,12 @@ def plot_segments(Data, Settings, segments):
     return fig, ax
     
 
-def plot_integrated_dos(Data):
+def plot_integrated_dos(DataVasp):
     """Plots integrated density of states (states/unit-cell) against energy
     (eV).
 
     Args:
-        Data (Data): instance of the :class:`Data` class.
+        DataVasp (DataVasp): instance of the :class:`DataVasp` class.
 
     Returns:
         Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
@@ -65,26 +65,26 @@ def plot_integrated_dos(Data):
     Notes:
         The valence band maximum is set to 0 eV.
     """
-    _check_integrated_dos_loaded(Data)
+    _check_integrated_dos_loaded(DataVasp)
 
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111)
-    energy = [x[0] - Data.VBM for x in Data.integrated_dos]
-    dos_data = [x[1] for x in Data.integrated_dos]
+    energy = [x[0] - DataVasp.VBM for x in DataVasp.integrated_dos]
+    dos_data = [x[1] for x in DataVasp.integrated_dos]
     ax.plot(energy, dos_data)
     ax.set_xlabel("Energy, eV")
     ax.set_ylabel("Integrated DOS, states / unit cell")
     ax.axvline(0, linestyle="--")
-    ax.axvline(Data.CBM - Data.VBM, linestyle="--")
+    ax.axvline(DataVasp.CBM - DataVasp.VBM, linestyle="--")
 
     return fig, ax
 
 
-def plot_dos(Data):
+def plot_dos(DataVasp):
     """Plots density of states (states/unit-cell) against energy (eV).
 
     Args:
-        Data (Data): instance of the :class:`Data` class.
+        DataVasp (DataVasp): instance of the :class:`DataVasp` class.
 
     Returns:
         Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
@@ -92,17 +92,17 @@ def plot_dos(Data):
     Notes:
         The valence band maximum is set to 0 eV.
     """
-    _check_dos_loaded(Data)
+    _check_dos_loaded(DataVasp)
 
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111)
-    energy = [x[0] - Data.VBM for x in Data.dos]
-    dos = [x[1] for x in Data.dos]
+    energy = [x[0] - DataVasp.VBM for x in DataVasp.dos]
+    dos = [x[1] for x in DataVasp.dos]
     ax.plot(energy, dos)
     ax.set_xlabel("Energy, eV")
     ax.set_ylabel("DOS")
     ax.axvline(0, linestyle="--")
-    ax.axvline(Data.CBM - Data.VBM, linestyle="--")
+    ax.axvline(DataVasp.CBM - DataVasp.VBM, linestyle="--")
 
     return fig, ax
 
