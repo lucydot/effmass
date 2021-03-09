@@ -110,8 +110,11 @@ class Segment:
         self.dE_eV = self.energies - self.energies[0]
         self.dE_hartree = np.multiply(self.energies - self.energies[0],
                                       ev_to_hartree)
-        self.occupancy = np.array(
-            [Data.occupancy[band, k] for k in kpoint_indices])
+        if Data.occupancy:
+            self.occupancy = np.array(
+                [Data.occupancy[band, k] for k in kpoint_indices])
+        else: 
+            self.occupancy = None
         self.direction = extrema.calculate_direction(self.kpoints[1],
                                                      self.kpoints[2])
         self.fermi_energy = Data.fermi_energy

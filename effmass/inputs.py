@@ -103,33 +103,48 @@ class Settings:
 class DataASE():
 
     r"""
-    Class for interfacing with ASE bandstructure object.
+    Class for interfacing with ASE bandstructure object. 
 
     Attributes:
-        spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).
         number_of_kpoints (int): the number of k-points per band.
         number_of_bands (int): the number of bands.
         number_of_ions (int): the number of ions.
         kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
         energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
         occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
-        reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
+        cartesian_kpoints (array(float)): 2-dimensional array. Each row contains the cartesian coordinates (angstrom :math:`^{-1}`) of a kpoint.
         CBM (float): the conduction band minimum energy in eV.
         VBM (float): the valence band maximum in eV.
         fermi_energy (float): the fermi energy in eV. Determined by the value of ASE.....
     """
 
 
-    def __init__():
+    def __init__(self, bs):
+        r"""
+        Initialises an instance of the :class:`~effmass.inputs.DataASE` class and infers which bands are occupied and unoccupied from the fermi level.
+
+        Args:
+          bs (ase.spectrum.band_structure.BandStructure): An instance of the ase.spectrum.band_structure.BandStructure object.
+
+        Returns: 
+            None.
+        """
 
         warnings.warn("The DataASE class does not parse eigenstate occupancy data. The Fermi energy will \
             be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above \
             the fermi energy). You should independently confirm that the fermi energy is in the band gap of \
             your material. Note that you can manually set the DataASE.fermi_energy attribute and find the CBM and VBM using the method `DataASE.find_cbm_vbm`. ")
 
-        self.CBM = None
-        self.VBM = None
+        self.spin_channels = bs.energies[0]
+        self.number_of_kpoints = bs.energies.shape[1]
+        self.number_of_bands = bs.energies.shape[2]
+        self.energies = bs.energies
+        self.occupancy = None
+        self.kpoints = bs.path.kpts
+        self.cartesian_kpoints = bs.path.cartesian_kpts
+        self.fermi_energy = bs.reference
         self.find_cbm_vbm
+
 
     def find_cbm_vbm(self)
         self.CBM, self.VBM = extrema.calc_CBM_VBM_from_Fermi(self,CBMVBM_search_depth=4.0)
@@ -292,24 +307,23 @@ class DataAims():
         fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.
     """
 
-    def __init__(self, file_path):
+    def __init__(self, directory_path):
         r"""
-        Initialises an instance of the :class:`~effmass.inputs.Data_Aims` class and checks data using :meth:`check_data`.
+        Initialises an instance of the :class:`~effmass.inputs.DataAims` class and checks data using :meth:`check_data`.
 
         Args:
-            file_path (str): The path to the directory containing output, geometry.in, control.in and bandstructure files
-            ignore (int): The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).
+            directory_path (str): The path to the directory containing output, geometry.in, control.in and bandstructure files
 
         Returns:
             None.
         """
-        assert (type(file_path) == str), "The file path must be a string"
+        assert (type(directory_path) == str), "The file path must be a string"
 
         "Finding reciprocal lattice vectors"
 
         latvec = []
 
-        for line in open("{}/geometry.in".format(file_path)):
+        for line in open("{}/geometry.in".format(directory_path)):
             line = line.split("\t")[0]
             words = line.split()
             if len(words) == 0:
@@ -340,7 +354,7 @@ class DataAims():
 
         spin_channels = 0
 
-        for line in open("{}/calculation.out".format(file_path)):
+        for line in open("{}/calculation.out".format(directory_path)):
             line = line.split("\t")[0]
             if "include_spin_orbit" in line:
                spin_channels = 4
@@ -356,7 +370,7 @@ class DataAims():
 
         number_of_bands = 0
 
-        for line in open("{}/calculation.out".format(file_path)):
+        for line in open("{}/calculation.out".format(directory_path)):
             line = line.split("\t")[0]
             if "Number of states" in line:
                 words = line.split()
@@ -373,7 +387,7 @@ class DataAims():
 
         number_of_ions = 0
 
-        for line in open("{}/calculation.out".format(file_path)):
+        for line in open("{}/calculation.out".format(directory_path)):
             line = line.split("\t")[0]
             if "Number of atoms" in line:
                 words = line.split()
@@ -389,7 +403,7 @@ class DataAims():
         number_of_BZ_paths = 0
         path_list = []
 
-        for line in open("{}/calculation.out".format(file_path)):
+        for line in open("{}/calculation.out".format(directory_path)):
             line = line.split("\t")[0]
             if not line.startswith("#") and "output" in line:
                 if "band" in line:
@@ -411,7 +425,7 @@ class DataAims():
             kpoint_counter = 0
             while path_counter<number_of_BZ_paths:
                 kpoint_counter = sum(path_list[:path_counter])
-                for line in open("{}/band1{:03d}.out".format(file_path, path_counter+1)):
+                for line in open("{}/band1{:03d}.out".format(directory_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
                     kpoints[int(kpoint_counter),0] = float(words[1])
@@ -426,7 +440,7 @@ class DataAims():
         if spin_channels == 2:
             while path_counter<number_of_BZ_paths:
                 kpoint_counter = sum(path_list[:path_counter])
-                for line in open("{}/band1{:03d}.out".format(file_path, path_counter+1)):
+                for line in open("{}/band1{:03d}.out".format(directory_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
                     kpoints[int(kpoint_counter),0] = float(words[1])
@@ -437,7 +451,7 @@ class DataAims():
                         occupancy[i,int(kpoint_counter)] = float(words[4+2*i])
                     kpoint_counter += 1
                 kpoint_counter = sum(path_list[:path_counter])
-                for line in open("{}/band2{:03d}.out".format(file_path, path_counter+1)):
+                for line in open("{}/band2{:03d}.out".format(directory_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
                     for i in range(number_of_bands//2):
