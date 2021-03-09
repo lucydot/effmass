@@ -13,43 +13,10 @@ A :class:`Settings` class stores analysis parameters set by the user.
 """
 from vasppy import procar, outcar
 from effmass import extrema
+import ase
 import math
 import warnings
 import numpy as np
-
-def check_data(spin_channels, number_of_kpoints, number_of_bands, number_of_ions, CBM, 
-                   VBM, fermi_energy, occupancy):
-    """Check that input data class attributes are sane.
-
-    Args:
-        None.
-
-    Returns:
-        None.
-
-    Notes:
-        There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
-    """
-    assert (
-        ((spin_channels == 1) | (spin_channels == 2) |
-         (spin_channels == 4)) is True
-    ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
-    assert (type(number_of_kpoints) == int
-            and number_of_kpoints > 0
-            ), "The number of kpoints is not a positive integer"
-    assert (type(number_of_bands) == int and number_of_bands > 0
-            ), "The number of bands is not a positive integer"
-    assert (type(number_of_ions) == int and number_of_ions > 0
-            ), "The number of ions is not a positive integer"
-    assert (CBM >
-            VBM), "The CBM energy is lower than than the VBM energy"
-    if fermi_energy < VBM:
-        warnings.warn("The fermi energy is lower than the VBM")
-    if fermi_energy > CBM:
-        warnings.warn("The fermi energy is higher than the CBM")
-    if ((occupancy == 0) | (occupancy == 1) |
-        (occupancy == 2)).all() is False:
-        warnings.warn("You have partial occupancy of bands")
 
 
 class Settings:
@@ -100,22 +67,41 @@ class Settings:
         ), "The bandfit degree must be a positive integer greater than 1"
 
 
-class DataASE():
+class DataCastep(DataASE):
+
+    r"""Class for parsing and storing data from a Castep bandstructure calculation. Inherits attributes and methods from the :class:`~effmass.inputs.DataASE` class."""
+
+    def __init__(self,directory_path,seedname):
+    r"""
+        Initialises an instance of the :class:`~effmass.inputs.DataCastep` class and checks data using :meth:`check_data`.
+
+        Args:
+            directory_path (str): The path to a directory containing seedname.cell, seedname.out and seedname.bands
+            seedname (str): The name (without suffix) of the input and output files
+ 
+        Returns: 
+            None.
+        """
+        
+        Castep_calculator = ase.calculators.castep.Castep(directory_path)
+        ASE_atoms = ase.io.castep.read_seed(directory_path+"./"+seedname)
+        Castep_calculator.atoms = atoms
+        ASE_bandstructure = Castep_calculator.band_structure(directory_path+"./"+seedname+".bands")
+        super().__init__(self, ASE_bandstructure)
+
+class DataASE(Data):
 
     r"""
-    Class for interfacing with ASE bandstructure object. 
+    Class for interfacing with the ASE bandstructure object. Inherits attributes and methods from the :class:`~effmass.inputs.Data` class, and extends
+    with a method for inferring the CBM/VBM from Fermi level.
 
-    Attributes:
-        number_of_kpoints (int): the number of k-points per band.
-        number_of_bands (int): the number of bands.
-        number_of_ions (int): the number of ions.
-        kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
-        energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
-        occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
-        cartesian_kpoints (array(float)): 2-dimensional array. Each row contains the cartesian coordinates (angstrom :math:`^{-1}`) of a kpoint.
-        CBM (float): the conduction band minimum energy in eV.
-        VBM (float): the valence band maximum in eV.
-        fermi_energy (float): the fermi energy in eV. Determined by the value of ASE.....
+    Note: DataASE.fermi_energy is taken from the seedname.out file. 
+
+    Note: The DataASE class does not parse eigenstate occupancy data. The Fermi energy will \
+          be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above \
+          the fermi energy). You should independently confirm that the fermi energy is in the band gap of \
+          your material. Note that you can manually set the DataASE.fermi_energy attribute and find the CBM and VBM using the method `DataASE.find_cbm_vbm`. ")
+
     """
 
 
@@ -135,15 +121,17 @@ class DataASE():
             the fermi energy). You should independently confirm that the fermi energy is in the band gap of \
             your material. Note that you can manually set the DataASE.fermi_energy attribute and find the CBM and VBM using the method `DataASE.find_cbm_vbm`. ")
 
+        super().__init__(self)
+
         self.spin_channels = bs.energies[0]
         self.number_of_kpoints = bs.energies.shape[1]
         self.number_of_bands = bs.energies.shape[2]
         self.energies = bs.energies
-        self.occupancy = None
         self.kpoints = bs.path.kpts
         self.cartesian_kpoints = bs.path.cartesian_kpts
         self.fermi_energy = bs.reference
-        self.find_cbm_vbm
+        self.find_cbm_vbm()
+        self.check_data()
 
 
     def find_cbm_vbm(self)
@@ -151,23 +139,78 @@ class DataASE():
 
 
 class Data():
-    r"""
-    Class for parsing and storing data from a vasp calculation.
 
-    Attributes:
+    def __init__(self):
+
+        self.spin_channels = None
+        self.number_of_bands = None
+        self.number_of_kpoints = None
+        self.energies = None
+        self.occupancy = None
+        self.kpoints = None
+        self.cartesian_kpoints = None
+        self.fermi_energy = None
+        self.reciprocal_lattice = None
+        self.CBM = None
+        self.VBM = None
+
+    def check_data(self, spin_channels, number_of_kpoints, number_of_bands, CBM, 
+                   VBM, fermi_energy, occupancy):
+    """Check that input data class attributes are sane.
+
+    Args:
+        None.
+
+    Returns:
+        None.
+
+    Notes:
+        There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
+    """
+    assert (
+        ((spin_channels == 1) | (spin_channels == 2) |
+         (spin_channels == 4)) is True
+    ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
+    assert (type(number_of_kpoints) == int
+            and number_of_kpoints > 0
+            ), "The number of kpoints is not a positive integer"
+    assert (type(number_of_bands) == int and number_of_bands > 0
+            ), "The number of bands is not a positive integer"
+    assert (CBM >
+            VBM), "The CBM energy is lower than than the VBM energy"
+    if fermi_energy < VBM:
+        warnings.warn("The fermi energy is lower than the VBM")
+    if fermi_energy > CBM:
+        warnings.warn("The fermi energy is higher than the CBM")
+    if ((occupancy == 0) | (occupancy == 1) |
+        (occupancy == 2)).all() is False:
+        warnings.warn("You have partial occupancy of bands")
+
+
+"""    Attributes:
         spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).
         number_of_kpoints (int): the number of k-points per band.
         number_of_bands (int): the number of bands.
-        number_of_ions (int): the number of ions.
         kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
         energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
         occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
         reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
+        cartesian_kpoints (array(float)): 2-dimensional array. Each row contains the cartesian coordinates (angstrom :math:`^{-1}`) of a kpoint.
         CBM (float): the conduction band minimum energy in eV.
         VBM (float): the valence band maximum in eV.
-        fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.
+        fermi_energy (float): the fermi energy in eV."""
+
+
+
+class DataVasp(Data):
+    r"""
+    Class for parsing and storing data from a vasp calculation. Extends the :class:`~effmass.inputs.Data` class to include support for analysing DOSCAR data"
+   
+    Additional attributes:
         dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)].
         integrated_dos: 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].
+    
+    Note: DataVasp.fermi_energy is automatically set to the mean of DataVasp.CBM and DataVasp.VBM.
     """
 
     def __init__(self, outcar_path, procar_path, ignore=0, **kwargs):
@@ -184,6 +227,9 @@ class Data():
         Returns: 
             None.
         """
+
+        super().__init__(self)
+
         assert (type(outcar_path) == str), "The OUTCAR path must be a string"
         assert (type(ignore) == int and ignore >= 0
                 ), "The number of kpoints to ignore must be a positive integer"
@@ -198,7 +244,6 @@ class Data():
 
         self.spin_channels = vasp_data.spin_channels
         self.number_of_bands = vasp_data.number_of_bands
-        self.number_of_ions = vasp_data.number_of_ions
 
         number_of_kpoints = vasp_data.number_of_k_points
         vasp_data_energies = np.array( [ band.energy for band in np.ravel( vasp_data.bands ) ] )
@@ -246,8 +291,8 @@ class Data():
         self.fermi_energy = (self.CBM + self.VBM) / 2
         self.dos = []
         self.integrated_dos = []
-        check_data(self.spin_channels, self.number_of_kpoints, self.number_of_bands, 
-                   self.number_of_ions, self.CBM, self.VBM, self.fermi_energy, self.occupancy)
+        self.check_data(self.spin_channels, self.number_of_kpoints, self.number_of_bands, 
+                   self.CBM, self.VBM, self.fermi_energy, self.occupancy)
 
 
 
@@ -289,7 +334,7 @@ class Data():
         return
 
 
-class DataAims():
+class DataAims(Data):
     r"""
     Class for parsing and storing data from a FHI-AIMS calculation.
 
@@ -297,7 +342,6 @@ class DataAims():
         spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).
         number_of_kpoints (int): the number of k-points per band.
         number_of_bands (int): the number of bands.
-        number_of_ions (int): the number of ions.
         kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
         energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
         occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
@@ -317,6 +361,8 @@ class DataAims():
         Returns:
             None.
         """
+        super().__init__(self)
+
         assert (type(directory_path) == str), "The file path must be a string"
 
         "Finding reciprocal lattice vectors"
@@ -382,20 +428,6 @@ class DataAims():
             number_of_bands = 2*number_of_bands
 
         self.number_of_bands = number_of_bands
-
-        "Finding number of ions"
-
-        number_of_ions = 0
-
-        for line in open("{}/calculation.out".format(directory_path)):
-            line = line.split("\t")[0]
-            if "Number of atoms" in line:
-                words = line.split()
-                number_of_ions = int(words[-1])
-
-                break
-
-        self.number_of_ions = number_of_ions
 
         "Finding number of kpoints and determining number of BZ paths"
 
@@ -498,40 +530,8 @@ class DataAims():
         self.energies = energies
         self.occupancy = occupancy
         self.kpoints = kpoints
-        self.dos = []
-        self.integrated_dos = []
-        check_data(self.spin_channels, self.number_of_kpoints, self.number_of_bands, 
-                   self.number_of_ions, self.CBM, self.VBM, self.fermi_energy, self.occupancy)
 
-    def check_data(self):
-       """Check that data class attributes are sane.
+        self.check_data(self.spin_channels, self.number_of_kpoints, self.number_of_bands, 
+                   self.CBM, self.VBM, self.fermi_energy, self.occupancy)
 
-       Args:
-           None.
 
-       Returns:
-           None.
-
-       Notes:
-           There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
-       """
-       assert (
-           ((self.spin_channels == 1) | (self.spin_channels == 2) |
-            (self.spin_channels == 4)) is True
-       ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
-       assert (type(self.number_of_kpoints) == int
-               and self.number_of_kpoints > 0
-               ), "The number of kpoints is not a positive integer"
-       assert (type(self.number_of_bands) == int and self.number_of_bands > 0
-               ), "The number of bands is not a positive integer"
-       assert (type(self.number_of_ions) == int and self.number_of_ions > 0
-               ), "The number of ions is not a positive integer"
-       assert (self.CBM >
-               self.VBM), "The CBM energy is lower than than the VBM energy"
-       if self.fermi_energy < self.VBM:
-           warnings.warn("The fermi energy is lower than the VBM")
-       if self.fermi_energy > self.CBM:
-           warnings.warn("The fermi energy is higher than the CBM")
-       if ((self.occupancy == 0) | (self.occupancy == 1) |
-           (self.occupancy == 2)).all() is False:
-           warnings.warn("You have partial occupancy of bands")#
