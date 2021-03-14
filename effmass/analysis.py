@@ -7,6 +7,7 @@ Contains the :class:`Segment` class and methods for calculating various definiti
 
 import warnings
 import numpy as np
+import math
 from scipy import integrate
 from effmass import extrema
 from effmass import angstrom_to_bohr
@@ -92,13 +93,9 @@ class Segment:
         self.kpoint_indices = kpoint_indices
         self.kpoints = np.array([Data.kpoints[k] for k in kpoint_indices
                                  ])  # in units 2*pi/angstrom
-        if Data.reciprocal_lattice:
-            self.cartesian_kpoints = np.array([
+        self.cartesian_kpoints = np.array([
                 np.dot(k, Data.reciprocal_lattice) for k in self.kpoints
                 ])  # in units 1/Angstrom. Reciprocal lattice includes factor 2*pi.
-        else:
-            self.cartesian_kpoints = np.array([Data.cartesian_kpoints[k] for 
-                k in kpoint_indices])
         self.dk_angs = np.linalg.norm(
             self.cartesian_kpoints - self.cartesian_kpoints[0], axis=1)
         self.dk_bohr = np.divide(
@@ -109,7 +106,7 @@ class Segment:
         self.dE_eV = self.energies - self.energies[0]
         self.dE_hartree = np.multiply(self.energies - self.energies[0],
                                       ev_to_hartree)
-        if Data.occupancy:
+        if Data.occupancy is not None:
             self.occupancy = np.array(
                 [Data.occupancy[band, k] for k in kpoint_indices])
         else: 

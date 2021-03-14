@@ -80,7 +80,6 @@ class Data():
             energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
             occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
             reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
-            cartesian_kpoints (array(float)): 2-dimensional array. Each row contains the cartesian coordinates (angstrom :math:`^{-1}`) of a kpoint.
             CBM (float): the conduction band minimum energy in eV.
             VBM (float): the valence band maximum in eV.
             fermi_energy (float): the fermi energy in eV.""" 
@@ -103,7 +102,6 @@ class Data():
         self.energies = None
         self.occupancy = None
         self.kpoints = None
-        self.cartesian_kpoints = None
         self.fermi_energy = None
         self.reciprocal_lattice = None
         self.CBM = None
@@ -161,7 +159,7 @@ class DataASE(Data):
     """
 
 
-    def __init__(self, bs):
+    def __init__(self, bs, atoms):
         r"""
         Initialises an instance of the :class:`~effmass.inputs.DataASE` class and infers which bands are occupied and unoccupied from the fermi level.
 
@@ -184,7 +182,7 @@ class DataASE(Data):
         self.number_of_bands = bs.energies.shape[2]*bs.energies.shape[0]
         self.energies = bs.energies.transpose(1,0,2).reshape(self.number_of_kpoints,-1).transpose()
         self.kpoints = bs.path.kpts
-        self.cartesian_kpoints = bs.path.cartesian_kpts()
+        self.reciprocal_lattice = atoms.cell.reciprocal()*2*math.pi
         self.fermi_energy = bs.reference
         self.find_cbm_vbm()
         self.check_data(self.spin_channels, self.number_of_kpoints, self.number_of_bands, self.CBM, 
@@ -210,7 +208,8 @@ class DataCastep(DataASE):
         Castep_calculator = Castep(directory_path)
         Castep_calculator.atoms = io.read(directory_path+"./"+seedname+".cell", format='castep-cell')
         ASE_bandstructure = Castep_calculator.band_structure(directory_path+"./"+seedname+".bands")
-        super().__init__(ASE_bandstructure)
+        ASE_atoms = Castep_calculator.atoms
+        super().__init__(ASE_bandstructure, ASE_atoms)
 
 
 
