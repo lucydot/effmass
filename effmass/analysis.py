@@ -56,7 +56,6 @@ def _solve_quadratic(a, b, c):
             x.append((-b + np.sqrt(d)) / (2 * a))
     return x
 
-
 class Segment:
     """Class for segments of the bandstructure. A Segment contains data for a
     particular region of reciprocal space and particular band.
@@ -75,10 +74,6 @@ class Segment:
         direction (array): 1-dimensional array with length 3. The direction between kpoints in the segment.
         band_type (str): The band type, determined by occupancy of the eigenstate. Argument choices are "conduction_band", "valence_band" or "unknown". If set to "unknown", some class methods will raise a warning and return None.
         fermi_energy (float): the fermi energy in eV.
-        dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. A slice of :attr:`effmass.inputs.Data.dos`.
-        integrated_dos (array): 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of :attr:`effmass.inputs.Data.integrated_dos`.
-
-
     """
 
     def __init__(self, Data, band, kpoint_indices):
@@ -97,9 +92,13 @@ class Segment:
         self.kpoint_indices = kpoint_indices
         self.kpoints = np.array([Data.kpoints[k] for k in kpoint_indices
                                  ])  # in units 2*pi/angstrom
-        self.cartesian_kpoints = np.array([
-            np.dot(k, Data.reciprocal_lattice) for k in self.kpoints
-        ])  # in units 1/Angstrom. Reciprocal lattice includes factor 2*pi.
+        if Data.reciprocal_lattice:
+            self.cartesian_kpoints = np.array([
+                np.dot(k, Data.reciprocal_lattice) for k in self.kpoints
+                ])  # in units 1/Angstrom. Reciprocal lattice includes factor 2*pi.
+        else:
+            self.cartesian_kpoints = np.array([Data.cartesian_kpoints[k] for 
+                k in kpoint_indices])
         self.dk_angs = np.linalg.norm(
             self.cartesian_kpoints - self.cartesian_kpoints[0], axis=1)
         self.dk_bohr = np.divide(
@@ -118,8 +117,6 @@ class Segment:
         self.direction = extrema.calculate_direction(self.kpoints[1],
                                                      self.kpoints[2])
         self.fermi_energy = Data.fermi_energy
-        self.dos = self._dos(Data)
-        self.integrated_dos = self._integrated_dos(Data)
         self._VBM = Data.VBM
         self._CBM = Data.CBM
         self.band_type = self._band_type()
@@ -252,49 +249,6 @@ class Segment:
             )
             band_type = "unknown"
         return band_type
-
-    def _dos(self, Data):
-        """Returns slice of :attr:`effmass.Data.dos` corresponding to the
-        energy range of the segment.
-
-        Args:
-            Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.
-
-        Returns:
-            list(floats): slice of :attr:`effmass.Data.dos` corresponding to the energy range of the segment.
-        """
-        if Data.dos == []:
-            dos = []
-        else:
-            dos = []
-            for i in range(len(self.energies)):
-                for j in range(len(Data.dos)):
-                    if self.energies[i] < Data.dos[j][0]:
-                        dos.append(Data.dos[j][1])
-                        break
-
-        return dos
-
-    def _integrated_dos(self, Data):
-        """Returns slice of :attr:`effmass.Data.integrated_dos` corresponding
-        to the energy range of the segment.
-
-        Args:
-            Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.
-
-        Returns:
-            array: slice of :attr:`effmass.Data.integrated_dos` corresponding to the energy range of the segment.
-        """
-        if Data.integrated_dos == []:
-            integrated_dos = []
-        else:
-            integrated_dos = []
-            for i in range(len(self.energies)):
-                for j in range(len(Data.integrated_dos)):
-                    if self.energies[i] < Data.integrated_dos[j][0]:
-                        integrated_dos.append(Data.integrated_dos[j][1])
-                        break
-        return integrated_dos
 
     # The collection of methods below calculate the optical effective mass by integrating numerically the analytical
     # expression for the second derivative of the Kane dispersion multiplied by a Fermi-Dirac weighting.
@@ -812,7 +766,7 @@ class Segment:
         return mass
 
     def weighted_leastsq_fit(self):
-        """Calculates the curvature effective mass using a weighted least-
+        """Calculates the curvature effective mass usinhag a weighted least-
         squares fit and then evaluates the corresponding parabolic dispersion
         along :attr:`~effmass.analysis.Segment.dk_bohr`.
 
@@ -870,5 +824,63 @@ class Segment:
         values = [((k**2) / (2 * m_bandedge))
                   for k in np.linspace(self.dk_bohr[0], self.dk_bohr[-1], 100)]
         return values
+
+class SegmentVasp(Segment):
+    """ Class for segments of a Vasp bandstructure. Inherits from :class:`~effmass.analysis.Segment` class,
+    and extends to include DOS Segment data.
+
+    Additional attributes:
+        dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. A slice of :attr:`effmass.inputs.DataVasp.dos`.
+        integrated_dos (array): 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of :attr:`effmass.inputs.DataVasp.integrated_dos`.
+    """
+
+    def __init__(self, DataVasp, band, kpoint_indices):
+
+        super().__init__(DataVasp, band, kpoint_indices)
+        self.dos = self._dos(DataVasp)
+        self.integrated_dos = self._integrated_dos(DataVasp)
+
+    def _dos(self, DataVasp):
+        """Returns slice of :attr:`effmass.DataVasp.dos` corresponding to the
+        energy range of the segment.
+
+        Args:
+            DataVasp (DataVasp): :class:`~effmass.inputs.DataVasp` instance which was used to generate the :class:`~effmass.analysis.SegmentVasp`.
+
+        Returns:
+            list(floats): slice of :attr:`effmass.DataVasp.dos` corresponding to the energy range of the segment.
+        """
+        if DataVasp.dos == []:
+            dos = []
+        else:
+            dos = []
+            for i in range(len(self.energies)):
+                for j in range(len(DataVasp.dos)):
+                    if self.energies[i] < DataVasp.dos[j][0]:
+                        dos.append(DataVasp.dos[j][1])
+                        break
+
+        return dos
+
+    def _integrated_dos(self, DataVasp):
+        """Returns slice of :attr:`effmass.DataVasp.integrated_dos` corresponding
+        to the energy range of the segment.
+
+        Args:
+            DataVasp (DataVasp): :class:`~effmass.inputs.DataVasp` instance which was used to generate the :class:`~effmass.analysis.Segment`.
+
+        Returns:
+            array: slice of :attr:`effmass.DataVasp.integrated_dos` corresponding to the energy range of the segment.
+        """
+        if DataVasp.integrated_dos == []:
+            integrated_dos = []
+        else:
+            integrated_dos = []
+            for i in range(len(self.energies)):
+                for j in range(len(DataVasp.integrated_dos)):
+                    if self.energies[i] < DataVasp.integrated_dos[j][0]:
+                        integrated_dos.append(DataVasp.integrated_dos[j][1])
+                        break
+        return integrated_dos
 
 

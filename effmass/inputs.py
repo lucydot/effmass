@@ -13,7 +13,9 @@ A :class:`Settings` class stores analysis parameters set by the user.
 """
 from vasppy import procar, outcar
 from effmass import extrema
-import ase
+from ase.calculators.castep import Castep
+from ase import io 
+import ase.io
 import math
 import warnings
 import numpy as np
@@ -64,30 +66,84 @@ class Settings:
                 0), "The energy depth must be a positive number"
         assert (
             type(self.degree_bandfit) == int and self.degree_bandfit > 1
-        ), "The bandfit degree must be a positive integer greater than 1"
+        ), "The bandfit degree must be a positive integer greater than 1"     
+
+class Data():
+    r"""Parent class for parsing and storing data from bandstructure calculations. Contains a :meth:`check_data` method for basic checks on bandstructure data.
 
 
-class DataCastep(DataASE):
+        Attributes:
+            spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).
+            number_of_kpoints (int): the number of k-points per band.
+            number_of_bands (int): the number of bands.
+            kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
+            energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
+            occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
+            reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
+            cartesian_kpoints (array(float)): 2-dimensional array. Each row contains the cartesian coordinates (angstrom :math:`^{-1}`) of a kpoint.
+            CBM (float): the conduction band minimum energy in eV.
+            VBM (float): the valence band maximum in eV.
+            fermi_energy (float): the fermi energy in eV.""" 
 
-    r"""Class for parsing and storing data from a Castep bandstructure calculation. Inherits attributes and methods from the :class:`~effmass.inputs.DataASE` class."""
-
-    def __init__(self,directory_path,seedname):
-    r"""
-        Initialises an instance of the :class:`~effmass.inputs.DataCastep` class and checks data using :meth:`check_data`.
+    def __init__(self):
+        r"""
+        Initialises an instance of the :class:`~effmass.inputs.Data` class. All attributes are None until set by the derived class.
 
         Args:
-            directory_path (str): The path to a directory containing seedname.cell, seedname.out and seedname.bands
-            seedname (str): The name (without suffix) of the input and output files
- 
+            None.
+
         Returns: 
             None.
         """
         
-        Castep_calculator = ase.calculators.castep.Castep(directory_path)
-        ASE_atoms = ase.io.castep.read_seed(directory_path+"./"+seedname)
-        Castep_calculator.atoms = atoms
-        ASE_bandstructure = Castep_calculator.band_structure(directory_path+"./"+seedname+".bands")
-        super().__init__(self, ASE_bandstructure)
+
+        self.spin_channels = None
+        self.number_of_bands = None
+        self.number_of_kpoints = None
+        self.energies = None
+        self.occupancy = None
+        self.kpoints = None
+        self.cartesian_kpoints = None
+        self.fermi_energy = None
+        self.reciprocal_lattice = None
+        self.CBM = None
+        self.VBM = None
+
+    def check_data(self, spin_channels, number_of_kpoints, number_of_bands, CBM, 
+                   VBM, fermi_energy, occupancy):
+        """Check that Data class attributes make basic sense.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Notes:
+            There is a similar method that runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
+        """
+        assert (
+            ((spin_channels == 1) | (spin_channels == 2) |
+             (spin_channels == 4)) is True
+        ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
+        assert (type(number_of_kpoints) == int
+                and number_of_kpoints > 0
+                ), "The number of kpoints is not a positive integer"
+        assert (type(number_of_bands) == int and number_of_bands > 0
+                ), "The number of bands is not a positive integer"
+        assert (CBM >
+                VBM), "The CBM energy is lower than than the VBM energy"
+        if fermi_energy < VBM:
+            warnings.warn("The fermi energy is lower than the VBM")
+        if fermi_energy > CBM:
+            warnings.warn("The fermi energy is higher than the CBM")
+        if occupancy:
+            if ((occupancy == 0) | (occupancy == 1) |
+                (occupancy == 2)).all() is False:
+                warnings.warn("You have partial occupancy of bands")
+
+    def find_cbm_vbm(self):
+        self.CBM, self.VBM = extrema.calc_CBM_VBM_from_Fermi(self,CBMVBM_search_depth=4.0)
 
 class DataASE(Data):
 
@@ -100,7 +156,7 @@ class DataASE(Data):
     Note: The DataASE class does not parse eigenstate occupancy data. The Fermi energy will \
           be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above \
           the fermi energy). You should independently confirm that the fermi energy is in the band gap of \
-          your material. Note that you can manually set the DataASE.fermi_energy attribute and find the CBM and VBM using the method `DataASE.find_cbm_vbm`. ")
+          your material. Note that you can manually set the :attribute:`~effmass.inputs.Data.fermi_energy` attribute and find the CBM and VBM using the method :method:`~effmass.inputs.Data.find_cbm_vbm`. ")
 
     """
 
@@ -119,88 +175,64 @@ class DataASE(Data):
         warnings.warn("The DataASE class does not parse eigenstate occupancy data. The Fermi energy will \
             be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above \
             the fermi energy). You should independently confirm that the fermi energy is in the band gap of \
-            your material. Note that you can manually set the DataASE.fermi_energy attribute and find the CBM and VBM using the method `DataASE.find_cbm_vbm`. ")
+            your material. Note that you can manually set the DataASE.fermi_energy attribute and then re-find the CBM and VBM using the method `DataASE.find_cbm_vbm`. ")
 
-        super().__init__(self)
+        super().__init__()
 
-        self.spin_channels = bs.energies[0]
+        self.spin_channels = bs.energies.shape[0]
         self.number_of_kpoints = bs.energies.shape[1]
-        self.number_of_bands = bs.energies.shape[2]
-        self.energies = bs.energies
+        self.number_of_bands = bs.energies.shape[2]*bs.energies.shape[0]
+        self.energies = bs.energies.transpose(1,0,2).reshape(self.number_of_kpoints,-1).transpose()
         self.kpoints = bs.path.kpts
-        self.cartesian_kpoints = bs.path.cartesian_kpts
+        self.cartesian_kpoints = bs.path.cartesian_kpts()
         self.fermi_energy = bs.reference
         self.find_cbm_vbm()
-        self.check_data()
+        self.check_data(self.spin_channels, self.number_of_kpoints, self.number_of_bands, self.CBM, 
+                    self.VBM, self.fermi_energy, self.occupancy)
 
 
-    def find_cbm_vbm(self)
-        self.CBM, self.VBM = extrema.calc_CBM_VBM_from_Fermi(self,CBMVBM_search_depth=4.0)
+class DataCastep(DataASE):
 
+    r"""Class for parsing and storing data from a Castep bandstructure calculation. Inherits attributes and methods from the :class:`~effmass.inputs.DataASE` class."""
 
-class Data():
+    def __init__(self,directory_path,seedname):
+        r"""
+        Initialises an instance of the :class:`~effmass.inputs.DataCastep` class.
 
-    def __init__(self):
-
-        self.spin_channels = None
-        self.number_of_bands = None
-        self.number_of_kpoints = None
-        self.energies = None
-        self.occupancy = None
-        self.kpoints = None
-        self.cartesian_kpoints = None
-        self.fermi_energy = None
-        self.reciprocal_lattice = None
-        self.CBM = None
-        self.VBM = None
-
-    def check_data(self, spin_channels, number_of_kpoints, number_of_bands, CBM, 
-                   VBM, fermi_energy, occupancy):
-    """Check that input data class attributes are sane.
-
-    Args:
-        None.
-
-    Returns:
-        None.
-
-    Notes:
-        There is a `sanity_check` method which runs automatically when reading data in using the `vasppy.procar <http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar>`_ module.
+        Args:
+            directory_path (str): The path to a directory containing seedname.cell, seedname.out and seedname.bands
+            seedname (str): The name (without suffix) of the input and output files
+ 
+        Returns: 
+            None.
     """
-    assert (
-        ((spin_channels == 1) | (spin_channels == 2) |
-         (spin_channels == 4)) is True
-    ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
-    assert (type(number_of_kpoints) == int
-            and number_of_kpoints > 0
-            ), "The number of kpoints is not a positive integer"
-    assert (type(number_of_bands) == int and number_of_bands > 0
-            ), "The number of bands is not a positive integer"
-    assert (CBM >
-            VBM), "The CBM energy is lower than than the VBM energy"
-    if fermi_energy < VBM:
-        warnings.warn("The fermi energy is lower than the VBM")
-    if fermi_energy > CBM:
-        warnings.warn("The fermi energy is higher than the CBM")
-    if ((occupancy == 0) | (occupancy == 1) |
-        (occupancy == 2)).all() is False:
-        warnings.warn("You have partial occupancy of bands")
+        
+        Castep_calculator = Castep(directory_path)
+        Castep_calculator.atoms = io.read(directory_path+"./"+seedname+".cell", format='castep-cell')
+        ASE_bandstructure = Castep_calculator.band_structure(directory_path+"./"+seedname+".bands")
+        super().__init__(ASE_bandstructure)
 
 
-"""    Attributes:
-        spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).
-        number_of_kpoints (int): the number of k-points per band.
-        number_of_bands (int): the number of bands.
-        kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].
-        energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.
-        occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).
-        reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.
-        cartesian_kpoints (array(float)): 2-dimensional array. Each row contains the cartesian coordinates (angstrom :math:`^{-1}`) of a kpoint.
-        CBM (float): the conduction band minimum energy in eV.
-        VBM (float): the valence band maximum in eV.
-        fermi_energy (float): the fermi energy in eV."""
 
+# class DataQE(DataASE):
 
+#     r"""Class for parsing and storing data from a Quantum Espresso bandstructure calculation. Inherits attributes and methods from the :class:`~effmass.inputs.DataASE` class."""
+
+#     def __init__(self,directory_path,seedname):
+#     r"""
+#         Initialises an instance of the :class:`~effmass.inputs.DataQE` class.
+
+#         Args:
+
+ 
+#         Returns: 
+#             None.
+#         """
+
+#         QE_calculator = ase.calculators.espresso.Espresso()
+#         QE_calculator.atoms = ase.io.espresso.read_espresso_out()
+#         ASE_bandstructure = QE_calculator.band_structure()
+#         super().__init__(self, ASE_bandstructure)
 
 class DataVasp(Data):
     r"""
@@ -228,7 +260,7 @@ class DataVasp(Data):
             None.
         """
 
-        super().__init__(self)
+        super().__init__()
 
         assert (type(outcar_path) == str), "The OUTCAR path must be a string"
         assert (type(ignore) == int and ignore >= 0
@@ -361,7 +393,7 @@ class DataAims(Data):
         Returns:
             None.
         """
-        super().__init__(self)
+        super().__init__()
 
         assert (type(directory_path) == str), "The file path must be a string"
 
