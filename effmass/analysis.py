@@ -56,6 +56,7 @@ def _solve_quadratic(a, b, c):
             x.append((-b + np.sqrt(d)) / (2 * a))
     return x
 
+
 class Segment:
     """Class for segments of the bandstructure. A Segment contains data for a
     particular region of reciprocal space and particular band.
@@ -93,8 +94,8 @@ class Segment:
         self.kpoints = np.array([Data.kpoints[k] for k in kpoint_indices
                                  ])  # in units 2*pi/angstrom
         self.cartesian_kpoints = np.array([
-                np.dot(k, Data.reciprocal_lattice) for k in self.kpoints
-                ])  # in units 1/Angstrom. Reciprocal lattice includes factor 2*pi.
+            np.dot(k, Data.reciprocal_lattice) for k in self.kpoints
+        ])  # in units 1/Angstrom. Reciprocal lattice includes factor 2*pi.
         self.dk_angs = np.linalg.norm(
             self.cartesian_kpoints - self.cartesian_kpoints[0], axis=1)
         self.dk_bohr = np.divide(
@@ -108,7 +109,7 @@ class Segment:
         if Data.occupancy is not None:
             self.occupancy = np.array(
                 [Data.occupancy[band, k] for k in kpoint_indices])
-        else: 
+        else:
             self.occupancy = None
         self.direction = extrema.calculate_direction(self.kpoints[1],
                                                      self.kpoints[2])
@@ -125,9 +126,9 @@ class Segment:
             A string containing the energy of the Segment extrema (referenced to the VBM) and the start- and end- points of the Segment in reciprocal space.
         """
         energy_str = "{0:.2f}".format(self.energies[0] - self._VBM)
-        start_str = str(np.round(self.kpoints[0],3))
-        end_str = str(np.round(self.kpoints[-1],3))
-        return energy_str+" eV; "+start_str+"-->"+end_str
+        start_str = str(np.round(self.kpoints[0], 3))
+        end_str = str(np.round(self.kpoints[-1], 3))
+        return energy_str + " eV; " + start_str + "-->" + end_str
 
     def _check_kanefit_points(self, polyfit_order=6):
         """Raises an AssertionError if there are not enough data points to fit
@@ -140,7 +141,7 @@ class Segment:
             None.
         """
         idx = self.explosion_index(polyfit_order=polyfit_order)
-        assert idx > 3,"Unable to calculate alpha parameter as inflexion too close to extrema"
+        assert idx > 3, "Unable to calculate alpha parameter as inflexion too close to extrema"
 
     def explosion_index(self, polyfit_order=6):
         r"""
@@ -191,7 +192,8 @@ class Segment:
             probability = 1 - (1 / ((np.exp(
                 (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1)))
         else:
-            raise ValueError("Unable to calculate fermi function as the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
+            raise ValueError(
+                "Unable to calculate fermi function as the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
         return probability
 
     def weighting(self, fermi_level=None, temp=300):
@@ -216,7 +218,7 @@ class Segment:
             for E in self.energies
         ]))
 
-        assert weighting.all() != 0,"Unable to assign a weighting to the dispersion as the Fermi-Dirac distribution at all kpoints is smaller than Python's double precision floats. Calculate band edge values using Segment.five_point_leastsq_effmass() or Segment.finite_difference_effmass()."
+        assert weighting.all() != 0, "Unable to assign a weighting to the dispersion as the Fermi-Dirac distribution at all kpoints is smaller than Python's double precision floats. Calculate band edge values using Segment.five_point_leastsq_effmass() or Segment.finite_difference_effmass()."
 
         return weighting
 
@@ -247,7 +249,8 @@ class Segment:
         return band_type
 
     # The collection of methods below calculate the optical effective mass by integrating numerically the analytical
-    # expression for the second derivative of the Kane dispersion multiplied by a Fermi-Dirac weighting.
+    # expression for the second derivative of the Kane dispersion multiplied
+    # by a Fermi-Dirac weighting.
 
     def mass_integration(self,
                          fermi_level=None,
@@ -326,7 +329,8 @@ class Segment:
         elif self.band_type == "unknown":
             raise ValueError("Unable to calculate fermi function as there is partial occupancy of the bands and the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
         else:
-            raise ValueError("Please set the Segment.band_type attribute (options are \"valence_band\" or \"conduction_band\")")
+            raise ValueError(
+                "Please set the Segment.band_type attribute (options are \"valence_band\" or \"conduction_band\")")
 
     def _kane_dispersion(self, k, alpha, mass_bandedge):
         """Helper function for :meth:`~effmass.analysis.Segment.fd`.
@@ -466,18 +470,20 @@ class Segment:
         sym_dk = np.concatenate((negative_dk, self.dk_bohr[1:]))
         sym_dE = np.concatenate((self.dE_hartree[::-1], self.dE_hartree[1:]))
         if polyfit_weighting:
-            # weight to enable a better fit for the values where it is important
+            # weight to enable a better fit for the values where it is
+            # important
             weighting = self.weighting()
         else:
             weighting = np.ones(len(self.dE_hartree))
-        W = np.append(weighting[::-1],
-                      weighting[1:])  # as it needs same dimensions as x and y.
+        # as it needs same dimensions as x and y.
+        W = np.append(weighting[::-1], weighting[1:])
         W = np.sqrt(
             np.diag(W))  # to allow dot product between weight and matrix/y.
         # for explanation of the coefficient matrix and least squares fit see https://stackoverflow.com/questions/32260204/numpy-polyfit-passing-through-0
         # for how to incorporate weighting see https://stackoverflow.com/questions/27128688/how-to-use-least-squares-with-weight-matrix-in-python
         # and https://stackoverflow.com/questions/19624997/understanding-scipys-least-square-function-with-irls
-        # by eliminating the units matrix of the array we are forcing a zero offset; the fit must pass through 0,0 as is physical
+        # by eliminating the units matrix of the array we are forcing a zero
+        # offset; the fit must pass through 0,0 as is physical
         coeff_matrix = np.vstack([
             sym_dk**i for i in np.arange(polyfit_order + 1)[polyfit_order:0:-1]
         ]).T
@@ -486,7 +492,8 @@ class Segment:
         coeff = np.append(np.linalg.lstsq(w_coeff_matrix, w_sym_dE)[0],
                           [0])  # remember to set zeroth power to 0!
         function = np.poly1d(coeff)
-        # function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W)) ----> simple polyfit call for sanity's sake
+        # function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W))
+        # ----> simple polyfit call for sanity's sake
         return function
 
     def poly_derivatives(self,
@@ -748,8 +755,8 @@ class Segment:
         coeff_matrix = np.vstack([sym_dk**2]).T
 
         weighting = self.weighting()
-        W = np.append(weighting[::-1],
-                      weighting[1:])  # as it needs same dimensions as x and y.
+        # as it needs same dimensions as x and y.
+        W = np.append(weighting[::-1], weighting[1:])
         W = np.sqrt(
             np.diag(W))  # to allow dot product between weight and matrix/y.
 
@@ -821,6 +828,7 @@ class Segment:
                   for k in np.linspace(self.dk_bohr[0], self.dk_bohr[-1], 100)]
         return values
 
+
 class SegmentVasp(Segment):
     """ Class for segments of a Vasp bandstructure. Inherits from :class:`~effmass.analysis.Segment` class,
     and extends to include DOS Segment data.
@@ -878,5 +886,3 @@ class SegmentVasp(Segment):
                         integrated_dos.append(DataVasp.integrated_dos[j][1])
                         break
         return integrated_dos
-
-
