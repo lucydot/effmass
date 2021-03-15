@@ -187,8 +187,8 @@ A function for parsing DOSCAR files is also provided.</p>
 <p>A <a class="reference internal" href="#effmass.inputs.Settings" title="effmass.inputs.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> class stores analysis parameters set by the user.</p>
 <dl class="py class">
 <dt id="effmass.inputs.Data">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">Data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outcar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for parsing and storing data from a vasp calculation.</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">Data</span></code><a class="reference internal" href="_modules/effmass/inputs.html#Data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent class for parsing and storing data from bandstructure calculations. Contains a <a class="reference internal" href="#effmass.inputs.Data.check_data" title="effmass.inputs.Data.check_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_data()</span></code></a> method for basic checks on bandstructure data.</p>
 <dl class="py attribute">
 <dt id="effmass.inputs.Data.spin_channels">
 <code class="sig-name descname"><span class="pre">spin_channels</span></code><a class="headerlink" href="#effmass.inputs.Data.spin_channels" title="Permalink to this definition">¶</a></dt>
@@ -215,17 +215,6 @@ A function for parsing DOSCAR files is also provided.</p>
 <dt id="effmass.inputs.Data.number_of_bands">
 <code class="sig-name descname"><span class="pre">number_of_bands</span></code><a class="headerlink" href="#effmass.inputs.Data.number_of_bands" title="Permalink to this definition">¶</a></dt>
 <dd><p>the number of bands.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="effmass.inputs.Data.number_of_ions">
-<code class="sig-name descname"><span class="pre">number_of_ions</span></code><a class="headerlink" href="#effmass.inputs.Data.number_of_ions" title="Permalink to this definition">¶</a></dt>
-<dd><p>the number of ions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>int</p>
@@ -302,7 +291,7 @@ A function for parsing DOSCAR files is also provided.</p>
 <dl class="py attribute">
 <dt id="effmass.inputs.Data.fermi_energy">
 <code class="sig-name descname"><span class="pre">fermi_energy</span></code><a class="headerlink" href="#effmass.inputs.Data.fermi_energy" title="Permalink to this definition">¶</a></dt>
-<dd><p>the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.</p>
+<dd><p>the fermi energy in eV.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>float</p>
@@ -310,35 +299,13 @@ A function for parsing DOSCAR files is also provided.</p>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt id="effmass.inputs.Data.dos">
-<code class="sig-name descname"><span class="pre">dos</span></code><a class="headerlink" href="#effmass.inputs.Data.dos" title="Permalink to this definition">¶</a></dt>
-<dd><p>2-dimensional array. Each row contains density of states data (units “number of states / unit cell”)  at a given energy: [energy(float),dos(float)].</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="effmass.inputs.Data.integrated_dos">
-<code class="sig-name descname"><span class="pre">integrated_dos</span></code><a class="headerlink" href="#effmass.inputs.Data.integrated_dos" title="Permalink to this definition">¶</a></dt>
-<dd><p>2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].</p>
-</dd></dl>
-
 <dl class="py method">
 <dt id="effmass.inputs.Data.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outcar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Data.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialises an instance of the <a class="reference internal" href="#effmass.inputs.Data" title="effmass.inputs.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a> class and checks data using <a class="reference internal" href="#effmass.inputs.check_data" title="effmass.inputs.check_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_data()</span></code></a>.</p>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Data.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises an instance of the <a class="reference internal" href="#effmass.inputs.Data" title="effmass.inputs.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a> class. All attributes are None until set by the derived class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>outcar_path</strong> (<em>str</em>) – The path to the OUTCAR file</p></li>
-<li><p><strong>procar_path</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – The path(s) to one or more PROCAR files.</p></li>
-<li><p><strong>ignore</strong> (<em>int</em>) – The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments for reading the PROCAR file(s).</p></li>
-</ul>
+<dd class="field-odd"><p><strong>None.</strong> – </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None.</p>
@@ -347,27 +314,52 @@ A function for parsing DOSCAR files is also provided.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="effmass.inputs.Data.parse_DOSCAR">
-<code class="sig-name descname"><span class="pre">parse_DOSCAR</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./DOSCAR'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Data.parse_DOSCAR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data.parse_DOSCAR" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses the DOS and integrated DOS from a vasp DOSCAR file.</p>
+<dt id="effmass.inputs.Data.check_data">
+<code class="sig-name descname"><span class="pre">check_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_kpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_bands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CBM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">VBM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fermi_energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occupancy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#Data.check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.Data.check_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that Data class attributes make basic sense.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – The location and filename of the DOSCAR to read in. Defaults to <cite>‘./DOSCAR’</cite>.</p>
+<dd class="field-odd"><p><strong>None.</strong> – </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>If the DOS has been sampled at more than 10000 points then this function will break at the expression for <cite>num_data_points</cite>.
-In this case, edit your DOSCAR file so that in the header there is a space preceding the number of points.</p>
+<p>There is a similar method that runs automatically when reading data in using the <a class="reference external" href="http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar">vasppy.procar</a> module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="effmass.inputs.DataASE">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">DataASE</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataASE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataASE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for interfacing with the ASE bandstructure object. Inherits attributes and methods from the <a class="reference internal" href="#effmass.inputs.Data" title="effmass.inputs.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a> class, and extends
+with a method for inferring the CBM/VBM from Fermi level.</p>
+<p>Note: DataASE.fermi_energy is taken from the seedname.out file.</p>
+<dl class="simple">
+<dt>Note: The DataASE class does not parse eigenstate occupancy data. The Fermi energy will </dt><dd><p>be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above the fermi energy). You should independently confirm that the fermi energy is in the band gap of your material. Note that you can manually set the <cite>fermi_energy</cite> attribute and find the CBM and VBM using the method <cite>find_cbm_vbm</cite>. “)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="effmass.inputs.DataASE.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataASE.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataASE.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises an instance of the <a class="reference internal" href="#effmass.inputs.DataASE" title="effmass.inputs.DataASE"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataASE</span></code></a> class and infers which bands are occupied and unoccupied from the fermi level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bs</strong> (<em>ase.spectrum.band_structure.BandStructure</em>) – An instance of the ase.spectrum.band_structure.BandStructure object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt id="effmass.inputs.DataAims">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">DataAims</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataAims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataAims" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">DataAims</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataAims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataAims" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for parsing and storing data from a FHI-AIMS calculation.</p>
 <dl class="py attribute">
 <dt id="effmass.inputs.DataAims.spin_channels">
@@ -395,17 +387,6 @@ In this case, edit your DOSCAR file so that in the header there is a space prece
 <dt id="effmass.inputs.DataAims.number_of_bands">
 <code class="sig-name descname"><span class="pre">number_of_bands</span></code><a class="headerlink" href="#effmass.inputs.DataAims.number_of_bands" title="Permalink to this definition">¶</a></dt>
 <dd><p>the number of bands.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="effmass.inputs.DataAims.number_of_ions">
-<code class="sig-name descname"><span class="pre">number_of_ions</span></code><a class="headerlink" href="#effmass.inputs.DataAims.number_of_ions" title="Permalink to this definition">¶</a></dt>
-<dd><p>the number of ions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>int</p>
@@ -492,35 +473,16 @@ In this case, edit your DOSCAR file so that in the header there is a space prece
 
 <dl class="py method">
 <dt id="effmass.inputs.DataAims.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataAims.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataAims.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialises an instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data_Aims</span></code> class and checks data using <a class="reference internal" href="#effmass.inputs.check_data" title="effmass.inputs.check_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_data()</span></code></a>.</p>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataAims.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataAims.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises an instance of the <a class="reference internal" href="#effmass.inputs.DataAims" title="effmass.inputs.DataAims"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAims</span></code></a> class and checks data using <code class="xref py py-meth docutils literal notranslate"><span class="pre">check_data()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>file_path</strong> (<em>str</em>) – The path to the directory containing output, geometry.in, control.in and bandstructure files</p></li>
-<li><p><strong>ignore</strong> (<em>int</em>) – The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).</p></li>
-</ul>
+<dd class="field-odd"><p><strong>directory_path</strong> (<em>str</em>) – The path to the directory containing output, geometry.in, control.in and bandstructure files</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="effmass.inputs.DataAims.check_data">
-<code class="sig-name descname"><span class="pre">check_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataAims.check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataAims.check_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that data class attributes are sane.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>None.</strong> – </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None.</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>There is a <cite>sanity_check</cite> method which runs automatically when reading data in using the <a class="reference external" href="http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar">vasppy.procar</a> module.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -532,25 +494,90 @@ In this case, edit your DOSCAR file so that in the header there is a space prece
 <dl class="py attribute">
 <dt id="id1">
 <code class="sig-name descname"><span class="pre">number_of_bands</span></code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Finding number of ions</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="id2">
-<code class="sig-name descname"><span class="pre">number_of_ions</span></code><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finding number of kpoints and determining number of BZ paths</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="id3">
-<code class="sig-name descname"><span class="pre">reciprocal_lattice</span></code><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dt id="id2">
+<code class="sig-name descname"><span class="pre">reciprocal_lattice</span></code><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finding spin channels</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="id4">
-<code class="sig-name descname"><span class="pre">spin_channels</span></code><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dt id="id3">
+<code class="sig-name descname"><span class="pre">spin_channels</span></code><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finding number of bands</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="effmass.inputs.DataCastep">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">DataCastep</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seedname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataCastep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataCastep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for parsing and storing data from a Castep bandstructure calculation. Inherits attributes and methods from the <a class="reference internal" href="#effmass.inputs.DataASE" title="effmass.inputs.DataASE"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataASE</span></code></a> class.</p>
+<dl class="py method">
+<dt id="effmass.inputs.DataCastep.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seedname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataCastep.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataCastep.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises an instance of the <a class="reference internal" href="#effmass.inputs.DataCastep" title="effmass.inputs.DataCastep"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataCastep</span></code></a> class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directory_path</strong> (<em>str</em>) – The path to a directory containing seedname.cell, seedname.out and seedname.bands</p></li>
+<li><p><strong>seedname</strong> (<em>str</em>) – The name (without suffix) of the input and output files</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="effmass.inputs.DataVasp">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">DataVasp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outcar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataVasp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataVasp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for parsing and storing data from a vasp calculation. Extends the <a class="reference internal" href="#effmass.inputs.Data" title="effmass.inputs.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a> class to include support for analysing DOSCAR data”</p>
+<dl class="simple">
+<dt>Additional attributes:</dt><dd><p>dos (array): 2-dimensional array. Each row contains density of states data (units “number of states / unit cell”)  at a given energy: [energy(float),dos(float)].
+integrated_dos: 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].</p>
+</dd>
+</dl>
+<p>Note: DataVasp.fermi_energy is automatically set to the mean of DataVasp.CBM and DataVasp.VBM.</p>
+<dl class="py method">
+<dt id="effmass.inputs.DataVasp.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outcar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procar_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataVasp.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataVasp.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises an instance of the <a class="reference internal" href="#effmass.inputs.Data" title="effmass.inputs.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a> class and checks data using <code class="xref py py-meth docutils literal notranslate"><span class="pre">check_data()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outcar_path</strong> (<em>str</em>) – The path to the OUTCAR file</p></li>
+<li><p><strong>procar_path</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – The path(s) to one or more PROCAR files.</p></li>
+<li><p><strong>ignore</strong> (<em>int</em>) – The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments for reading the PROCAR file(s).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="effmass.inputs.DataVasp.parse_DOSCAR">
+<code class="sig-name descname"><span class="pre">parse_DOSCAR</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./DOSCAR'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#DataVasp.parse_DOSCAR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.DataVasp.parse_DOSCAR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the DOS and integrated DOS from a vasp DOSCAR file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – The location and filename of the DOSCAR to read in. Defaults to <cite>‘./DOSCAR’</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If the DOS has been sampled at more than 10000 points then this function will break at the expression for <cite>num_data_points</cite>.
+In this case, edit your DOSCAR file so that in the header there is a space preceding the number of points.</p>
 </dd></dl>
 
 </dd></dl>
@@ -597,22 +624,6 @@ when calculating the transport mass.</p>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt id="effmass.inputs.check_data">
-<code class="sig-prename descclassname"><span class="pre">effmass.inputs.</span></code><code class="sig-name descname"><span class="pre">check_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_kpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_bands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_ions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CBM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">VBM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fermi_energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occupancy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/inputs.html#check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.inputs.check_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that input data class attributes are sane.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>None.</strong> – </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None.</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>There is a <cite>sanity_check</cite> method which runs automatically when reading data in using the <a class="reference external" href="http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar">vasppy.procar</a> module.</p>
 </dd></dl>
 
 </div>

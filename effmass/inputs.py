@@ -154,7 +154,7 @@ class DataASE(Data):
     Note: The DataASE class does not parse eigenstate occupancy data. The Fermi energy will \
           be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above \
           the fermi energy). You should independently confirm that the fermi energy is in the band gap of \
-          your material. Note that you can manually set the :attribute:`~effmass.inputs.Data.fermi_energy` attribute and find the CBM and VBM using the method :method:`~effmass.inputs.Data.find_cbm_vbm`. ")
+          your material. Note that you can manually set the `fermi_energy` attribute and find the CBM and VBM using the method `find_cbm_vbm`. ")
 
     """
 

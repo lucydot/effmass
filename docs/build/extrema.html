@@ -184,6 +184,24 @@ a <code class="xref py py-class docutils literal notranslate"><span class="pre">
 <p>The extrema are found within an energy range given by the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.
 Each <cite>Segment</cite> object contains data for kpoints within an energy range given by the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.</p>
 <dl class="py function">
+<dt id="effmass.extrema.calc_CBM_VBM_from_Fermi">
+<code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">calc_CBM_VBM_from_Fermi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CBMVBM_search_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#calc_CBM_VBM_from_Fermi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.calc_CBM_VBM_from_Fermi" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to find the CBM and VBM when there is no occupancy data. It relies upon the Fermi level being in the middle of the band gap.
+The CBMVBM_search_depth is refereced from the fermi energy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>DataASE</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.DataASE" title="effmass.inputs.DataASE"><em>DataASE</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataASE</span></code> class.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tuple containing the conduction band minimum and valence band maximum in eV.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(float, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="effmass.extrema.calculate_direction">
 <code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">calculate_direction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#calculate_direction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.calculate_direction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the direction vector between two points.</p>
@@ -239,7 +257,7 @@ maximum (<a class="reference internal" href="inputs.html#effmass.inputs.Data.VBM
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A 2-dimensional array of size (number of extrema, 2). Each row corresponds to an extrema and contains [<code class="xref py py-attr docutils literal notranslate"><span class="pre">efmmas.inputs.Data.bands</span></code> index, <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a> index].</p>
+<dd class="field-even"><p>A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [<code class="xref py py-attr docutils literal notranslate"><span class="pre">efmmas.inputs.Data.bands</span></code> index, <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a> index] for each extrema.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>array</p>
