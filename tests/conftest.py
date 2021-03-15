@@ -10,6 +10,15 @@ import os
 def MAPI_settings_object():
 	return inputs.Settings(extrema_search_depth=0.025, energy_range=0.25)
 
+
+@pytest.fixture()
+def Si_nsp_data_object(): # Si nsp calculation data
+        return inputs.DataCastep(os.path.join(os.path.dirname(__file__), 'data_castep/Si_nsp/'), 'Si')
+
+@pytest.fixture()
+def GaAs_sp_data_object(): # GaAs sp calculation data
+        return inputs.DataCastep(os.path.join(os.path.dirname(__file__), 'data_castep/GaAs_sp/', 'GaAs')
+
 @pytest.fixture()
 def MAPI_soc_data_object(): # MAPI SoC calculation data
 	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_PROCAR'), ignore=216)
