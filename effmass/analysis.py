@@ -7,7 +7,6 @@ Contains the :class:`Segment` class and methods for calculating various definiti
 
 import warnings
 import numpy as np
-import math
 from scipy import integrate
 from effmass import extrema
 from effmass import angstrom_to_bohr
