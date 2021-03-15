@@ -16,7 +16,7 @@ def Si_nsp_data_object(): # Si nsp calculation data
 
 @pytest.fixture()
 def GaAs_sp_data_object(): # GaAs sp calculation data
-        return inputs.DataCastep(os.path.join(os.path.dirname(__file__), 'data_castep/GaAs_sp/', 'GaAs')
+        return inputs.DataCastep(os.path.join(os.path.dirname(__file__), 'data_castep/GaAs_sp/'), 'GaAs')
 
 @pytest.fixture()
 def MAPI_soc_data_object(): # MAPI SoC calculation data
