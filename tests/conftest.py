@@ -10,7 +10,6 @@ import os
 def MAPI_settings_object():
 	return inputs.Settings(extrema_search_depth=0.025, energy_range=0.25)
 
-
 @pytest.fixture()
 def Si_nsp_data_object(): # Si nsp calculation data
         return inputs.DataCastep(os.path.join(os.path.dirname(__file__), 'data_castep/Si_nsp/'), 'Si')
