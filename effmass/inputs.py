@@ -135,7 +135,7 @@ class Data():
             warnings.warn("The fermi energy is lower than the VBM")
         if fermi_energy > CBM:
             warnings.warn("The fermi energy is higher than the CBM")
-        if occupancy:
+        if occupancy is not None:
             if ((occupancy == 0) | (occupancy == 1) |
                 (occupancy == 2)).all() is False:
                 warnings.warn("You have partial occupancy of bands")
