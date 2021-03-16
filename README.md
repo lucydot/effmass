@@ -20,6 +20,16 @@ Source code is available as a git repository at [https://github.com/lucydot/effm
 
 If you use `effmass` for your published research [please cite effmass](##citing-`effmass`).
 
+## Release 2.0.0
+
+--> The latest release of `effmass` extends support for other codes:
+- `effmass` can now read in Castep output data (in addition to Vasp and FHI-aims)
+- `effmass` can now interface with ASE bandstructure objects
+
+--> `effmass` 2.0.0 also  includes a command line interface
+
+As a result of these changes, and with view to supporting more DFT codes in the future, the `Data` class has been renamed to `DataVasp`. **On updating to the latest version of effmass you may need to update your scripts / Jupyter Notebook to reflect this change.**
+
 ## Features
 
 `effmass` can:
