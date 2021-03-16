@@ -30,7 +30,7 @@ def test_change_direction(toy_data_object):
 
 def test_find_extrema_indices(toy_data_object,toy_settings_object):
 
-    assert np.array_equal(extrema.find_extrema_indices(toy_data_object, toy_settings_object),np.array([[0,0],[0,3],[1,0],[1,4]]))
+    assert np.array_equal(extrema.find_extrema_indices(toy_data_object, toy_settings_object),np.array([[0,0],[0,3],[1,0],[1,4]],dtype=object)
 
 def test_get_kpoints_before(toy_data_object,toy_settings_object):
 
