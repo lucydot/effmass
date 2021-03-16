@@ -1,8 +1,11 @@
 #! /usr/bin/env python3
 
 import questionary
+from effmass import inputs, analysis, extrema, outputs
 
 def cli():
+
+	print("Welcome to effmass 2.0.0 \U0001F388")
 
 	DFT_code = questionary.select(
 		"Which DFT code have you used to generate the bandstructure?",
@@ -29,17 +32,21 @@ def cli():
 		).ask()
 
 	extrema_search_depth = questionary.text(
-		"How far from the CBM (VBM) would you like me to search for minima (maxima)")
+		"How far (in eV) from the CBM (VBM) would you like me to search for minima (maxima)?",
+		default = "0.05"
+		).ask()
 
 	energy_range = questionary.text(
-		"What would you like the energy range of each segment to be?")
+		"What would you like the energy range (in eV) of each segment to be?",
+		default = "0.5"
+		).ask()
 
 	which_values = questionary.checkbox(
 		"Which values would you like me to calculate?",
 		choices=[
-			Choice("parabolic m* (least squares)", checked=True),
-			Choice("parabolic m* (finite difference)", checked=True)
-		]).ask()
+			questionary.Choice("parabolic m* (least squares)", checked=True),
+			questionary.Choice("parabolic m* (finite difference)", checked=True)
+		]).ask()   # need to select oe
 
 	save_plot = questionary.confirm(
 		"Would you like me to save a plot of the band segments?",
@@ -55,6 +62,10 @@ def cli():
 
 	search_depth = questionary.text(
 		"")
+
+	#if DFT_code == 
+
+
 
 # Output table:   particle band-index direction least-squares m* finite-difference m*
 

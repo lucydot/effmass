@@ -35,7 +35,7 @@ config = {
     'license': 'MIT',
     'packages': [ 'effmass' ],
     'scripts': [],
-    'name': 'effmass'
+    'name': 'effmass',
     'entry_points': {"console_scripts": ["effmass = effmass.cli:cli"]}
 }
 
