@@ -12,19 +12,19 @@
 💃 Effmass now supports FHI-Aims, Castep and ASE  
 ⚠️ The `Data` class has now been renamed `DataVasp`. You may need to update your scripts!
 
-`effmass` is a Python 3 package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
+`effmass` is a [peer-reviewed](https://joss.theoj.org/papers/10.21105/joss.00797) Python package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core `Segment` class that calculates the effective mass and other associated properties of selected bandstructure segments. The programme also contains functions for locating bandstructure extrema, constructing segments and plotting approximations to the dispersion. There is a command line interface for calculating parabolic effective mass values, and an API for the more complex, non-parabolic definitions of effective mass.
 
-If you use `effmass` for your published research [please cite effmass](##citing-`effmass`).
+If you use `effmass` for your published research [please cite accordingly](##citing-`effmass`).
 
 ## Release 2.0.0
 
---> `effmass` now interfaces with more codes:
-- `effmass` can now read in Castep output data (in addition to Vasp and FHI-aims)
-- `effmass` can now work with ASE bandstructure objects
+💃 `effmass` now interfaces with more codes:
+- it can read in Castep output data (in addition to Vasp and FHI-aims)
+- it can work with ASE bandstructure objects
 
---> `effmass` now includes a command line interface
+💃 `effmass` now includes a command line interface
 
-As a result of these changes, and with view to supporting more DFT codes in the future, the `Data` class has been renamed to `DataVasp`. **On updating to the latest version of effmass you may need to update your scripts / Jupyter Notebook to reflect this change.**
+As a result of these changes, and with view to supporting more DFT codes in the future, the `Data` class has been renamed to `DataVasp`. ⚠️ **On updating to the latest version of effmass you may need to update your scripts / Jupyter Notebook to reflect this change.** ⚠️
 
 ## Features
 
