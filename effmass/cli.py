@@ -3,6 +3,9 @@
 import questionary
 from effmass import inputs, analysis, extrema, outputs
 
+import warnings
+warnings.filterwarnings("ignore")
+
 def cli():
 
 	print("Welcome to effmass 2.0.0 \U0001F388")
@@ -76,9 +79,9 @@ def cli():
 		data = inputs.DataAims(pathname)
 
 	else:
-		data = inputs.DataCastep(pathname, seedname)
+		data = inputs.DataCastep(pathname+"/", seedname)
 		data.fermi_level = fermi_level
-		data.calc_CBM_VBM_from_Fermi()
+		data.find_cbm_vbm()
     
 	print("Finding extrema...")  
 	print("Generating segments...")
