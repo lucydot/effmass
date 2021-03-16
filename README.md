@@ -14,7 +14,7 @@
 
 `effmass` is a [peer-reviewed](https://joss.theoj.org/papers/10.21105/joss.00797) Python (3.6+) package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core `Segment` class that calculates the effective mass and other associated properties of selected bandstructure segments. The programme also contains functions for locating bandstructure extrema, constructing segments and plotting approximations to the dispersion. There is a command line interface for calculating parabolic effective mass values, and an API for the more complex, non-parabolic definitions of effective mass.
 
-If you use `effmass` for your published research [please cite accordingly](##citing-`effmass`).
+If you use `effmass` for your published research [please cite accordingly](##citing-effmass).
 
 ## Release 2.0.0
 
