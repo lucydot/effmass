@@ -20,15 +20,15 @@ def GaAs_sp_data_object(): # GaAs sp calculation data
 
 @pytest.fixture()
 def MAPI_soc_data_object(): # MAPI SoC calculation data
-	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_PROCAR'), ignore=216)
+	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_PROCAR'), ignore=216)
 
 @pytest.fixture()
 def Ge_SP_data_object(): # Ge spin-polarised calculation from Adam Jackson
- 	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/Ge_SP_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/Ge_SP_PROCAR'))
+ 	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/Ge_SP_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data_vasp/Ge_SP_PROCAR'))
 
 @pytest.fixture()
 def MAPI_cl_data_object(): # MAPI cl calculation data
-	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_cl_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_cl_PROCAR'), ignore=216)
+	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_cl_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_cl_PROCAR'), ignore=216)
 
 @pytest.fixture()
 def Ge_nsp_aims_data_object(): # Ge non spin-polarised calculation done with FHI-Aims
