@@ -36,6 +36,7 @@ config = {
     'packages': [ 'effmass' ],
     'scripts': [],
     'name': 'effmass'
+    'entry_points': {"console_scripts": ["effmass = effmass.cli:cli"]}
 }
 
 setup(**config)

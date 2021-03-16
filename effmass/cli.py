@@ -2,57 +2,59 @@
 
 import questionary
 
-DFT_code = questionary.select(
-	"Which DFT code have you used to generate the bandstructure?",
-	choices=[
-		'Vasp',
-		'FHI-aims',
-		'Castep'
-	]).ask()
+def cli():
 
-pathname = questionary.path(
-	"What's the path to your {} output files?".format(DFT_code),
-	default = "./",
-	only_directories=True
-	).ask()
+	DFT_code = questionary.select(
+		"Which DFT code have you used to generate the bandstructure?",
+		choices=[
+			'Vasp',
+			'FHI-aims',
+			'Castep'
+		]).ask()
 
-if DFT_code == 'Castep':
+	pathname = questionary.path(
+		"What's the path to your {} output files?".format(DFT_code),
+		default = "./",
+		only_directories=True
+		).ask()
 
-	seedname = questionary.text(
-	"What's the seedname of your Castep files? (e.g. Si.bands and Si.castep have the seedname Si)",
-	).ask()
-	fermi_level = questionary.text(
-	"I will infer the position of the CBM and VBM from the calculated Fermi level." +
-	" If you know this value to be incorrect, please input a more accurate value:",
-	).ask()
+	if DFT_code == 'Castep':
 
-extrema_search_depth = questionary.text(
-	"How far from the CBM (VBM) would you like me to search for minima (maxima)")
+		seedname = questionary.text(
+		"What's the seedname of your Castep files? (e.g. Si.bands and Si.castep have the seedname Si)",
+		).ask()
+		fermi_level = questionary.text(
+		"I will infer the position of the CBM and VBM from the calculated Fermi level." +
+		" If you know this value to be incorrect, please input a more accurate value:",
+		).ask()
 
-energy_range = questionary.text(
-	"What would you like the energy range of each segment to be?")
+	extrema_search_depth = questionary.text(
+		"How far from the CBM (VBM) would you like me to search for minima (maxima)")
 
-which_values = questionary.checkbox(
-	"Which values would you like me to calculate?",
-	choices=[
-		Choice("parabolic m* (least squares)", checked=True),
-		Choice("parabolic m* (finite difference)", checked=True)
-	]).ask()
+	energy_range = questionary.text(
+		"What would you like the energy range of each segment to be?")
 
-save_plot = questionary.confirm(
-	"Would you like me to save a plot of the band segments?",
-	default=True,
-	auto_enter=False
-	).ask()
+	which_values = questionary.checkbox(
+		"Which values would you like me to calculate?",
+		choices=[
+			Choice("parabolic m* (least squares)", checked=True),
+			Choice("parabolic m* (finite difference)", checked=True)
+		]).ask()
 
-save_summary = questionary.confirm(
-	"Would you like me to save a summary file?",
-	default=True,
-	auto_enter=False
-	).ask()
+	save_plot = questionary.confirm(
+		"Would you like me to save a plot of the band segments?",
+		default=True,
+		auto_enter=False
+		).ask()
 
-search_depth = questionary.text(
-	"")
+	save_summary = questionary.confirm(
+		"Would you like me to save a summary file?",
+		default=True,
+		auto_enter=False
+		).ask()
+
+	search_depth = questionary.text(
+		"")
 
 # Output table:   particle band-index direction least-squares m* finite-difference m*
 
