@@ -77,6 +77,8 @@ def cli():
 
 	else:
 		data = inputs.DataCastep(pathname, seedname)
+		data.fermi_level = fermi_level
+		data.calc_CBM_VBM_from_Fermi()
     
 	print("Finding extrema...")  
 	print("Generating segments...")
