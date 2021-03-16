@@ -24,7 +24,7 @@ If you use `effmass` for your published research [please cite accordingly](##cit
 
 💃 `effmass` now includes a command line interface
 
-As a result of these changes, and with view to supporting more DFT codes in the future, the `Data` class has been renamed to `DataVasp`. ⚠️ **On updating to the latest version of effmass you may need to update your scripts / Jupyter Notebook to reflect this change.** ⚠️
+As a result of these changes, and with view to supporting more DFT codes in the future, the `Data` class has been renamed to `DataVasp` ⚠️ **On updating to the latest version of effmass you may need to update your scripts / Jupyter Notebook to reflect this change** ⚠️
 
 ## Features
 
@@ -48,8 +48,8 @@ Using density-of-states data and assuming no thermal smearing, `effmass` can cal
 **Plot fits to the dispersion:**
 Selected bandstructure segments and approximations to the dispersion (assuming a Kane, quadratic, or higher order fit) can be visualised.
 
-The [command line interface](## Installation) provides basic functionality for calculating parabolic effective masses.
-For those who have a basic familiarity with Python there is an API which provides access to more (non-parabolic) effective mass definitions. 
+The [command line interface](##Installation) provides basic functionality for calculating parabolic effective masses.
+For those who have a basic familiarity with Python there is an API which provides access to all features, including non-parabolic effective mass definitions. 
 
 Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed [here](https://effmass.readthedocs.io/en/latest/Related%20packages.html) will suit your needs better.
@@ -72,28 +72,18 @@ To start the command line interface simply type
 effmass
 ```
 
-To download and install the latest release from [GitHub](https://github.com/lucydot/effmass/releases):
+If you do not use `pip` you can download and install the latest release from [GitHub](https://github.com/lucydot/effmass/releases):
 ```
 cd effmass
-python3 setup.py install
-```
-
-Or clone the latest development version
-```
-git clone git@github.com:lucydot/effmass.git
-```
-and install the same way.
-```
-cd effmass
-python3 setup.py install 
+python setup.py install
 ```
 
 ## Documentation
 
-An overview of the features of effmass along with example code for Vasp and FHI-aims is contained in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
-Additional examples for the Castep and ASE interface are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tests/Test_Castep_interface.ipynb).
-API documentation is [here](https://effmass.readthedocs.io/en/latest/).
-Source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
+- An overview of the features of effmass, along with example code for Vasp and FHI-aims output data, is contained in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
+- Additional examples for the Castep and ASE interfaces are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tests/Test_Castep_interface.ipynb).
+- The API documentation is [here](https://effmass.readthedocs.io/en/latest/).
+- The source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
 
 ## Publications using `effmass`
 
@@ -113,12 +103,11 @@ If you would like to contribute please do so via a pull request. All contributor
 
 Automated testing of the latest commit happens [here](https://travis-ci.com/lucydot/effmass).
 
-Manual tests can be run using 
+You can also run manual tests after download:
 ```
-python3 -m pytest
+cd effmass
+pytest
 ```
-
-This code has been tested with Python versions 3.6.
 
 ## Citing `effmass`
 
