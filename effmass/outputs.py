@@ -11,13 +11,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from adjustText import adjust_text
 
+from random import randint
+from prettytable import PrettyTable
+
 from effmass import ev_to_hartree
 from effmass.dos import _check_integrated_dos_loaded
 from effmass.dos import _check_dos_loaded
 from effmass.analysis import _check_poly_order
 
 
-def plot_segments(Data, Settings, segments):
+def plot_segments(Data, Settings, segments, savefig=False):
     """Plots bandstructure overlaid with the DFT-calculated points for each Segment
     instance. Each Segment is labelled with it's direction in reciprocal space
     and index number from the segments argument.
@@ -47,6 +50,11 @@ def plot_segments(Data, Settings, segments):
         (Data.CBM - Data.VBM) +
         (Settings.extrema_search_depth + Settings.energy_range + 1)
     ])
+
+    if savefig == True:
+        random_int = randint(10000,99999)
+        fig.savefig("effmass_{}.png".format(random_int))
+        return random_int
 
     return fig, ax
     
@@ -104,6 +112,39 @@ def plot_dos(DataVasp):
     ax.axvline(DataVasp.CBM - DataVasp.VBM, linestyle="--")
 
     return fig, ax
+
+def print_table_summary(segments, which_values):
+    """Prints table summary of segments data to terminal"""
+
+    table = PrettyTable()
+    column_names = ["particle", "band-index", "direction"]
+    if 'parabolic m* (least squares)' in which_values:
+        column_names.append("Least squares m* (m_e)")
+    if 'parabolic m* (finite difference)' in which_values:
+        column_names.append("Finite difference m* (m_e)")
+    table.field_names = column_names
+    for segment in segments:
+        if segment.band_type == "conduction_band":
+            particle = "electron"
+        if segment.band_type == "valence_band":
+            particle = "hole"
+        if segment.band_type == "unknown":
+            particle = "unknown"
+        segment_data = [
+            particle,
+            segment.band,
+            segment.direction
+        ]
+        if 'parabolic m* (least squares)' in which_values:
+            segment_data.append("{:.4f}".format(segment.five_point_leastsq_effmass()))
+        if 'parabolic m* (finite difference)' in which_values:
+            segment_data.append("{:.4f}".format(segment.finite_difference_effmass()))
+        table.add_row(segment_data)
+
+    print(table)
+
+
+# Output table:   particle band-index direction least-squares m* finite-difference m*
 
 
 def print_results(segment, data, settings, polyfit_order=None):

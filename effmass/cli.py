@@ -24,6 +24,7 @@ def cli():
 	if DFT_code == 'Vasp':
 		ignore = questionary.text(
 		"How many k-points should I ignore at the start of the file? (useful for hybrid calculations)",
+		default="0"
 		).ask()
 
 	if DFT_code == 'Castep':
@@ -59,47 +60,36 @@ def cli():
 		auto_enter=False
 		).ask()
 
-	save_summary = questionary.confirm(
-		"Would you like me to save a summary file?",
-		default=True,
-		auto_enter=False
-		).ask()
+#	save_summary = questionary.confirm(
+#		"Would you like me to save a summary file?",
+#		default=True,
+#		auto_enter=False
+#		).ask()
 
-	search_depth = questionary.text(
-		"")
-
-	settings = inputs.Settings(extrema_search_depth=extrema_search_depth, energy_range=energy_range)
+	settings = inputs.Settings(extrema_search_depth=float(extrema_search_depth), energy_range=float(energy_range))
 	print("Reading in data...")
 
 	if DFT_code == "Vasp":       
-		data = inputs.DataVasp(pathname+"./OUTCAR",pathname+"./PROCAR", ignore=ignore)
+		data = inputs.DataVasp(pathname+"/OUTCAR",pathname+"/PROCAR", ignore=int(ignore))
 
 	elif DFT_code == "FHI-aims":
 		data = inputs.DataAims(pathname)
 
-	elif DFT_code = "Castep":
+	else:
 		data = inputs.DataCastep(pathname, seedname)
     
-    print("Finding extrema...")
-    print("Generating segments...")
+	print("Finding extrema...")  
+	print("Generating segments...")
 	segments = extrema.generate_segments(settings, data)
 
-	### print out segment data
-	# Output table:   particle band-index direction least-squares m* finite-difference m*
+	print("Calculating effective masses...")
+	outputs.print_table_summary(segments, which_values)
 
-    ### save plot
 	if save_plot:
 		print("Plotting segments...")
-		outputs.plot_segments(data,settings,segments)
+		randomint = outputs.plot_segments(data,settings,segments,savefig=True)
+		print("Plot of segments saved to effmass_{}.png".format(randomint))
 
+	### if save_summary: print out user settings from questionary, and results
 
-    ### print out settings and results
-	### if save_summary:  
-
-
-
-
-
-
->>>>>>> Stashed changes
 
