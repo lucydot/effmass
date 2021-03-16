@@ -60,7 +60,7 @@ it may be that one of the packages listed [here](https://effmass.readthedocs.io/
 
 ## Installation
 
-`effmass` is a Python 3 package and requires key packages from the [SciPy ecosystem](https://www.scipy.org/about.html): SciPy, NumPy and Matplotlib. If you have not installed these packages before, it may be best to install them using your preferred package manager (eg: Homebrew). Note that together they will use >100MB of disk space. `effmass` can then be built using the Python package manager `pip`:
+`effmass` can then be installed using the Python package manager `pip`:
 
 ```
 pip install effmass
