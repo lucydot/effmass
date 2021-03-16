@@ -21,6 +21,11 @@ def cli():
 		only_directories=True
 		).ask()
 
+	if DFT_code == 'Vasp':
+		ignore = questionary.text(
+		"How many k-points should I ignore at the start of the file? (useful for hybrid calculations)",
+		).ask()
+
 	if DFT_code == 'Castep':
 
 		seedname = questionary.text(
@@ -63,9 +68,38 @@ def cli():
 	search_depth = questionary.text(
 		"")
 
-	#if DFT_code == 
+	settings = inputs.Settings(extrema_search_depth=extrema_search_depth, energy_range=energy_range)
+	print("Reading in data...")
+
+	if DFT_code == "Vasp":       
+		data = inputs.DataVasp(pathname+"./OUTCAR",pathname+"./PROCAR", ignore=ignore)
+
+	elif DFT_code == "FHI-aims":
+		data = inputs.DataAims(pathname)
+
+	elif DFT_code = "Castep":
+		data = inputs.DataCastep(pathname, seedname)
+    
+    print("Finding extrema...")
+    print("Generating segments...")
+	segments = extrema.generate_segments(settings, data)
+
+	### print out segment data
+	# Output table:   particle band-index direction least-squares m* finite-difference m*
+
+    ### save plot
+	if save_plot:
+		print("Plotting segments...")
+		outputs.plot_segments(data,settings,segments)
+
+
+    ### print out settings and results
+	### if save_summary:  
 
 
 
-# Output table:   particle band-index direction least-squares m* finite-difference m*
+
+
+
+>>>>>>> Stashed changes
 
