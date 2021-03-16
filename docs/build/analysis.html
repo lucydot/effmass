@@ -330,28 +330,6 @@ particular region of reciprocal space and particular band.</p>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt id="effmass.analysis.Segment.dos">
-<code class="sig-name descname"><span class="pre">dos</span></code><a class="headerlink" href="#effmass.analysis.Segment.dos" title="Permalink to this definition">¶</a></dt>
-<dd><p>2-dimensional array. Each row contains density of states data (units “number of states / unit cell”)  at a given energy: [energy(float),dos(float)]. A slice of <a class="reference internal" href="inputs.html#effmass.inputs.Data.dos" title="effmass.inputs.Data.dos"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.dos</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="effmass.analysis.Segment.integrated_dos">
-<code class="sig-name descname"><span class="pre">integrated_dos</span></code><a class="headerlink" href="#effmass.analysis.Segment.integrated_dos" title="Permalink to this definition">¶</a></dt>
-<dd><p>2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of <a class="reference internal" href="inputs.html#effmass.inputs.Data.integrated_dos" title="effmass.inputs.Data.integrated_dos"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.integrated_dos</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt id="effmass.analysis.Segment.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoint_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/analysis.html#Segment.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.analysis.Segment.__init__" title="Permalink to this definition">¶</a></dt>
@@ -788,7 +766,7 @@ to all points in the segment, plus those from symmetry, E(k)=E(-k).</p>
 <dl class="py method">
 <dt id="effmass.analysis.Segment.weighted_leastsq_fit">
 <code class="sig-name descname"><span class="pre">weighted_leastsq_fit</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/analysis.html#Segment.weighted_leastsq_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.analysis.Segment.weighted_leastsq_fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the curvature effective mass using a weighted least-
+<dd><p>Calculates the curvature effective mass usinhag a weighted least-
 squares fit and then evaluates the corresponding parabolic dispersion
 along <a class="reference internal" href="#effmass.analysis.Segment.dk_bohr" title="effmass.analysis.Segment.dk_bohr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dk_bohr</span></code></a>.</p>
 <dl class="field-list simple">
@@ -825,6 +803,36 @@ statistics.</p>
 </dl>
 <p class="rubric">Notes</p>
 <p>The weighting is relative only: constants will cancel out when using to weight least square fits or means.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="effmass.analysis.SegmentVasp">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">effmass.analysis.</span></code><code class="sig-name descname"><span class="pre">SegmentVasp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DataVasp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoint_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/analysis.html#SegmentVasp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.analysis.SegmentVasp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for segments of a Vasp bandstructure. Inherits from <a class="reference internal" href="#effmass.analysis.Segment" title="effmass.analysis.Segment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Segment</span></code></a> class,
+and extends to include DOS Segment data.</p>
+<dl class="simple">
+<dt>Additional attributes:</dt><dd><p>dos (array): 2-dimensional array. Each row contains density of states data (units “number of states / unit cell”)  at a given energy: [energy(float),dos(float)]. A slice of <code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.DataVasp.dos</span></code>.
+integrated_dos (array): 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of <code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.DataVasp.integrated_dos</span></code>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="effmass.analysis.SegmentVasp.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DataVasp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoint_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/analysis.html#SegmentVasp.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.analysis.SegmentVasp.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialise an instance of the Segment class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Data</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Data" title="effmass.inputs.Data"><em>Data</em></a>) – Data instance initialised from the bandstructure which contains the segment</p></li>
+<li><p><strong>band</strong> (<em>int</em>) – the band number of the segment</p></li>
+<li><p><strong>kpoint_indices</strong> (<em>list</em><em>(</em><em>int</em><em>)</em>) – the kpoint indices of the segment</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

@@ -11,16 +11,24 @@ def MAPI_settings_object():
 	return inputs.Settings(extrema_search_depth=0.025, energy_range=0.25)
 
 @pytest.fixture()
+def Si_nsp_data_object(): # Si nsp calculation data
+        return inputs.DataCastep(os.path.join(os.path.dirname(__file__), 'data_castep/Si_nsp/'), 'Si')
+
+@pytest.fixture()
+def GaAs_sp_data_object(): # GaAs sp calculation data
+        return inputs.DataCastep(os.path.join(os.path.dirname(__file__), 'data_castep/GaAs_sp/'), 'GaAs')
+
+@pytest.fixture()
 def MAPI_soc_data_object(): # MAPI SoC calculation data
-	return inputs.Data(os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_PROCAR'), ignore=216)
+	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_PROCAR'), ignore=216)
 
 @pytest.fixture()
 def Ge_SP_data_object(): # Ge spin-polarised calculation from Adam Jackson
- 	return inputs.Data(os.path.join(os.path.dirname(__file__), 'data/Ge_SP_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/Ge_SP_PROCAR'))
+ 	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/Ge_SP_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data_vasp/Ge_SP_PROCAR'))
 
 @pytest.fixture()
 def MAPI_cl_data_object(): # MAPI cl calculation data
-	return inputs.Data(os.path.join(os.path.dirname(__file__), 'data/MAPI_cl_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_cl_PROCAR'), ignore=216)
+	return inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_cl_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_cl_PROCAR'), ignore=216)
 
 @pytest.fixture()
 def Ge_nsp_aims_data_object(): # Ge non spin-polarised calculation done with FHI-Aims
@@ -36,8 +44,8 @@ def Ge_soc_aims_data_object(): # Ge spin-orbit coupling calculation done with FH
 
 @pytest.fixture()
 def MAPI_soc_data_object_with_DOSCAR(MAPI_settings_object): # MAPI spin orbit coupling calculation data with doscar loaded
-    data = inputs.Data(os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_PROCAR'), ignore=216)
-    data.parse_DOSCAR(os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_DOSCAR'))
+    data = inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_PROCAR'), ignore=216)
+    data.parse_DOSCAR(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_DOSCAR'))
     return data
 
 
@@ -61,7 +69,7 @@ def toy_settings_object_smaller_range():
 
 @pytest.fixture()
 def toy_data_object():
-    data_object = inputs.Data(os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data/MAPI_soc_PROCAR'),ignore=0)
+    data_object = inputs.DataVasp(os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_OUTCAR'), os.path.join(os.path.dirname(__file__), 'data_vasp/MAPI_soc_PROCAR'),ignore=0)
     
     data_object.number_of_kpoints = 5
     data_object.number_of_bands = 2

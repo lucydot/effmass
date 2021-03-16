@@ -8,19 +8,17 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![JOSS status](http://joss.theoj.org/papers/389754561f0710b756514b8cb9ac0e6a/status.svg)](http://joss.theoj.org/papers/389754561f0710b756514b8cb9ac0e6a)
 
-*New: Effmass can now read in FHI-Aims output data*
+*New: Effmass can now read in FHI-Aims and Castep output data*
+*New: Effmass can now interface with ASE bandstructure objects*
 
 `effmass` is a Python 3 package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core class that calculates the effective mass and other associated properties of selected bandstructure segments. The module also contains functions for locating bandstructure extrema and plotting approximations to the dispersion.
 
 Examples are provided in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
+Additional examples for the Castep and ASE interface are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tests/Test_Castep_interface.ipynb)
 API documentation is [here](https://effmass.readthedocs.io/en/latest/).
 Source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
 
-
 If you use `effmass` for your published research [please cite effmass](##citing-`effmass`).
-
-The [paper](https://github.com/lucydot/effmass/paper) directory contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for an academic paper using this software: *Impact of nonparabolic electronic band structure on the optical and transport properties of photovoltaic materials*  
-Phys. Rev. B **99** (8), 085207 - also avaiable on [arXiv](https://arxiv.org/pdf/1811.02281.pdf)..
 
 ## Features
 
@@ -49,7 +47,13 @@ it may be that one of the packages listed [here](https://effmass.readthedocs.io/
 
 ## Supported Codes
 
-`effmass` currently supports `VASP` and `FHI-Aims`. We are currently working on interfacing with `Castep` output and, in the near future, hope to play nicely with pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
+`effmass` currently supports `VASP`, `FHI-Aims`, `Castep` and `ASE`. In the near future we hope to play nicely with other codes that interface with the ASE bandstructure class, and pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
+
+## Publications using `effmass`
+
+A [number of publications](https://scholar.google.co.uk/scholar?oi=bibs&hl=en&cites=12032412581356217625) have used `effmass`.
+
+The [paper](https://github.com/lucydot/effmass/paper) directory contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for *Impact of nonparabolic electronic band structure on the optical and transport properties of photovoltaic materials*  Phys. Rev. B **99** (8), 085207 - also avaiable on [arXiv](https://arxiv.org/pdf/1811.02281.pdf).
 
 ## Questions, bug reports, feature requests
 
@@ -97,6 +101,7 @@ This code has been tested with Python versions 3.6.
 ## Documentation
 
 An overview of the features of effmass along with example code is contained in a [Jupyter notebook](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
+Additional examples for the Castep and ASE interface are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tests/Test_Castep_interface.ipynb)
 
 API documentation is available [here](https://effmass.readthedocs.io/en/latest/).
 

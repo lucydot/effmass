@@ -6,3 +6,4 @@ adjustText
 pytest-lazy-fixture
 coverage==4.3.4
 codeclimate-test-reporter
+ase>=3.21.1

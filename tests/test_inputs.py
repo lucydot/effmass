@@ -19,9 +19,9 @@ def test_settings(settings_object,extrema_search_depth,energy_range):
         (pytest.lazy_fixture('Ge_SP_data_object'),5.50690368,5.23191533,(5.23191533+5.50690368)/2),
         (pytest.lazy_fixture('Ge_sp_aims_data_object'), 0.00082, -0.0027, (0.00082-0.0027)/2),
         (pytest.lazy_fixture('Ge_nsp_aims_data_object'), 0.02619, 0.01512, (0.02619+0.01512)/2),
-        (pytest.lazy_fixture('Ge_soc_aims_data_object'), 0.00531, -0.01667, (0.00531-0.01667)/2)
+        (pytest.lazy_fixture('Ge_soc_aims_data_object'), 0.00531, -0.01667, (0.00531-0.01667)/2),
+        (pytest.lazy_fixture('Si_nsp_data_object'), 2.40429888498042, 1.284889194542445, 1.2881053080765)
 ])
-
 def test_data(data_object,CBM,VBM,fermi_energy):
 	# note that there is testing done after parsing from PROCAR within the VASPPY module
     assert math.isclose(data_object.CBM,CBM,rel_tol=1e-5)

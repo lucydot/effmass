@@ -5,7 +5,7 @@ Features
 `effmass` can:
 
 **Read in a bandstructure:**
-It is assumed you have used a DFT calculator to walk through a 1D slice of the Brillouin Zone, capturing the maxima and minima of interest. `effmass` uses the Python package [vasppy](https://github.com/bjmorgan/vasppy) for parsing `VASP` output.
+It is assumed you have used a DFT calculator to walk through a 1D slice of the Brillouin Zone, capturing the maxima and minima of interest. `effmass` uses the Python packages [vasppy](https://github.com/bjmorgan/vasppy) for parsing `VASP` output, and `ASE` for parsing the `Castep` output.
 
 **Locate extrema:**
 These correspond to the valence band maxima and conduction band minima. Maxima and minima within a certain energy range can also be located.

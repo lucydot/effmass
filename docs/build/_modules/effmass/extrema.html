@@ -88,6 +88,7 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Supported%20codes.html">Supported Codes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../API%20documentation.html">API documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Implementation.html">Implementation</a></li>
@@ -178,6 +179,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
 <span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">analysis</span>
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">inputs</span>
 
 
 <span class="k">def</span> <span class="nf">_check_partial_occupancy</span><span class="p">(</span><span class="n">occupancy</span><span class="p">):</span>
@@ -282,6 +284,27 @@
             <span class="k">break</span>
     <span class="k">return</span> <span class="n">change_index</span></div>
 
+<div class="viewcode-block" id="calc_CBM_VBM_from_Fermi"><a class="viewcode-back" href="../../extrema.html#effmass.extrema.calc_CBM_VBM_from_Fermi">[docs]</a><span class="k">def</span> <span class="nf">calc_CBM_VBM_from_Fermi</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">CBMVBM_search_depth</span><span class="o">=</span><span class="mf">4.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This function is used to find the CBM and VBM when there is no occupancy data. It relies upon the Fermi level being in the middle of the band gap.</span>
+<span class="sd">    The CBMVBM_search_depth is refereced from the fermi energy.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        DataASE (DataASE): instance of the :class:`DataASE` class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (float, float): A tuple containing the conduction band minimum and valence band maximum in eV.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="n">Data</span><span class="o">.</span><span class="n">CBM</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">fermi_energy</span>
+    <span class="n">Data</span><span class="o">.</span><span class="n">VBM</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">fermi_energy</span>
+
+    <span class="n">Settings</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">Settings</span><span class="p">(</span><span class="n">extrema_search_depth</span><span class="o">=</span><span class="n">CBMVBM_search_depth</span><span class="p">)</span>
+    <span class="n">extrema_indices</span><span class="o">=</span><span class="n">find_extrema_indices</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">Settings</span><span class="p">)</span>
+
+    <span class="n">CBM</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">extrema_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">VBM</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">extrema_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="n">CBM</span><span class="p">,</span> <span class="n">VBM</span></div>
+
 
 <div class="viewcode-block" id="find_extrema_indices"><a class="viewcode-back" href="../../extrema.html#effmass.extrema.find_extrema_indices">[docs]</a><span class="k">def</span> <span class="nf">find_extrema_indices</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">Settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Finds the kpoint index and band index of the minimum/maximum energy</span>
@@ -294,7 +317,7 @@
 <span class="sd">        Settings (Settings): instance of the :class:`Settings` class.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        array: A 2-dimensional array of size (number of extrema, 2). Each row corresponds to an extrema and contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index].</span>
+<span class="sd">        array: A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each extrema.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">energy_CB</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">energies</span> <span class="o">&lt;</span> <span class="n">Data</span><span class="o">.</span><span class="n">CBM</span><span class="p">,</span> <span class="n">Data</span><span class="o">.</span><span class="n">energies</span><span class="p">)</span>
@@ -314,12 +337,12 @@
     <span class="n">CB_minima</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span>
         <span class="n">_mark_minima</span><span class="p">(</span><span class="n">electrons_in_range</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">electrons_in_range</span><span class="p">)</span>
 
-    <span class="c1"># Returns a 2D array of band numbers and k-points for extrema in the correct energy range.</span>
+    <span class="c1"># Returns an array of band numbers and k-points for extrema in the correct energy range.</span>
+    <span class="c1"># The first index differentiates between the valence band and conduction band.</span>
     <span class="c1"># At a given k-point there may be multiple bands with highest energy</span>
-    <span class="n">extrema_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+    <span class="n">extrema_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
         <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">VB_maxima</span><span class="o">.</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">CB_minima</span><span class="o">.</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span>
-        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">CB_minima</span><span class="o">.</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)],</span><span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">extrema_position</span></div>
 
 
@@ -518,10 +541,11 @@
     <span class="k">if</span> <span class="n">bk</span><span class="p">:</span>
         <span class="n">extrema_array</span> <span class="o">=</span> <span class="n">bk</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">extrema_array</span> <span class="o">=</span> <span class="n">find_extrema_indices</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">Settings</span><span class="p">)</span>
+        <span class="n">extrema_array_3d</span> <span class="o">=</span> <span class="n">find_extrema_indices</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span> <span class="n">Settings</span><span class="p">)</span>
+        <span class="n">extrema_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">extrema_array_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">extrema_array_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
     <span class="n">kpoints_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">band_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">band</span><span class="p">,</span> <span class="n">kpoint</span> <span class="ow">in</span> <span class="n">extrema_array</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">band</span><span class="p">,</span> <span class="n">kpoint</span> <span class="ow">in</span> <span class="n">extrema_array</span><span class="p">:</span> <span class="c1"># flatten CB and VB arrays to a single array</span>
         <span class="n">kpoints_before</span> <span class="o">=</span> <span class="n">get_kpoints_before</span><span class="p">(</span>
             <span class="n">band</span><span class="p">,</span>
             <span class="n">kpoint</span><span class="p">,</span>
