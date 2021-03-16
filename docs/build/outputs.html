@@ -177,76 +177,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-effmass.outputs">
-<span id="effmass-outputs"></span><h1>effmass.outputs<a class="headerlink" href="#module-effmass.outputs" title="Permalink to this headline">¶</a></h1>
-<p>A module for plotting and summarising segments information,
-density-of-states information and effective mass analysis.</p>
-<dl class="py function">
-<dt id="effmass.outputs.plot_dos">
-<code class="sig-prename descclassname"><span class="pre">effmass.outputs.</span></code><code class="sig-name descname"><span class="pre">plot_dos</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DataVasp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/outputs.html#plot_dos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.outputs.plot_dos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots density of states (states/unit-cell) against energy (eV).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>DataVasp</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.DataVasp" title="effmass.inputs.DataVasp"><em>DataVasp</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataVasp</span></code> class.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>tuple containing instance of the <a class="reference external" href="https://matplotlib.org/api/figure_api.html">matplotlib.pyplot.figure</a> class and <a class="reference external" href="https://matplotlib.org/api/axes_api.html">matplotlib.pyplot.axes</a> class.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Figure, Axes</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The valence band maximum is set to 0 eV.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="effmass.outputs.plot_integrated_dos">
-<code class="sig-prename descclassname"><span class="pre">effmass.outputs.</span></code><code class="sig-name descname"><span class="pre">plot_integrated_dos</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DataVasp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/outputs.html#plot_integrated_dos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.outputs.plot_integrated_dos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots integrated density of states (states/unit-cell) against energy
-(eV).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>DataVasp</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.DataVasp" title="effmass.inputs.DataVasp"><em>DataVasp</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataVasp</span></code> class.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>tuple containing instance of the <a class="reference external" href="https://matplotlib.org/api/figure_api.html">matplotlib.pyplot.figure</a> class and <a class="reference external" href="https://matplotlib.org/api/axes_api.html">matplotlib.pyplot.axes</a> class.</p>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Figure, Axes</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The valence band maximum is set to 0 eV.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="effmass.outputs.plot_segments">
-<code class="sig-prename descclassname"><span class="pre">effmass.outputs.</span></code><code class="sig-name descname"><span class="pre">plot_segments</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/outputs.html#plot_segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.outputs.plot_segments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots bandstructure overlaid with the DFT-calculated points for each Segment
-instance. Each Segment is labelled with it’s direction in reciprocal space
-and index number from the segments argument.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Data</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Data" title="effmass.inputs.Data"><em>Data</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code> class.</p></li>
-<li><p><strong>Settings</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Settings" title="effmass.inputs.Settings"><em>Settings</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.</p></li>
-<li><p><strong>segments</strong> (<em>list</em><em>(</em><a class="reference internal" href="analysis.html#effmass.analysis.Segment" title="effmass.analysis.Segment"><em>Segment</em></a><em>)</em>) – A list of instances of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Segment</span></code> class.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>tuple containing instance of the <a class="reference external" href="https://matplotlib.org/api/figure_api.html">matplotlib.pyplot.figure</a> class and <a class="reference external" href="https://matplotlib.org/api/axes_api.html">matplotlib.pyplot.axes</a> class.</p>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Figure, Axes</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The x-axis of the plot is not to scale.</p>
-</dd></dl>
-
+  <div class="section" id="effmass-outputs">
+<h1>effmass.outputs<a class="headerlink" href="#effmass-outputs" title="Permalink to this headline">¶</a></h1>
 </div>
 
 

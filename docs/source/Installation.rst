@@ -7,9 +7,15 @@ Installation
 
 .. code-block:: none
 
-   pip3 install --user effmass
+   pip install effmass
 
-Or download the latest release from `GitHub <https://github.com/lucydot/effmass/releases>`_, and install
+To start the command line interface simply type
+
+.. code-block:: none
+
+    effmass
+
+To download and install the latest release from `GitHub <https://github.com/lucydot/effmass/releases>`_
 
 .. code-block:: none
 

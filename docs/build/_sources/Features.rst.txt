@@ -22,11 +22,10 @@ Using density-of-states data and assuming no thermal smearing, `effmass` can cal
 **Plot fits to the dispersion:**
 Selected bandstructure segments and approximations to the dispersion (assuming a Kane, quadratic, or higher order fit) can be visualised.
 
-The `effmass` package is aimed towards theoretical solid state physicists and chemists who have a basic familiarity with Python. Depending on the functionality and level of approximation you are looking for, 
+The command line interface provides basic functionality for calculating parabolic effective masses.
+For those who have a basic familiarity with Python there is an API which provides access to more (non-parabolic) effective mass definitions. 
+Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed [here](https://effmass.readthedocs.io/en/latest/Related%20packages.html) will suit your needs better.
-
-
-
 
 .. figure:: .static/screenshot.png
     :figwidth: 400px

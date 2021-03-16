@@ -302,7 +302,7 @@
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The fermi energy is lower than the VBM&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">fermi_energy</span> <span class="o">&gt;</span> <span class="n">CBM</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The fermi energy is higher than the CBM&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">occupancy</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">occupancy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">((</span><span class="n">occupancy</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">occupancy</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span>
                 <span class="p">(</span><span class="n">occupancy</span> <span class="o">==</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;You have partial occupancy of bands&quot;</span><span class="p">)</span></div>

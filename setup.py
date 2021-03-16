@@ -29,12 +29,15 @@ config = {
                           'codeclimate-test-reporter',
                           'pytest-lazy-fixture',
                           'coverage==4.3.4',
-                          'ase>=3.21.1'],
+                          'ase>=3.21.1',
+                          'questionary>=1.9.0',
+                          'prettytable>=2.1.0'],
     'python_requires': '>=3.6',
     'license': 'MIT',
     'packages': [ 'effmass' ],
     'scripts': [],
-    'name': 'effmass'
+    'name': 'effmass',
+    'entry_points': {"console_scripts": ["effmass = effmass.cli:cli"]}
 }
 
 setup(**config)
