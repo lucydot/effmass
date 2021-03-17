@@ -80,8 +80,9 @@ def cli():
 
 	else:
 		data = inputs.DataCastep(pathname+"/", seedname)
-		data.fermi_level = fermi_level
-		data.find_cbm_vbm()
+		if data.fermi_level:
+			data.fermi_level = fermi_level
+			data.find_cbm_vbm()
     
 	print("Finding extrema...")  
 	print("Generating segments...")
