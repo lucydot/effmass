@@ -80,7 +80,7 @@ def cli():
 
 	else:
 		data = inputs.DataCastep(pathname+"/", seedname)
-		if data.fermi_level:
+		if fermi_level:
 			data.fermi_level = fermi_level
 			data.find_cbm_vbm()
     
