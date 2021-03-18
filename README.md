@@ -16,7 +16,7 @@
 
 If you use `effmass` for your published research [please cite accordingly](#citing-effmass).
 
-## Release 2.0.0
+## What's new?
 
 💃 `effmass` now interfaces with more codes:
 - it can read in Castep output data (in addition to Vasp and FHI-aims)
