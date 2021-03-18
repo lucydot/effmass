@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from adjustText import adjust_text
 
-from random import randint
 from prettytable import PrettyTable
 
 from effmass import ev_to_hartree
@@ -20,7 +19,7 @@ from effmass.dos import _check_dos_loaded
 from effmass.analysis import _check_poly_order
 
 
-def plot_segments(Data, Settings, segments, savefig=False):
+def plot_segments(Data, Settings, segments, savefig=False, random_int=None):
     """Plots bandstructure overlaid with the DFT-calculated points for each Segment
     instance. Each Segment is labelled with it's direction in reciprocal space
     and index number from the segments argument.
@@ -51,10 +50,9 @@ def plot_segments(Data, Settings, segments, savefig=False):
         (Settings.extrema_search_depth + Settings.energy_range + 1)
     ])
 
-    if savefig == True:
-        random_int = randint(10000,99999)
+    if (savefig is True) and (random_int is not None):
+        
         fig.savefig("effmass_{}.png".format(random_int))
-        return random_int
 
     return fig, ax
     
@@ -113,7 +111,7 @@ def plot_dos(DataVasp):
 
     return fig, ax
 
-def print_table_summary(segments, which_values):
+def make_table(segments, which_values):
     """Prints table summary of segments data to terminal"""
 
     table = PrettyTable()
@@ -141,11 +139,34 @@ def print_table_summary(segments, which_values):
             segment_data.append("{:.4f}".format(segment.finite_difference_effmass()))
         table.add_row(segment_data)
 
+    return table
+
+def print_terminal_table(table):
+
     print(table)
 
+def print_summary_file(random_int, DFT_code, pathname, ignore, seedname,
+            fermi_level, extrema_search_depth, energy_range,
+            table):
 
-# Output table:   particle band-index direction least-squares m* finite-difference m*
-
+    with open("effmass_{}.txt".format(random_int), 'a') as out:
+        out.write( 
+            "DFT code: "+DFT_code+'\n'+
+            "Path: "+pathname+'\n'
+        )
+        if ignore:
+            out.write("k-points to ignore: "+ignore+"\n")
+        if seedname:
+            out.write("File seedname: "+seedname+"\n") 
+        if fermi_level:
+            out.write(
+            "User specified Fermi level: "+fermi_level+'\n'
+            ) 
+        out.write(
+            "Extrema search depth (eV): "+extrema_search_depth+"\n"+
+            "Energy range: "+energy_range+"\n"+'\n'+'\n'
+        )
+        out.write(table.get_string())
 
 def print_results(segment, data, settings, polyfit_order=None):
     

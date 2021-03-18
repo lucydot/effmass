@@ -2,6 +2,7 @@
 
 import questionary
 from effmass import inputs, analysis, extrema, outputs
+from random import randint
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -9,6 +10,9 @@ warnings.filterwarnings("ignore")
 def cli():
 
 	print("Welcome to effmass 2.0.0 \U0001F388")
+
+	ignore, seedname, fermi_level = None, None, None
+	random_int = randint(10000,99999)
 
 	DFT_code = questionary.select(
 		"Which DFT code have you used to generate the bandstructure?",
@@ -63,11 +67,11 @@ def cli():
 		auto_enter=False
 		).ask()
 
-#	save_summary = questionary.confirm(
-#		"Would you like me to save a summary file?",
-#		default=True,
-#		auto_enter=False
-#		).ask()
+	save_summary = questionary.confirm(
+		"Would you like me to save a summary file?",
+		default=True,
+		auto_enter=False
+		).ask()
 
 	settings = inputs.Settings(extrema_search_depth=float(extrema_search_depth), energy_range=float(energy_range))
 	print("Reading in data...")
@@ -89,13 +93,28 @@ def cli():
 	segments = extrema.generate_segments(settings, data)
 
 	print("Calculating effective masses...")
-	outputs.print_table_summary(segments, which_values)
+	table = outputs.make_table(segments, which_values)
+	outputs.print_terminal_table(table)
 
 	if save_plot:
 		print("Plotting segments...")
-		randomint = outputs.plot_segments(data,settings,segments,savefig=True)
-		print("Plot of segments saved to effmass_{}.png".format(randomint))
+		outputs.plot_segments(data,settings,segments,savefig=True,random_int=random_int)
+		print("Plot of segments saved to effmass_{}.png".format(random_int))
 
-	### if save_summary: print out user settings from questionary, and results
+	if save_summary: 
+		print("Writing summary file...")
+
+		outputs.print_summary_file(
+			random_int,
+			DFT_code,
+			pathname,
+			ignore,
+			seedname,
+			fermi_level,
+			extrema_search_depth,
+			energy_range,
+			table)
+
+		print("Summary file saved as effmass_{}.txt".format(random_int))
 
 
