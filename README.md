@@ -85,7 +85,7 @@ python setup.py install
 - An overview of the features of effmass, along with example code for Vasp and FHI-aims output data, is contained in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
 - Additional examples for the Castep and ASE interfaces are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tests/Test_Castep_interface.ipynb).
 - The API documentation is [here](https://effmass.readthedocs.io/en/latest/).
-- Further details about the various definitions of effective mass implemented can be found in Phys. Rev. B **99** (8), 085207, which is also [avaiable on arXiv](https://arxiv.org/pdf/1811.02281.pdf).
+- Further details about the various effective mass definitions implemented in `effmass` can be found in Phys. Rev. B **99** (8), 085207, which is also [available on arXiv](https://arxiv.org/pdf/1811.02281.pdf).
 - The source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
 
 ## Publications using `effmass`
