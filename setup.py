@@ -17,7 +17,7 @@ config = {
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
     'author': 'Lucy Whalley',
-    'author_email': 'lucywhalley@gmail.com',
+    'author_email': 'l.whalley@northumbria.ac.uk',
     'url': 'https://github.com/lucydot/effmass',
     'download_url': "https://github.com/lucydot/effmass/archive/%s.tar.gz" % (__version__),
     'version': __version__,
