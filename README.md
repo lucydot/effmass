@@ -91,7 +91,7 @@ To start the command line interface simply type
 effmass
 ```
 
-and follow the prompts.
+and follow the prompts. You are asked if you would like to print a plot of the segments found - we recommend that you do this, to check that the segments are "sensible". You are also asked if you would like to print a summary file - again, we recommend that you do this, so that you have a record of the CLI options chosen.
 
 ## Documentation
 
