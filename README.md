@@ -50,9 +50,6 @@ Using density-of-states data and assuming no thermal smearing, `effmass` can cal
 **Plot fits to the dispersion:**
 Selected bandstructure segments and approximations to the dispersion (assuming a Kane, quadratic, or higher order fit) can be visualised.
 
-The [command line interface](#Installation) provides basic functionality for calculating parabolic effective masses.
-For those who have a basic familiarity with Python there is an API which provides access to all features, including non-parabolic effective mass definitions. 
-
 Depending on the functionality and level of approximation you are looking for, 
 it may be that one of the packages listed [here](https://effmass.readthedocs.io/en/latest/Related%20packages.html) will suit your needs better.
 
@@ -68,25 +65,57 @@ it may be that one of the packages listed [here](https://effmass.readthedocs.io/
 pip install effmass
 ```
 
+If you use conda/anaconda the safest thing to do is to create a new environment and then install effmass:
+
+```
+conda create --name effmass
+conda activate effmass
+conda install pip
+pip install effmass
+```
+
+If you do not use `pip` you can download and install the latest release from [GitHub](https://github.com/lucydot/effmass/releases) and install:
+```
+cd effmass
+python setup.py install
+```
+
+## Command Line Interface
+
+The [command line interface](#Installation) provides basic functionality for calculating parabolic effective masses.
+For those who have a basic familiarity with Python there is an API which provides access to all features, including non-parabolic effective mass definitions. 
+
 To start the command line interface simply type
 
 ```
 effmass
 ```
 
-If you do not use `pip` you can download and install the latest release from [GitHub](https://github.com/lucydot/effmass/releases):
-```
-cd effmass
-python setup.py install
-```
+and follow the prompts.
 
 ## Documentation
 
 - An overview of the features of effmass, along with example code for Vasp and FHI-aims output data, is contained in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
-- Additional examples for the Castep and ASE interfaces are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tests/Castep_ASE_interface.ipynb).
+- Additional Jupyter notebook examples for the Castep and ASE interfaces are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tests/Castep_ASE_interface.ipynb).
 - The API documentation is [here](https://effmass.readthedocs.io/en/latest/).
 - Further details about the various effective mass definitions implemented in `effmass` can be found in Phys. Rev. B **99** (8), 085207, which is also [available on arXiv](https://arxiv.org/pdf/1811.02281.pdf).
 - The source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
+
+### Running notebook examples
+
+If you want to run the jupyter notebook examples/tutorials you will also need to install `notebook`:
+
+```
+pip install notebook
+```
+
+To run the notebook, run the following command at the Terminal (Mac/Linux) or Command Prompt (Windows):
+
+``` 
+jupyter notebook
+```
+
+This will open a web browser tab, which you can use to navigate to the notebook examples.
 
 ## Publications using `effmass`
 
@@ -106,10 +135,11 @@ If you would like to contribute please do so via a pull request. All contributor
 
 Automated testing of the latest commit happens [here](https://travis-ci.com/lucydot/effmass).
 
-You can also run manual tests after download:
+You can also run tests locally:
 ```
+pip install effmass[tests]
 cd effmass
-pytest
+python -m pytest
 ```
 
 ## Citing `effmass`
