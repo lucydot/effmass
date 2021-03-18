@@ -1,4 +1,4 @@
-# effmass
+# effmass 2.1.0
 
 [![PyPI version](https://badge.fury.io/py/effmass.svg)](https://badge.fury.io/py/effmass)
 [![Documentation Status](https://readthedocs.org/projects/effmass/badge/?version=latest)](https://effmass.readthedocs.io/en/latest/?badge=latest)
