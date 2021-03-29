@@ -455,7 +455,7 @@ class DataAims(Data):
 
                 break
 
-        if spin_channels == 2: #Doubling for spin-polarised calculation
+        if spin_channels == 2 or spin_channels == 4: #Doubling for spin-polarised calculation
             number_of_bands = 2*number_of_bands
 
         self.number_of_bands = number_of_bands
