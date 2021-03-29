@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>effmass.extrema &mdash; effmass 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="effmass.dos" href="dos.html" />
+    <link rel="prev" title="effmass.inputs" href="inputs.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> effmass
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Supported%20codes.html">Supported Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="API%20documentation.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="inputs.html">effmass.inputs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">effmass.extrema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dos.html">effmass.dos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html">effmass.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html">effmass.outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Implementation.html">Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Related%20packages.html">Related packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">effmass</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="API%20documentation.html">API documentation</a> &raquo;</li>
+        
+      <li>effmass.extrema</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/extrema.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-effmass.extrema">
+<span id="effmass-extrema"></span><h1>effmass.extrema<a class="headerlink" href="#module-effmass.extrema" title="Permalink to this headline">¶</a></h1>
+<p>A module for finding the band structure extrema and instantiating
+a <code class="xref py py-class docutils literal notranslate"><span class="pre">Segment</span></code> object for each extrema point.</p>
+<p>The extrema are found within an energy range given by the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.
+Each <cite>Segment</cite> object contains data for kpoints within an energy range given by the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.</p>
+<dl class="py function">
+<dt id="effmass.extrema.calc_CBM_VBM_from_Fermi">
+<code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">calc_CBM_VBM_from_Fermi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CBMVBM_search_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#calc_CBM_VBM_from_Fermi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.calc_CBM_VBM_from_Fermi" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to find the CBM and VBM when there is no occupancy data. It relies upon the Fermi level being in the middle of the band gap.
+The CBMVBM_search_depth is refereced from the fermi energy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>DataASE</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.DataASE" title="effmass.inputs.DataASE"><em>DataASE</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataASE</span></code> class.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tuple containing the conduction band minimum and valence band maximum in eV.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(float, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.extrema.calculate_direction">
+<code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">calculate_direction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#calculate_direction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.calculate_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the direction vector between two points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>list</em>) – the position vector of point a.</p></li>
+<li><p><strong>b</strong> (<em>list</em>) – the position vector of point b.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The (unnormalised) direction vector between points a and b. The smallest magnitude of an element is 1 (eg: [1,1,2]).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.extrema.change_direction">
+<code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">change_direction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoint_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#change_direction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.change_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the index of the kpoint (if any) where there is a change of
+direction in reciprocal space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kpoints</strong> (<em>array</em>) – array of kpoints with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz]. See <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a>.</p></li>
+<li><p><strong>kpoint_indices</strong> (<em>list</em><em> (</em><em>int</em><em>)</em>) – the kpoint indices over which to check for change in direction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the index of the kpoint where there is a change of direction. If there is no change of direction, returns None.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.extrema.find_extrema_indices">
+<code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">find_extrema_indices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Settings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#find_extrema_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.find_extrema_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the kpoint index and band index of the minimum/maximum energy
+turning points within <code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Settings.energy_range</span></code> of the
+conduction band minimum (<a class="reference internal" href="inputs.html#effmass.inputs.Data.CBM" title="effmass.inputs.Data.CBM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.CBM</span></code></a>) / valence band
+maximum (<a class="reference internal" href="inputs.html#effmass.inputs.Data.VBM" title="effmass.inputs.Data.VBM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.VBM</span></code></a>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Data</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Data" title="effmass.inputs.Data"><em>Data</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code> class.</p></li>
+<li><p><strong>Settings</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Settings" title="effmass.inputs.Settings"><em>Settings</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [<code class="xref py py-attr docutils literal notranslate"><span class="pre">efmmas.inputs.Data.bands</span></code> index, <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a> index] for each extrema.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.extrema.generate_segments">
+<code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">generate_segments</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">truncate_dir_change</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#generate_segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.generate_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a list of Segment objects.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>Settings (Settings): instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.
+Data (Data): instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code> class.
+truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.
+bk (list(int)): To manually set an extrema point, in format [<code class="xref py py-attr docutils literal notranslate"><span class="pre">efmmas.inputs.Data.bands</span></code> index, <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a> index]. Defaults to None.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of <code class="xref py py-class docutils literal notranslate"><span class="pre">Segment</span></code> objects.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list(Segments)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.extrema.get_kpoints_after">
+<code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">get_kpoints_after</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">band_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoint_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">truncate_dir_change</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#get_kpoints_after"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.get_kpoints_after" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a given eigenstate, finds eigenstates which 1) belong to the same
+band 2) come after the given eigenstate in the route through reciprocal
+space 3) are within <code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Settings.energy_range</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>band_index</strong> (<em>int</em>) – index of <code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.bands</span></code>.</p></li>
+<li><p><strong>kpoint_index</strong> (<em>int</em>) – index of <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a>.</p></li>
+<li><p><strong>Settings</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Settings" title="effmass.inputs.Settings"><em>Settings</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.</p></li>
+<li><p><strong>Data</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Data" title="effmass.inputs.Data"><em>Data</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code> class.</p></li>
+<li><p><strong>truncate_dir_change</strong> (<em>bool</em>) – If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>indices of <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list(int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="effmass.extrema.get_kpoints_before">
+<code class="sig-prename descclassname"><span class="pre">effmass.extrema.</span></code><code class="sig-name descname"><span class="pre">get_kpoints_before</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">band_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpoint_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">truncate_dir_change</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/effmass/extrema.html#get_kpoints_before"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#effmass.extrema.get_kpoints_before" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a given eigenstate, finds eigenstates which 1) belong to the same
+band 2) come before the given eigenstate in the route through reciprocal
+space 3) are within <code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Settings.energy_range</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>band_index</strong> (<em>int</em>) – index of <code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.bands</span></code>.</p></li>
+<li><p><strong>kpoint_index</strong> (<em>int</em>) – index of <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a>.</p></li>
+<li><p><strong>Settings</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Settings" title="effmass.inputs.Settings"><em>Settings</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code> class.</p></li>
+<li><p><strong>Data</strong> (<a class="reference internal" href="inputs.html#effmass.inputs.Data" title="effmass.inputs.Data"><em>Data</em></a>) – instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code> class.</p></li>
+<li><p><strong>truncate_dir_change</strong> (<em>bool</em>) – If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>indices of <a class="reference internal" href="inputs.html#effmass.inputs.Data.kpoints" title="effmass.inputs.Data.kpoints"><code class="xref py py-attr docutils literal notranslate"><span class="pre">effmass.inputs.Data.kpoints</span></code></a>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list(int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="dos.html" class="btn btn-neutral float-right" title="effmass.dos" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="inputs.html" class="btn btn-neutral float-left" title="effmass.inputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2018, Lucy Whalley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

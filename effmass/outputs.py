@@ -6,11 +6,12 @@ density-of-states information and effective mass analysis.
 
 """
 import matplotlib
-matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import numpy as np
 from adjustText import adjust_text
+
+from prettytable import PrettyTable
 
 from effmass import ev_to_hartree
 from effmass.dos import _check_integrated_dos_loaded
@@ -18,7 +19,7 @@ from effmass.dos import _check_dos_loaded
 from effmass.analysis import _check_poly_order
 
 
-def plot_segments(Data, Settings, segments):
+def plot_segments(Data, Settings, segments, savefig=False, random_int=None):
     """Plots bandstructure overlaid with the DFT-calculated points for each Segment
     instance. Each Segment is labelled with it's direction in reciprocal space
     and index number from the segments argument.
@@ -49,15 +50,19 @@ def plot_segments(Data, Settings, segments):
         (Settings.extrema_search_depth + Settings.energy_range + 1)
     ])
 
+    if (savefig is True) and (random_int is not None):
+        
+        fig.savefig("effmass_{}.png".format(random_int))
+
     return fig, ax
     
 
-def plot_integrated_dos(Data):
+def plot_integrated_dos(DataVasp):
     """Plots integrated density of states (states/unit-cell) against energy
     (eV).
 
     Args:
-        Data (Data): instance of the :class:`Data` class.
+        DataVasp (DataVasp): instance of the :class:`DataVasp` class.
 
     Returns:
         Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
@@ -65,26 +70,26 @@ def plot_integrated_dos(Data):
     Notes:
         The valence band maximum is set to 0 eV.
     """
-    _check_integrated_dos_loaded(Data)
+    _check_integrated_dos_loaded(DataVasp)
 
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111)
-    energy = [x[0] - Data.VBM for x in Data.integrated_dos]
-    dos_data = [x[1] for x in Data.integrated_dos]
+    energy = [x[0] - DataVasp.VBM for x in DataVasp.integrated_dos]
+    dos_data = [x[1] for x in DataVasp.integrated_dos]
     ax.plot(energy, dos_data)
     ax.set_xlabel("Energy, eV")
     ax.set_ylabel("Integrated DOS, states / unit cell")
     ax.axvline(0, linestyle="--")
-    ax.axvline(Data.CBM - Data.VBM, linestyle="--")
+    ax.axvline(DataVasp.CBM - DataVasp.VBM, linestyle="--")
 
     return fig, ax
 
 
-def plot_dos(Data):
+def plot_dos(DataVasp):
     """Plots density of states (states/unit-cell) against energy (eV).
 
     Args:
-        Data (Data): instance of the :class:`Data` class.
+        DataVasp (DataVasp): instance of the :class:`DataVasp` class.
 
     Returns:
         Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
@@ -92,20 +97,76 @@ def plot_dos(Data):
     Notes:
         The valence band maximum is set to 0 eV.
     """
-    _check_dos_loaded(Data)
+    _check_dos_loaded(DataVasp)
 
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111)
-    energy = [x[0] - Data.VBM for x in Data.dos]
-    dos = [x[1] for x in Data.dos]
+    energy = [x[0] - DataVasp.VBM for x in DataVasp.dos]
+    dos = [x[1] for x in DataVasp.dos]
     ax.plot(energy, dos)
     ax.set_xlabel("Energy, eV")
     ax.set_ylabel("DOS")
     ax.axvline(0, linestyle="--")
-    ax.axvline(Data.CBM - Data.VBM, linestyle="--")
+    ax.axvline(DataVasp.CBM - DataVasp.VBM, linestyle="--")
 
     return fig, ax
 
+def make_table(segments, which_values):
+    """Prints table summary of segments data to terminal"""
+
+    table = PrettyTable()
+    column_names = ["particle", "band-index", "direction"]
+    if 'parabolic m* (least squares)' in which_values:
+        column_names.append("Least squares m* (m_e)")
+    if 'parabolic m* (finite difference)' in which_values:
+        column_names.append("Finite difference m* (m_e)")
+    table.field_names = column_names
+    for segment in segments:
+        if segment.band_type == "conduction_band":
+            particle = "electron"
+        if segment.band_type == "valence_band":
+            particle = "hole"
+        if segment.band_type == "unknown":
+            particle = "unknown"
+        segment_data = [
+            particle,
+            segment.band,
+            segment.direction
+        ]
+        if 'parabolic m* (least squares)' in which_values:
+            segment_data.append("{:.4f}".format(segment.five_point_leastsq_effmass()))
+        if 'parabolic m* (finite difference)' in which_values:
+            segment_data.append("{:.4f}".format(segment.finite_difference_effmass()))
+        table.add_row(segment_data)
+
+    return table
+
+def print_terminal_table(table):
+
+    print(table)
+
+def print_summary_file(random_int, DFT_code, pathname, ignore, seedname,
+            fermi_level, extrema_search_depth, energy_range,
+            table):
+
+    with open("effmass_{}.txt".format(random_int), 'a') as out:
+        out.write( 
+            "DFT code: "+DFT_code+'\n'+
+            "Path: "+pathname+'\n'
+        )
+        if ignore:
+            out.write("k-points to ignore: "+ignore+"\n")
+        if seedname:
+            out.write("File seedname: "+seedname+"\n") 
+        if fermi_level:
+            out.write(
+            "User specified Fermi level: "+fermi_level+'\n'
+            ) 
+        out.write(
+            "Extrema search depth (eV): "+extrema_search_depth+"\n"+
+            "Energy range: "+energy_range+"\n"+'\n'+'\n'
+        )
+        out.write(table.get_string())
 
 def print_results(segment, data, settings, polyfit_order=None):
     

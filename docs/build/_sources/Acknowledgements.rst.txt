@@ -1,0 +1,5 @@
+================
+Acknowledgements
+================
+
+This package was originally written by `Lucy Whalley <https://github.com/lucydot>`_ during a PhD funded by the `EPSRC <http://www.epsrc.ac.uk>`_ through the `Centre for Doctoral Training in New and Sustainable Photovoltaics <http://www.cdt-pv.org/>`_ (grant no. `EP/L01551X/1 <http://gtr.ukri.org/projects?ref=EP/L01551X/1>`_) at `Imperial College London <http://www.imperial.ac.uk/>`_. Aron Walsh and Benjamin J. Morgan supervised the development of the code.

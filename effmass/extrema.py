@@ -12,6 +12,7 @@ import warnings
 import numpy as np
 import numpy.ma as ma
 from effmass import analysis
+from effmass import inputs
 
 
 def _check_partial_occupancy(occupancy):
@@ -116,6 +117,27 @@ def change_direction(kpoints, kpoint_indices):
             break
     return change_index
 
+def calc_CBM_VBM_from_Fermi(Data, CBMVBM_search_depth=4.0):
+    """ This function is used to find the CBM and VBM when there is no occupancy data. It relies upon the Fermi level being in the middle of the band gap.
+    The CBMVBM_search_depth is refereced from the fermi energy.
+    
+    Args:
+        DataASE (DataASE): instance of the :class:`DataASE` class.
+
+    Returns:
+        (float, float): A tuple containing the conduction band minimum and valence band maximum in eV.
+"""
+    Data.CBM = Data.fermi_energy
+    Data.VBM = Data.fermi_energy
+
+    Settings = inputs.Settings(extrema_search_depth=CBMVBM_search_depth)
+    extrema_indices=find_extrema_indices(Data, Settings)
+
+    CBM = min([Data.energies[i][j] for i,j in extrema_indices[1]])
+    VBM = max([Data.energies[i][j] for i,j in extrema_indices[0]])
+
+    return CBM, VBM
+
 
 def find_extrema_indices(Data, Settings):
     """Finds the kpoint index and band index of the minimum/maximum energy
@@ -128,7 +150,7 @@ def find_extrema_indices(Data, Settings):
         Settings (Settings): instance of the :class:`Settings` class.
 
     Returns:
-        array: A 2-dimensional array of size (number of extrema, 2). Each row corresponds to an extrema and contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index].
+        array: A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each extrema.
     """
 
     energy_CB = ma.masked_where(Data.energies < Data.CBM, Data.energies)
@@ -148,12 +170,12 @@ def find_extrema_indices(Data, Settings):
     CB_minima = ma.masked_where(
         _mark_minima(electrons_in_range) == 0, electrons_in_range)
 
-    # Returns a 2D array of band numbers and k-points for extrema in the correct energy range.
+    # Returns an array of band numbers and k-points for extrema in the correct energy range.
+    # The first index differentiates between the valence band and conduction band.
     # At a given k-point there may be multiple bands with highest energy
-    extrema_position = np.append(
+    extrema_position = np.array([
         np.argwhere(VB_maxima.mask == 0),
-        np.argwhere(CB_minima.mask == 0),
-        axis=0)
+        np.argwhere(CB_minima.mask == 0)],dtype=object)
     return extrema_position
 
 
@@ -352,10 +374,11 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
     if bk:
         extrema_array = bk
     else:
-        extrema_array = find_extrema_indices(Data, Settings)
+        extrema_array_3d = find_extrema_indices(Data, Settings)
+        extrema_array = np.concatenate((extrema_array_3d[0],extrema_array_3d[1]))
     kpoints_list = []
     band_list = []
-    for band, kpoint in extrema_array:
+    for band, kpoint in extrema_array: # flatten CB and VB arrays to a single array
         kpoints_before = get_kpoints_before(
             band,
             kpoint,

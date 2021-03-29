@@ -1,0 +1,781 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>effmass.inputs &mdash; effmass 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> effmass
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Supported%20codes.html">Supported Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API%20documentation.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Implementation.html">Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Related%20packages.html">Related packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">effmass</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>effmass.inputs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for effmass.inputs</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A module for storing electronic structure data and user settings. Currently supported codes are VASP and FHI-Aims (with limited functionality).</span>
+
+<span class="sd">The module contains a :class:`Data` class which parses OUTCAR and PROCAR files using the `vasppy &lt;https://github.com/bjmorgan/vasppy&gt;`_ package. </span>
+<span class="sd">A function for parsing DOSCAR files is also provided. </span>
+
+<span class="sd">The module contains a :class:`DataAims` class which parses and stores the `geometry.in`/`calculation.out` files generated for/from a FHI-AIMS calculation.</span>
+
+<span class="sd">A :class:`Settings` class stores analysis parameters set by the user.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">vasppy</span> <span class="kn">import</span> <span class="n">procar</span><span class="p">,</span> <span class="n">outcar</span>
+<span class="kn">from</span> <span class="nn">effmass</span> <span class="kn">import</span> <span class="n">extrema</span>
+<span class="kn">from</span> <span class="nn">ase.calculators.castep</span> <span class="kn">import</span> <span class="n">Castep</span>
+<span class="kn">from</span> <span class="nn">ase</span> <span class="kn">import</span> <span class="n">io</span> 
+<span class="kn">import</span> <span class="nn">ase.io</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="Settings"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.Settings">[docs]</a><span class="k">class</span> <span class="nc">Settings</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class for setting analysis parameters.</span>
+
+<span class="sd">    Attributes:     energy_range (float): energy in kT over which the</span>
+<span class="sd">    segment extends.     extrema_search_depth (float): energy in kT from</span>
+<span class="sd">    bandedge over which to search for extrema.     degree_bandfit (int):</span>
+<span class="sd">    the degree of the polynomial which is used to fit to dispersion data</span>
+<span class="sd">    when calculating the transport mass.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Settings.__init__"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.Settings.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">energy_range</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+                 <span class="n">extrema_search_depth</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span>
+                 <span class="n">bandfit</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialises an instance of the Settings class and checks input using</span>
+<span class="sd">        :meth:`check_settings()`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            energy_range (float): energy in eV over which the segment extends. Defaults to 0.25 eV.</span>
+<span class="sd">            extrema_search_depth (float): energy in eV from bandedge over which to search for extrema. Defaults to 0.025 eV.</span>
+<span class="sd">            degree_bandfit (int): the degree of the polynomial which is used to fit to dispersion data when calculating the transport mass.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_range</span> <span class="o">=</span> <span class="n">energy_range</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extrema_search_depth</span> <span class="o">=</span> <span class="n">extrema_search_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">degree_bandfit</span> <span class="o">=</span> <span class="n">bandfit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_settings</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Settings.check_settings"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.Settings.check_settings">[docs]</a>    <span class="k">def</span> <span class="nf">check_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that Settings class attributes are sane.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_range</span> <span class="o">&gt;</span>
+                <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;The energy range must be a positive number&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extrema_search_depth</span> <span class="o">&gt;</span>
+                <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;The energy depth must be a positive number&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degree_bandfit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">degree_bandfit</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="p">),</span> <span class="s2">&quot;The bandfit degree must be a positive integer greater than 1&quot;</span>     </div></div>
+
+<div class="viewcode-block" id="Data"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.Data">[docs]</a><span class="k">class</span> <span class="nc">Data</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parent class for parsing and storing data from bandstructure calculations. Contains a :meth:`check_data` method for basic checks on bandstructure data.</span>
+
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).</span>
+<span class="sd">            number_of_kpoints (int): the number of k-points per band.</span>
+<span class="sd">            number_of_bands (int): the number of bands.</span>
+<span class="sd">            kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].</span>
+<span class="sd">            energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.</span>
+<span class="sd">            occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).</span>
+<span class="sd">            reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.</span>
+<span class="sd">            CBM (float): the conduction band minimum energy in eV.</span>
+<span class="sd">            VBM (float): the valence band maximum in eV.</span>
+<span class="sd">            fermi_energy (float): the fermi energy in eV.&quot;&quot;&quot;</span> 
+
+<div class="viewcode-block" id="Data.__init__"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.Data.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises an instance of the :class:`~effmass.inputs.Data` class. All attributes are None until set by the derived class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spin_channels</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_kpoints</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal_lattice</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CBM</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Data.check_data"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.Data.check_data">[docs]</a>    <span class="k">def</span> <span class="nf">check_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spin_channels</span><span class="p">,</span> <span class="n">number_of_kpoints</span><span class="p">,</span> <span class="n">number_of_bands</span><span class="p">,</span> <span class="n">CBM</span><span class="p">,</span> 
+                   <span class="n">VBM</span><span class="p">,</span> <span class="n">fermi_energy</span><span class="p">,</span> <span class="n">occupancy</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that Data class attributes make basic sense.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            There is a similar method that runs automatically when reading data in using the `vasppy.procar &lt;http://vasppy.readthedocs.io/en/latest/vasppy.html#module-vasppy.procar&gt;`_ module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="p">((</span><span class="n">spin_channels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">spin_channels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span>
+             <span class="p">(</span><span class="n">spin_channels</span> <span class="o">==</span> <span class="mi">4</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="p">),</span> <span class="s2">&quot;Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">number_of_kpoints</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span>
+                <span class="ow">and</span> <span class="n">number_of_kpoints</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="p">),</span> <span class="s2">&quot;The number of kpoints is not a positive integer&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">number_of_bands</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span> <span class="ow">and</span> <span class="n">number_of_bands</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="p">),</span> <span class="s2">&quot;The number of bands is not a positive integer&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">CBM</span> <span class="o">&gt;</span>
+                <span class="n">VBM</span><span class="p">),</span> <span class="s2">&quot;The CBM energy is lower than than the VBM energy&quot;</span>
+        <span class="k">if</span> <span class="n">fermi_energy</span> <span class="o">&lt;</span> <span class="n">VBM</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The fermi energy is lower than the VBM&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fermi_energy</span> <span class="o">&gt;</span> <span class="n">CBM</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The fermi energy is higher than the CBM&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">occupancy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">occupancy</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">occupancy</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span>
+                <span class="p">(</span><span class="n">occupancy</span> <span class="o">==</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;You have partial occupancy of bands&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">find_cbm_vbm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CBM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span> <span class="o">=</span> <span class="n">extrema</span><span class="o">.</span><span class="n">calc_CBM_VBM_from_Fermi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">CBMVBM_search_depth</span><span class="o">=</span><span class="mf">4.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataASE"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataASE">[docs]</a><span class="k">class</span> <span class="nc">DataASE</span><span class="p">(</span><span class="n">Data</span><span class="p">):</span>
+
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for interfacing with the ASE bandstructure object. Inherits attributes and methods from the :class:`~effmass.inputs.Data` class, and extends</span>
+<span class="sd">    with a method for inferring the CBM/VBM from Fermi level.</span>
+
+<span class="sd">    Note: DataASE.fermi_energy is taken from the seedname.out file. </span>
+
+<span class="sd">    Note: The DataASE class does not parse eigenstate occupancy data. The Fermi energy will \</span>
+<span class="sd">          be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above \</span>
+<span class="sd">          the fermi energy). You should independently confirm that the fermi energy is in the band gap of \</span>
+<span class="sd">          your material. Note that you can manually set the `fermi_energy` attribute and find the CBM and VBM using the method `find_cbm_vbm`. &quot;)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="DataASE.__init__"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataASE.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bs</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises an instance of the :class:`~effmass.inputs.DataASE` class and infers which bands are occupied and unoccupied from the fermi level.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          bs (ase.spectrum.band_structure.BandStructure): An instance of the ase.spectrum.band_structure.BandStructure object.</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The DataASE class does not parse eigenstate occupancy data. The Fermi energy will </span><span class="se">\</span>
+<span class="s2">            be used to infer which bands are occupied (below the fermi energy) and which are unoccupied (above </span><span class="se">\</span>
+<span class="s2">            the fermi energy). You should independently confirm that the fermi energy is in the band gap of </span><span class="se">\</span>
+<span class="s2">            your material. Note that you can manually set the DataASE.fermi_energy attribute and then re-find the CBM and VBM using the method `DataASE.find_cbm_vbm`. &quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spin_channels</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">energies</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_kpoints</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">energies</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">energies</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">bs</span><span class="o">.</span><span class="n">energies</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">energies</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_kpoints</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">kpts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal_lattice</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">reference</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_cbm_vbm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spin_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_kpoints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CBM</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DataCastep"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataCastep">[docs]</a><span class="k">class</span> <span class="nc">DataCastep</span><span class="p">(</span><span class="n">DataASE</span><span class="p">):</span>
+
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for parsing and storing data from a Castep bandstructure calculation. Inherits attributes and methods from the :class:`~effmass.inputs.DataASE` class.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DataCastep.__init__"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataCastep.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">directory_path</span><span class="p">,</span><span class="n">seedname</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises an instance of the :class:`~effmass.inputs.DataCastep` class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            directory_path (str): The path to a directory containing seedname.cell, seedname.out and seedname.bands</span>
+<span class="sd">            seedname (str): The name (without suffix) of the input and output files</span>
+<span class="sd"> </span>
+<span class="sd">        Returns: </span>
+<span class="sd">            None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        
+        <span class="n">Castep_calculator</span> <span class="o">=</span> <span class="n">Castep</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)</span>
+        <span class="n">Castep_calculator</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">directory_path</span><span class="o">+</span><span class="s2">&quot;./&quot;</span><span class="o">+</span><span class="n">seedname</span><span class="o">+</span><span class="s2">&quot;.cell&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;castep-cell&#39;</span><span class="p">)</span>
+        <span class="n">ASE_bandstructure</span> <span class="o">=</span> <span class="n">Castep_calculator</span><span class="o">.</span><span class="n">band_structure</span><span class="p">(</span><span class="n">directory_path</span><span class="o">+</span><span class="s2">&quot;./&quot;</span><span class="o">+</span><span class="n">seedname</span><span class="o">+</span><span class="s2">&quot;.bands&quot;</span><span class="p">)</span>
+        <span class="n">ASE_atoms</span> <span class="o">=</span> <span class="n">Castep_calculator</span><span class="o">.</span><span class="n">atoms</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ASE_bandstructure</span><span class="p">,</span> <span class="n">ASE_atoms</span><span class="p">)</span></div></div>
+
+
+
+<span class="c1"># class DataQE(DataASE):</span>
+
+<span class="c1">#     r&quot;&quot;&quot;Class for parsing and storing data from a Quantum Espresso bandstructure calculation. Inherits attributes and methods from the :class:`~effmass.inputs.DataASE` class.&quot;&quot;&quot;</span>
+
+<span class="c1">#     def __init__(self,directory_path,seedname):</span>
+<span class="c1">#     r&quot;&quot;&quot;</span>
+<span class="c1">#         Initialises an instance of the :class:`~effmass.inputs.DataQE` class.</span>
+
+<span class="c1">#         Args:</span>
+
+ 
+<span class="c1">#         Returns: </span>
+<span class="c1">#             None.</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+
+<span class="c1">#         QE_calculator = ase.calculators.espresso.Espresso()</span>
+<span class="c1">#         QE_calculator.atoms = ase.io.espresso.read_espresso_out()</span>
+<span class="c1">#         ASE_bandstructure = QE_calculator.band_structure()</span>
+<span class="c1">#         super().__init__(self, ASE_bandstructure)</span>
+
+<div class="viewcode-block" id="DataVasp"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataVasp">[docs]</a><span class="k">class</span> <span class="nc">DataVasp</span><span class="p">(</span><span class="n">Data</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for parsing and storing data from a vasp calculation. Extends the :class:`~effmass.inputs.Data` class to include support for analysing DOSCAR data&quot;</span>
+<span class="sd">   </span>
+<span class="sd">    Additional attributes:</span>
+<span class="sd">        dos (array): 2-dimensional array. Each row contains density of states data (units &quot;number of states / unit cell&quot;)  at a given energy: [energy(float),dos(float)].</span>
+<span class="sd">        integrated_dos: 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)].</span>
+<span class="sd">    </span>
+<span class="sd">    Note: DataVasp.fermi_energy is automatically set to the mean of DataVasp.CBM and DataVasp.VBM.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DataVasp.__init__"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataVasp.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outcar_path</span><span class="p">,</span> <span class="n">procar_path</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises an instance of the :class:`~effmass.inputs.Data` class and checks data using :meth:`check_data`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            outcar_path (str): The path to the OUTCAR file</span>
+<span class="sd">            procar_path (:obj:`str` or :obj:`list`): The path(s) to one or more PROCAR files.</span>
+<span class="sd">            </span>
+<span class="sd">            ignore (int): The number of kpoints to ignore at the beginning of the bandstructure slice through kspace (useful for hybrid calculations where zero weightings are appended to a previous self-consistent calculation).</span>
+<span class="sd">            **kwargs: Additional keyword arguments for reading the PROCAR file(s). </span>
+<span class="sd"> </span>
+<span class="sd">        Returns: </span>
+<span class="sd">            None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">outcar_path</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">),</span> <span class="s2">&quot;The OUTCAR path must be a string&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ignore</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span> <span class="ow">and</span> <span class="n">ignore</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                <span class="p">),</span> <span class="s2">&quot;The number of kpoints to ignore must be a positive integer&quot;</span>
+
+        <span class="n">reciprocal_lattice</span> <span class="o">=</span> <span class="n">outcar</span><span class="o">.</span><span class="n">reciprocal_lattice_from_outcar</span><span class="p">(</span><span class="n">outcar_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">procar_path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">vasp_data</span> <span class="o">=</span> <span class="n">procar</span><span class="o">.</span><span class="n">Procar</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">procar_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">procar_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">vasp_data</span> <span class="o">=</span> <span class="n">procar</span><span class="o">.</span><span class="n">Procar</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">procar_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;procar_path must be a string or list of strings&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spin_channels</span> <span class="o">=</span> <span class="n">vasp_data</span><span class="o">.</span><span class="n">spin_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span> <span class="o">=</span> <span class="n">vasp_data</span><span class="o">.</span><span class="n">number_of_bands</span>
+
+        <span class="n">number_of_kpoints</span> <span class="o">=</span> <span class="n">vasp_data</span><span class="o">.</span><span class="n">number_of_k_points</span>
+        <span class="n">vasp_data_energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span> <span class="n">band</span><span class="o">.</span><span class="n">energy</span> <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span> <span class="n">vasp_data</span><span class="o">.</span><span class="n">bands</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">vasp_data_occupancies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span> <span class="n">band</span><span class="o">.</span><span class="n">occupancy</span> <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span> <span class="n">vasp_data</span><span class="o">.</span><span class="n">bands</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">vasp_data</span><span class="o">.</span><span class="n">calculation</span><span class="p">[</span><span class="s1">&#39;spin_polarised&#39;</span><span class="p">]:</span> <span class="c1"># to account for the change in PROCAR format for calculations with 2 spin channels (1 k-point block ---&gt; 2 k-point blocks)</span>
+            <span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="n">number_of_kpoints</span><span class="p">])</span> <span class="c1"># This is a very ugly way to slice &#39;n&#39; dice. Should avoid creating new array and use array methods instead. But it does the job so will keep for now.</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">):</span>
+                <span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">vasp_data_energies</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                                            <span class="n">number_of_kpoints</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span>  <span class="c1"># factor of 2 for each kpoint block</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="n">number_of_kpoints</span><span class="p">]</span>
+                <span class="n">energies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="o">+</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">vasp_data_energies</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                                            <span class="n">number_of_kpoints</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">number_of_kpoints</span><span class="p">:]</span>
+            <span class="n">occupancy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="n">number_of_kpoints</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">):</span>
+                <span class="n">occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">vasp_data_occupancies</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                                                 <span class="n">number_of_kpoints</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="n">number_of_kpoints</span><span class="p">]</span>
+                <span class="n">occupancy</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="o">+</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">vasp_data_occupancies</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                                                 <span class="n">number_of_kpoints</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">number_of_kpoints</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">energies</span> <span class="o">=</span> <span class="n">vasp_data_energies</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                                            <span class="n">number_of_kpoints</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">occupancy</span> <span class="o">=</span> <span class="n">vasp_data_occupancies</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                                                 <span class="n">number_of_kpoints</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># remove values which are from the self-consistent calculation prior to the bandstructure calculation (workflow for hybrid functionals)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">energies</span><span class="p">,</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ignore</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ignore</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_kpoints</span> <span class="o">=</span> <span class="n">number_of_kpoints</span> <span class="o">-</span> <span class="n">ignore</span>
+
+        <span class="c1"># handle negative occupancy values</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;One or more occupancies in your PROCAR file are negative. All negative occupancies will be set to zero.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span> <span class="n">kp</span><span class="o">.</span><span class="n">frac_coords</span> 
+            <span class="k">for</span> <span class="n">kp</span> <span class="ow">in</span> <span class="n">vasp_data</span><span class="o">.</span><span class="n">k_points</span><span class="p">[</span><span class="n">ignore</span><span class="p">:</span><span class="n">vasp_data</span><span class="o">.</span><span class="n">number_of_k_points</span><span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal_lattice</span> <span class="o">=</span> <span class="n">reciprocal_lattice</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CBM</span> <span class="o">=</span> <span class="n">extrema</span><span class="o">.</span><span class="n">_calc_CBM</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span> <span class="o">=</span> <span class="n">extrema</span><span class="o">.</span><span class="n">_calc_VBM</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CBM</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integrated_dos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spin_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_kpoints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">,</span> 
+                   <span class="bp">self</span><span class="o">.</span><span class="n">CBM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DataVasp.parse_DOSCAR"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataVasp.parse_DOSCAR">[docs]</a>    <span class="k">def</span> <span class="nf">parse_DOSCAR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;./DOSCAR&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parses the DOS and integrated DOS from a vasp DOSCAR file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str, optional): The location and filename of the DOSCAR to read in. Defaults to `&#39;./DOSCAR&#39;`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            If the DOS has been sampled at more than 10000 points then this function will break at the expression for `num_data_points`.</span>
+<span class="sd">            In this case, edit your DOSCAR file so that in the header there is a space preceding the number of points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="n">num_data_points</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="n">num_data_points</span> <span class="o">+</span> <span class="mi">6</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrated_dos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">4</span><span class="p">])</span>
+            <span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="n">num_data_points</span> <span class="o">+</span> <span class="mi">6</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span>
+                                  <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])]</span>
+                                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="n">num_data_points</span> <span class="o">+</span> <span class="mi">6</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrated_dos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span>
+                  <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">])]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="n">num_data_points</span> <span class="o">+</span> <span class="mi">6</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;problem parsing DOSCAR&quot;</span><span class="p">)</span>
+        <span class="k">return</span></div></div>
+
+
+<div class="viewcode-block" id="DataAims"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataAims">[docs]</a><span class="k">class</span> <span class="nc">DataAims</span><span class="p">(</span><span class="n">Data</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for parsing and storing data from a FHI-AIMS calculation.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        spin_channels (int): 1 (non-spin-polarised), 2 (spin-polarised), 4 (spin-orbit coupling).</span>
+<span class="sd">        number_of_kpoints (int): the number of k-points per band.</span>
+<span class="sd">        number_of_bands (int): the number of bands.</span>
+<span class="sd">        kpoints (array(float)): 2-dimensional array with shape (number_of_kpoints, 3). Each row contains the fractional coordinates of a kpoint [kx,ky,kz].</span>
+<span class="sd">        energies (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains energies of eigenstates in eV for a particular band.</span>
+<span class="sd">        occupancy (array(float)): 2-dimensional array with shape (number_of_bands,number_of_kpoints). Each row contains occupation number of the eigenstates for a particular band. Values range from 0-1 (spin-polarised) or 0-2 (non-spin-polarised).</span>
+<span class="sd">        reciprocal_lattice (list(float)): the reciprocal lattice vectors in format [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]], units Angstrom :math:`^{-1}`.</span>
+<span class="sd">        CBM (float): the conduction band minimum energy in eV.</span>
+<span class="sd">        VBM (float): the valence band maximum in eV.</span>
+<span class="sd">        fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DataAims.__init__"><a class="viewcode-back" href="../../inputs.html#effmass.inputs.DataAims.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory_path</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises an instance of the :class:`~effmass.inputs.DataAims` class and checks data using :meth:`check_data`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            directory_path (str): The path to the directory containing output, geometry.in, control.in and bandstructure files</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">),</span> <span class="s2">&quot;The file path must be a string&quot;</span>
+
+        <span class="s2">&quot;Finding reciprocal lattice vectors&quot;</span>
+
+        <span class="n">latvec</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/geometry.in&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;lattice_vector&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;geometry.in: Syntax error in line &#39;&quot;</span><span class="o">+</span><span class="n">line</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+                <span class="n">latvec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">latvec</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;geometry.in: Must contain exactly 3 lattice vectors&quot;</span><span class="p">)</span>
+
+        <span class="n">latvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">latvec</span><span class="p">)</span>
+        <span class="n">latvec</span> <span class="o">=</span> <span class="n">latvec</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+        <span class="c1">#Calculate reciprocal lattice vectors</span>
+        <span class="n">rlatvec</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">latvec</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">latvec</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span><span class="n">latvec</span><span class="p">[</span><span class="mi">2</span><span class="p">,:])))</span>
+        <span class="n">rlatvec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">latvec</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span><span class="n">latvec</span><span class="p">[</span><span class="mi">2</span><span class="p">,:])</span><span class="o">/</span><span class="n">volume</span><span class="p">))</span>
+        <span class="n">rlatvec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">latvec</span><span class="p">[</span><span class="mi">2</span><span class="p">,:],</span><span class="n">latvec</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span><span class="o">/</span><span class="n">volume</span><span class="p">))</span>
+        <span class="n">rlatvec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">latvec</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span><span class="n">latvec</span><span class="p">[</span><span class="mi">1</span><span class="p">,:])</span><span class="o">/</span><span class="n">volume</span><span class="p">))</span>
+
+        <span class="n">reciprocal_lattice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rlatvec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reciprocal_lattice</span> <span class="o">=</span> <span class="n">reciprocal_lattice</span>
+
+
+        <span class="s2">&quot;Finding spin channels&quot;</span>
+
+        <span class="n">spin_channels</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/calculation.out&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;include_spin_orbit&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+               <span class="n">spin_channels</span> <span class="o">=</span> <span class="mi">4</span>
+               <span class="k">break</span>
+            <span class="k">elif</span> <span class="s2">&quot;Number of spin channels&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+               <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+               <span class="n">spin_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+               <span class="k">break</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spin_channels</span> <span class="o">=</span> <span class="n">spin_channels</span>
+
+        <span class="s2">&quot;Finding number of bands&quot;</span>
+
+        <span class="n">number_of_bands</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/calculation.out&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;Number of states&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">number_of_bands</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">spin_channels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c1">#Doubling for spin-polarised calculation</span>
+            <span class="n">number_of_bands</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">number_of_bands</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span> <span class="o">=</span> <span class="n">number_of_bands</span>
+
+        <span class="s2">&quot;Finding number of kpoints and determining number of BZ paths&quot;</span>
+
+        <span class="n">number_of_kpoints</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">number_of_BZ_paths</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">path_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/calculation.out&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;output&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;band&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                   <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                   <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;output&quot;</span> <span class="ow">and</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;band&quot;</span><span class="p">:</span>
+                     <span class="n">path_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">8</span><span class="p">]))</span>
+                     <span class="n">number_of_BZ_paths</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">number_of_kpoints</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span>
+
+        <span class="s2">&quot;Reading out bandstructure files to determine kpoint, energy and occupation matrices&quot;</span>
+
+        <span class="n">kpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">number_of_kpoints</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">number_of_bands</span><span class="p">,</span><span class="n">number_of_kpoints</span><span class="p">])</span>
+        <span class="n">occupancy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">number_of_bands</span><span class="p">,</span><span class="n">number_of_kpoints</span><span class="p">])</span>
+        <span class="n">path_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">spin_channels</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">spin_channels</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">kpoint_counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">path_counter</span><span class="o">&lt;</span><span class="n">number_of_BZ_paths</span><span class="p">:</span>
+                <span class="n">kpoint_counter</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">path_list</span><span class="p">[:</span><span class="n">path_counter</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/band1</span><span class="si">{:03d}</span><span class="s2">.out&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">directory_path</span><span class="p">,</span> <span class="n">path_counter</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="n">kpoints</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">),</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">kpoints</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">),</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="n">kpoints</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">),</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_bands</span><span class="p">):</span>
+                        <span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">])</span>
+                        <span class="n">occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">kpoint_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">path_counter</span> <span class="o">+=</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">spin_channels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">path_counter</span><span class="o">&lt;</span><span class="n">number_of_BZ_paths</span><span class="p">:</span>
+                <span class="n">kpoint_counter</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">path_list</span><span class="p">[:</span><span class="n">path_counter</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/band1</span><span class="si">{:03d}</span><span class="s2">.out&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">directory_path</span><span class="p">,</span> <span class="n">path_counter</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="n">kpoints</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">),</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">kpoints</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">),</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="n">kpoints</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">),</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_bands</span><span class="o">//</span><span class="mi">2</span><span class="p">):</span>
+                        <span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">])</span>
+                        <span class="n">occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">kpoint_counter</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">kpoint_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">kpoint_counter</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">path_list</span><span class="p">[:</span><span class="n">path_counter</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/band2</span><span class="si">{:03d}</span><span class="s2">.out&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">directory_path</span><span class="p">,</span> <span class="n">path_counter</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_bands</span><span class="o">//</span><span class="mi">2</span><span class="p">):</span>
+                        <span class="n">energies</span><span class="p">[</span><span class="n">number_of_bands</span><span class="o">//</span><span class="mi">2</span><span class="o">+</span><span class="n">i</span><span class="p">,</span><span class="n">kpoint_counter</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">])</span>
+                        <span class="n">occupancy</span><span class="p">[</span><span class="n">number_of_bands</span><span class="o">//</span><span class="mi">2</span><span class="o">+</span><span class="n">i</span><span class="p">,</span><span class="n">kpoint_counter</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">kpoint_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">path_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="s2">&quot;Delete double kpoints at path edges&quot;</span>
+
+        <span class="n">index_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpoints</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">index_count</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">kpoints</span><span class="p">[</span><span class="n">index</span><span class="p">],</span><span class="n">kpoints</span><span class="p">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">kpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">kpoints</span><span class="p">,</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">energies</span><span class="p">,</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">occupancy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">index_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpoints</span><span class="p">)</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_kpoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpoints</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">CBM</span> <span class="o">=</span> <span class="n">extrema</span><span class="o">.</span><span class="n">_calc_CBM</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">energies</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span> <span class="o">=</span> <span class="n">extrema</span><span class="o">.</span><span class="n">_calc_VBM</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">energies</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CBM</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="s2">&quot;Cutting energy values in a range of 30 eV above and below the Fermi level. FHI AIMS is all electron, but not all states are needed for a meaningful effmass calculation&quot;</span>
+
+        <span class="n">index_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">index_count</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">item</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="o">-</span> <span class="mi">30</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energies</span><span class="p">[</span><span class="n">index</span><span class="p">]):</span>
+                <span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">energies</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">occupancy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">index_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="n">item</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span> <span class="o">+</span> <span class="mi">30</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energies</span><span class="p">[</span><span class="n">index</span><span class="p">]):</span>
+                <span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">energies</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">occupancy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">index_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="n">energies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">=</span> <span class="n">occupancy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kpoints</span> <span class="o">=</span> <span class="n">kpoints</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spin_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_kpoints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">,</span> 
+                   <span class="bp">self</span><span class="o">.</span><span class="n">CBM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VBM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fermi_energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">)</span></div></div>
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2018, Lucy Whalley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

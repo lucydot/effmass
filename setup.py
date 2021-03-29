@@ -17,7 +17,7 @@ config = {
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
     'author': 'Lucy Whalley',
-    'author_email': 'lucywhalley@gmail.com',
+    'author_email': 'l.whalley@northumbria.ac.uk',
     'url': 'https://github.com/lucydot/effmass',
     'download_url': "https://github.com/lucydot/effmass/archive/%s.tar.gz" % (__version__),
     'version': __version__,
@@ -26,14 +26,28 @@ config = {
 			  'numpy', 
                           'matplotlib',
                           'adjustText',
-                          'codeclimate-test-reporter',
-                          'pytest-lazy-fixture',
-                          'coverage==4.3.4' ],
+                          'ase>=3.21.1',
+                          'questionary>=1.9.0',
+                          'prettytable>=2.1.0'],
+    'extras_require': {
+	    "docs": [
+		    "sphinx >=3.2.1",
+		    "sphinx_rtd_theme>=0.5.0",
+	    ],
+	    "tests": [
+		    "pytest",
+		    "pytest-lazy-fixture",
+		    "code-climate-test-reporter",
+		    "coverage==4.3.4"
+	    ],
+	    "dev": ["black"],
+    },
     'python_requires': '>=3.6',
     'license': 'MIT',
     'packages': [ 'effmass' ],
     'scripts': [],
-    'name': 'effmass'
+    'name': 'effmass',
+    'entry_points': {"console_scripts": ["effmass = effmass.cli:cli"]}
 }
 
 setup(**config)

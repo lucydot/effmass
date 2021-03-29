@@ -75,10 +75,6 @@ class Segment:
         direction (array): 1-dimensional array with length 3. The direction between kpoints in the segment.
         band_type (str): The band type, determined by occupancy of the eigenstate. Argument choices are "conduction_band", "valence_band" or "unknown". If set to "unknown", some class methods will raise a warning and return None.
         fermi_energy (float): the fermi energy in eV.
-        dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. A slice of :attr:`effmass.inputs.Data.dos`.
-        integrated_dos (array): 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of :attr:`effmass.inputs.Data.integrated_dos`.
-
-
     """
 
     def __init__(self, Data, band, kpoint_indices):
@@ -110,13 +106,14 @@ class Segment:
         self.dE_eV = self.energies - self.energies[0]
         self.dE_hartree = np.multiply(self.energies - self.energies[0],
                                       ev_to_hartree)
-        self.occupancy = np.array(
-            [Data.occupancy[band, k] for k in kpoint_indices])
+        if Data.occupancy is not None:
+            self.occupancy = np.array(
+                [Data.occupancy[band, k] for k in kpoint_indices])
+        else:
+            self.occupancy = None
         self.direction = extrema.calculate_direction(self.kpoints[1],
                                                      self.kpoints[2])
         self.fermi_energy = Data.fermi_energy
-        self.dos = self._dos(Data)
-        self.integrated_dos = self._integrated_dos(Data)
         self._VBM = Data.VBM
         self._CBM = Data.CBM
         self.band_type = self._band_type()
@@ -129,9 +126,9 @@ class Segment:
             A string containing the energy of the Segment extrema (referenced to the VBM) and the start- and end- points of the Segment in reciprocal space.
         """
         energy_str = "{0:.2f}".format(self.energies[0] - self._VBM)
-        start_str = str(np.round(self.kpoints[0],3))
-        end_str = str(np.round(self.kpoints[-1],3))
-        return energy_str+" eV; "+start_str+"-->"+end_str
+        start_str = str(np.round(self.kpoints[0], 3))
+        end_str = str(np.round(self.kpoints[-1], 3))
+        return energy_str + " eV; " + start_str + "-->" + end_str
 
     def _check_kanefit_points(self, polyfit_order=6):
         """Raises an AssertionError if there are not enough data points to fit
@@ -144,7 +141,7 @@ class Segment:
             None.
         """
         idx = self.explosion_index(polyfit_order=polyfit_order)
-        assert idx > 3,"Unable to calculate alpha parameter as inflexion too close to extrema"
+        assert idx > 3, "Unable to calculate alpha parameter as inflexion too close to extrema"
 
     def explosion_index(self, polyfit_order=6):
         r"""
@@ -195,7 +192,8 @@ class Segment:
             probability = 1 - (1 / ((np.exp(
                 (eigenvalue - fermi_level) / (((boltzmann * temp) / q))) + 1)))
         else:
-            raise ValueError("Unable to calculate fermi function as the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
+            raise ValueError(
+                "Unable to calculate fermi function as the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
         return probability
 
     def weighting(self, fermi_level=None, temp=300):
@@ -220,7 +218,7 @@ class Segment:
             for E in self.energies
         ]))
 
-        assert weighting.all() != 0,"Unable to assign a weighting to the dispersion as the Fermi-Dirac distribution at all kpoints is smaller than Python's double precision floats. Calculate band edge values using Segment.five_point_leastsq_effmass() or Segment.finite_difference_effmass()."
+        assert weighting.all() != 0, "Unable to assign a weighting to the dispersion as the Fermi-Dirac distribution at all kpoints is smaller than Python's double precision floats. Calculate band edge values using Segment.five_point_leastsq_effmass() or Segment.finite_difference_effmass()."
 
         return weighting
 
@@ -250,51 +248,9 @@ class Segment:
             band_type = "unknown"
         return band_type
 
-    def _dos(self, Data):
-        """Returns slice of :attr:`effmass.Data.dos` corresponding to the
-        energy range of the segment.
-
-        Args:
-            Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.
-
-        Returns:
-            list(floats): slice of :attr:`effmass.Data.dos` corresponding to the energy range of the segment.
-        """
-        if Data.dos == []:
-            dos = []
-        else:
-            dos = []
-            for i in range(len(self.energies)):
-                for j in range(len(Data.dos)):
-                    if self.energies[i] < Data.dos[j][0]:
-                        dos.append(Data.dos[j][1])
-                        break
-
-        return dos
-
-    def _integrated_dos(self, Data):
-        """Returns slice of :attr:`effmass.Data.integrated_dos` corresponding
-        to the energy range of the segment.
-
-        Args:
-            Data (Data): :class:`~effmass.inputs.Data` instance which was used to generate the :class:`~effmass.analysis.Segment`.
-
-        Returns:
-            array: slice of :attr:`effmass.Data.integrated_dos` corresponding to the energy range of the segment.
-        """
-        if Data.integrated_dos == []:
-            integrated_dos = []
-        else:
-            integrated_dos = []
-            for i in range(len(self.energies)):
-                for j in range(len(Data.integrated_dos)):
-                    if self.energies[i] < Data.integrated_dos[j][0]:
-                        integrated_dos.append(Data.integrated_dos[j][1])
-                        break
-        return integrated_dos
-
     # The collection of methods below calculate the optical effective mass by integrating numerically the analytical
-    # expression for the second derivative of the Kane dispersion multiplied by a Fermi-Dirac weighting.
+    # expression for the second derivative of the Kane dispersion multiplied
+    # by a Fermi-Dirac weighting.
 
     def mass_integration(self,
                          fermi_level=None,
@@ -373,7 +329,8 @@ class Segment:
         elif self.band_type == "unknown":
             raise ValueError("Unable to calculate fermi function as there is partial occupancy of the bands and the band type is unknown. Please set the Segment.band_type attribute manually (options are \"valence_band\" or \"conduction_band\").")
         else:
-            raise ValueError("Please set the Segment.band_type attribute (options are \"valence_band\" or \"conduction_band\")")
+            raise ValueError(
+                "Please set the Segment.band_type attribute (options are \"valence_band\" or \"conduction_band\")")
 
     def _kane_dispersion(self, k, alpha, mass_bandedge):
         """Helper function for :meth:`~effmass.analysis.Segment.fd`.
@@ -513,18 +470,20 @@ class Segment:
         sym_dk = np.concatenate((negative_dk, self.dk_bohr[1:]))
         sym_dE = np.concatenate((self.dE_hartree[::-1], self.dE_hartree[1:]))
         if polyfit_weighting:
-            # weight to enable a better fit for the values where it is important
+            # weight to enable a better fit for the values where it is
+            # important
             weighting = self.weighting()
         else:
             weighting = np.ones(len(self.dE_hartree))
-        W = np.append(weighting[::-1],
-                      weighting[1:])  # as it needs same dimensions as x and y.
+        # as it needs same dimensions as x and y.
+        W = np.append(weighting[::-1], weighting[1:])
         W = np.sqrt(
             np.diag(W))  # to allow dot product between weight and matrix/y.
         # for explanation of the coefficient matrix and least squares fit see https://stackoverflow.com/questions/32260204/numpy-polyfit-passing-through-0
         # for how to incorporate weighting see https://stackoverflow.com/questions/27128688/how-to-use-least-squares-with-weight-matrix-in-python
         # and https://stackoverflow.com/questions/19624997/understanding-scipys-least-square-function-with-irls
-        # by eliminating the units matrix of the array we are forcing a zero offset; the fit must pass through 0,0 as is physical
+        # by eliminating the units matrix of the array we are forcing a zero
+        # offset; the fit must pass through 0,0 as is physical
         coeff_matrix = np.vstack([
             sym_dk**i for i in np.arange(polyfit_order + 1)[polyfit_order:0:-1]
         ]).T
@@ -533,7 +492,8 @@ class Segment:
         coeff = np.append(np.linalg.lstsq(w_coeff_matrix, w_sym_dE)[0],
                           [0])  # remember to set zeroth power to 0!
         function = np.poly1d(coeff)
-        # function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W)) ----> simple polyfit call for sanity's sake
+        # function = np.poly1d(np.polyfit(sym_dk,sym_dE,polyfit_order,w=W))
+        # ----> simple polyfit call for sanity's sake
         return function
 
     def poly_derivatives(self,
@@ -795,8 +755,8 @@ class Segment:
         coeff_matrix = np.vstack([sym_dk**2]).T
 
         weighting = self.weighting()
-        W = np.append(weighting[::-1],
-                      weighting[1:])  # as it needs same dimensions as x and y.
+        # as it needs same dimensions as x and y.
+        W = np.append(weighting[::-1], weighting[1:])
         W = np.sqrt(
             np.diag(W))  # to allow dot product between weight and matrix/y.
 
@@ -809,7 +769,7 @@ class Segment:
         return mass
 
     def weighted_leastsq_fit(self):
-        """Calculates the curvature effective mass using a weighted least-
+        """Calculates the curvature effective mass usinhag a weighted least-
         squares fit and then evaluates the corresponding parabolic dispersion
         along :attr:`~effmass.analysis.Segment.dk_bohr`.
 
@@ -869,3 +829,60 @@ class Segment:
         return values
 
 
+class SegmentVasp(Segment):
+    """ Class for segments of a Vasp bandstructure. Inherits from :class:`~effmass.analysis.Segment` class,
+    and extends to include DOS Segment data.
+
+    Additional attributes:
+        dos (array): 2-dimensional array. Each row contains density of states data (units "number of states / unit cell")  at a given energy: [energy(float),dos(float)]. A slice of :attr:`effmass.inputs.DataVasp.dos`.
+        integrated_dos (array): 2-dimensional array. Each row contains integrated density of states data at a given energy: [energy(float),integrated_dos(float)]. A slice of :attr:`effmass.inputs.DataVasp.integrated_dos`.
+    """
+
+    def __init__(self, DataVasp, band, kpoint_indices):
+
+        super().__init__(DataVasp, band, kpoint_indices)
+        self.dos = self._dos(DataVasp)
+        self.integrated_dos = self._integrated_dos(DataVasp)
+
+    def _dos(self, DataVasp):
+        """Returns slice of :attr:`effmass.DataVasp.dos` corresponding to the
+        energy range of the segment.
+
+        Args:
+            DataVasp (DataVasp): :class:`~effmass.inputs.DataVasp` instance which was used to generate the :class:`~effmass.analysis.SegmentVasp`.
+
+        Returns:
+            list(floats): slice of :attr:`effmass.DataVasp.dos` corresponding to the energy range of the segment.
+        """
+        if DataVasp.dos == []:
+            dos = []
+        else:
+            dos = []
+            for i in range(len(self.energies)):
+                for j in range(len(DataVasp.dos)):
+                    if self.energies[i] < DataVasp.dos[j][0]:
+                        dos.append(DataVasp.dos[j][1])
+                        break
+
+        return dos
+
+    def _integrated_dos(self, DataVasp):
+        """Returns slice of :attr:`effmass.DataVasp.integrated_dos` corresponding
+        to the energy range of the segment.
+
+        Args:
+            DataVasp (DataVasp): :class:`~effmass.inputs.DataVasp` instance which was used to generate the :class:`~effmass.analysis.Segment`.
+
+        Returns:
+            array: slice of :attr:`effmass.DataVasp.integrated_dos` corresponding to the energy range of the segment.
+        """
+        if DataVasp.integrated_dos == []:
+            integrated_dos = []
+        else:
+            integrated_dos = []
+            for i in range(len(self.energies)):
+                for j in range(len(DataVasp.integrated_dos)):
+                    if self.energies[i] < DataVasp.integrated_dos[j][0]:
+                        integrated_dos.append(DataVasp.integrated_dos[j][1])
+                        break
+        return integrated_dos
