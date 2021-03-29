@@ -316,7 +316,7 @@ class DataAims():
 
         for line in open("{}/calculation.out".format(file_path)):
             line = line.split("\t")[0]
-            if "Number of states" in line:
+            if "Number of Kohn-Sham" in line:
                 words = line.split()
                 number_of_bands = int(words[-1])
 
@@ -383,7 +383,7 @@ class DataAims():
 
         if spin_channels == 2:
             while path_counter<number_of_BZ_paths:
-                kpoint_counter = sum(path_list[:path_counter])
+                kpoint_counter = int(sum(path_list[:path_counter]))
                 for line in open("{}/band1{:03d}.out".format(file_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
@@ -394,7 +394,7 @@ class DataAims():
                         energies[i,int(kpoint_counter)] = float(words[5+2*i])
                         occupancy[i,int(kpoint_counter)] = float(words[4+2*i])
                     kpoint_counter += 1
-                kpoint_counter = sum(path_list[:path_counter])
+                kpoint_counter = int(sum(path_list[:path_counter]))
                 for line in open("{}/band2{:03d}.out".format(file_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
