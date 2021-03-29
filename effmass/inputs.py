@@ -382,12 +382,13 @@ class DataAims(Data):
         fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.
     """
 
-    def __init__(self, directory_path):
+    def __init__(self, directory_path, output_name='calculation.out'):
         r"""
         Initialises an instance of the :class:`~effmass.inputs.DataAims` class and checks data using :meth:`check_data`.
 
         Args:
             directory_path (str): The path to the directory containing output, geometry.in, control.in and bandstructure files
+	    output_name (str): Name of the output file - contrary to the rest of the files, this is chosen by the user during an Aims run. Defaults to 'aims.out'.
 
         Returns:
             None.
@@ -431,7 +432,7 @@ class DataAims(Data):
 
         spin_channels = 0
 
-        for line in open("{}/calculation.out".format(directory_path)):
+        for line in open("{}/{}".format(directory_path, output_name)):
             line = line.split("\t")[0]
             if "include_spin_orbit" in line:
                spin_channels = 4
@@ -447,7 +448,7 @@ class DataAims(Data):
 
         number_of_bands = 0
 
-        for line in open("{}/calculation.out".format(directory_path)):
+        for line in open("{}/{}".format(directory_path, output_name)):
             line = line.split("\t")[0]
             if "Number of Kohn-Sham" in line:
                 words = line.split()
@@ -466,7 +467,7 @@ class DataAims(Data):
         number_of_BZ_paths = 0
         path_list = []
 
-        for line in open("{}/calculation.out".format(directory_path)):
+        for line in open("{}/{}".format(directory_path, output_name)):
             line = line.split("\t")[0]
             if not line.startswith("#") and "output" in line:
                 if "band" in line:
