@@ -503,7 +503,7 @@ class DataAims(Data):
         if spin_channels == 2:
             while path_counter<number_of_BZ_paths:
                 kpoint_counter = int(sum(path_list[:path_counter]))
-                for line in open("{}/band1{:03d}.out".format(file_path, path_counter+1)):
+                for line in open("{}/band1{:03d}.out".format(directory_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
                     kpoints[int(kpoint_counter),0] = float(words[1])
@@ -514,7 +514,7 @@ class DataAims(Data):
                         occupancy[i,int(kpoint_counter)] = float(words[4+2*i])
                     kpoint_counter += 1
                 kpoint_counter = int(sum(path_list[:path_counter]))
-                for line in open("{}/band2{:03d}.out".format(file_path, path_counter+1)):
+                for line in open("{}/band2{:03d}.out".format(directory_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
                     for i in range(number_of_bands//2):
