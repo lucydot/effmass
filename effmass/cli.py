@@ -34,6 +34,12 @@ def cli():
 		default="0"
 		).ask()
 
+	if DFT_code == 'FHI-aims':
+		output_name = questionary.text(
+		"What's the name of your output file?",
+		default="calculation.out"
+		).ask()
+
 	if DFT_code == 'Castep':
 
 		seedname = questionary.text(

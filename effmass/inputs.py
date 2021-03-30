@@ -382,12 +382,13 @@ class DataAims(Data):
         fermi_energy (float): the fermi energy in eV. Automatically set to the mean of Data.CBM and Data.VBM.
     """
 
-    def __init__(self, directory_path):
+    def __init__(self, directory_path, output_name='calculation.out'):
         r"""
         Initialises an instance of the :class:`~effmass.inputs.DataAims` class and checks data using :meth:`check_data`.
 
         Args:
             directory_path (str): The path to the directory containing output, geometry.in, control.in and bandstructure files
+	    output_name (str): Name of the output file - contrary to the rest of the files, this is chosen by the user during an Aims run. Defaults to 'aims.out'.
 
         Returns:
             None.
@@ -431,7 +432,7 @@ class DataAims(Data):
 
         spin_channels = 0
 
-        for line in open("{}/calculation.out".format(directory_path)):
+        for line in open("{}/{}".format(directory_path, output_name)):
             line = line.split("\t")[0]
             if "include_spin_orbit" in line:
                spin_channels = 4
@@ -447,15 +448,15 @@ class DataAims(Data):
 
         number_of_bands = 0
 
-        for line in open("{}/calculation.out".format(directory_path)):
+        for line in open("{}/{}".format(directory_path, output_name)):
             line = line.split("\t")[0]
-            if "Number of states" in line:
+            if "Number of Kohn-Sham" in line:
                 words = line.split()
                 number_of_bands = int(words[-1])
 
                 break
 
-        if spin_channels == 2: #Doubling for spin-polarised calculation
+        if spin_channels == 2 or spin_channels == 4: #Doubling for spin-polarised calculation
             number_of_bands = 2*number_of_bands
 
         self.number_of_bands = number_of_bands
@@ -466,7 +467,7 @@ class DataAims(Data):
         number_of_BZ_paths = 0
         path_list = []
 
-        for line in open("{}/calculation.out".format(directory_path)):
+        for line in open("{}/{}".format(directory_path, output_name)):
             line = line.split("\t")[0]
             if not line.startswith("#") and "output" in line:
                 if "band" in line:
@@ -502,7 +503,7 @@ class DataAims(Data):
 
         if spin_channels == 2:
             while path_counter<number_of_BZ_paths:
-                kpoint_counter = sum(path_list[:path_counter])
+                kpoint_counter = int(sum(path_list[:path_counter]))
                 for line in open("{}/band1{:03d}.out".format(directory_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
@@ -513,7 +514,7 @@ class DataAims(Data):
                         energies[i,int(kpoint_counter)] = float(words[5+2*i])
                         occupancy[i,int(kpoint_counter)] = float(words[4+2*i])
                     kpoint_counter += 1
-                kpoint_counter = sum(path_list[:path_counter])
+                kpoint_counter = int(sum(path_list[:path_counter]))
                 for line in open("{}/band2{:03d}.out".format(directory_path, path_counter+1)):
                     line = line.split("\t")[0]
                     words = line.split()
