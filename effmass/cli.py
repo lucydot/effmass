@@ -19,7 +19,8 @@ def cli():
 		choices=[
 			'Vasp',
 			'FHI-aims',
-			'Castep'
+			'Castep',
+			'Octopus'
 		]).ask()
 
 	pathname = questionary.path(
@@ -87,6 +88,9 @@ def cli():
 
 	elif DFT_code == "FHI-aims":
 		data = inputs.DataAims(pathname)
+
+	elif DFT_code == "Octopus":
+		data = inputs.DataOctopus(pathname+"/", pathname+"/", pathname+"/")
 
 	else:
 		data = inputs.DataCastep(pathname+"/", seedname)
