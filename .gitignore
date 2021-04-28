@@ -15,3 +15,4 @@ effmass.egg-info/
 __pycache__/
 docs/build/
 **/.pytest_cache
+**/.vscode/*

@@ -19,7 +19,9 @@ import ase.io
 import math
 import warnings
 import numpy as np
-
+from pymatgen.io.vasp.outputs import BSVasprun
+from pymatgen.electronic_structure.bandstructure import get_reconstructed_band_structure
+import os
 
 class Settings:
     """Class for setting analysis parameters.
@@ -232,6 +234,78 @@ class DataCastep(DataASE):
 #         QE_calculator.atoms = ase.io.espresso.read_espresso_out()
 #         ASE_bandstructure = QE_calculator.band_structure()
 #         super().__init__(self, ASE_bandstructure)
+
+class DataVasprun(Data): 
+    r"""
+    Class for parsing and storing data from a VASP calculation using vasprun.xml. 
+    Works for parsing calculations with split k-point paths
+
+    Note: occupancies are set to 0 below fermi level and 1 above it 
+    """
+
+    def __init__(self, path): 
+        r"""
+        Initialises an instance of the :class:`~effmass.inputs.Data` class and 
+        checks data using :meth:`check_data`.
+
+        Args:
+            path (str): Path to vasprun.xml. If the calculation was split along 
+            the k-path, the path should be to the folder which contains the 
+            splits. i.e. for mapi/split-01/vasprun.xml, mapi/split-02/vasprun.xml
+            you would specify path=mapi 
+            
+
+        Returns: 
+            None.
+        """
+
+        super().__init__()
+
+        # read in vasprun
+        if path.endswith('vasprun.xml'): 
+            if os.path.exists(path):
+                vr = BSVasprun(path)
+                bs = vr.get_band_structure(line_mode=True)
+        
+        # read in vaspruns from multiple splits, parse_potcar is false because  
+        # it generates useless warnings, parse_projected is false because we
+        # don't need projected eigenstates
+        else: 
+            filenames = []
+            for fol in sorted(os.listdir(path)): 
+                vr_file = os.path.join(path, fol, "vasprun.xml")
+                if os.path.exists(vr_file):
+                    filenames.append(vr_file)
+            
+            bandstructures = []
+            for vr_file in filenames:
+                vr = BSVasprun(vr_file, parse_projected_eigen=False, 
+                parse_potcar_file=False)
+                bs = vr.get_band_structure(line_mode=True)
+                bandstructures.append(bs)
+                
+            bs = get_reconstructed_band_structure(bandstructures)
+
+        bs_dict = bs.as_dict()
+
+        # set occupancies below fermi as 0, above fermi as 1
+        occupancy = np.array(bs_dict['bands']['1'])
+        occupancy[occupancy < bs_dict['efermi']] = 1
+        occupancy[occupancy > bs_dict['efermi']] = 0
+
+        # set spin channels 
+        spin = 2 if bs_dict['is_spin_polarized'] else 1
+
+        self.spin_channels = spin
+        self.number_of_bands = len(bs_dict['bands']['1'])
+        self.number_of_kpoints = len(bs_dict['kpoints'])
+        self.energies = np.array(bs_dict['bands']['1'])
+        self.occupancy = occupancy
+        self.kpoints = np.array(bs_dict['kpoints'])
+        self.fermi_energy = bs_dict['efermi']
+        self.reciprocal_lattice = bs_dict['lattice_rec']['matrix']
+        self.CBM = bs_dict['cbm']['energy']
+        self.VBM = bs_dict['vbm']['energy']
 
 class DataVasp(Data):
     r"""
