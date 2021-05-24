@@ -468,7 +468,7 @@ class DataAims(Data):
         path_list = []
 
         for line in open("{}/{}".format(directory_path, output_name)):
-            line = line.split("\t")[0]
+            line = line.split("\n")[0]
             if not line.startswith("#") and "output" in line:
                 if "band" in line:
                    words = line.split()
