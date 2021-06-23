@@ -11,7 +11,7 @@
 
 
 💃 Effmass now has a command line interface  
-💃 Effmass now supports FHI-Aims, Castep and ASE  
+💃 Effmass now supports FHI-Aims, Castep, ASE, and Octopus  
 ⚠️ The `Data` class has now been renamed `DataVasp`. You may need to update your scripts!
 
 `effmass` is a [peer-reviewed](https://joss.theoj.org/papers/10.21105/joss.00797) Python (3.6+) package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core `Segment` class that calculates the effective mass and other associated properties of selected bandstructure segments. The programme also contains functions for locating bandstructure extrema, constructing segments and plotting approximations to the dispersion. There is a command line interface for calculating parabolic effective mass values, and an API for the more complex, non-parabolic definitions of effective mass.
@@ -23,6 +23,7 @@ If you use `effmass` for your published research [please cite accordingly](#citi
 💃 `effmass` now interfaces with more codes:
 - it can read in Castep output data (in addition to Vasp and FHI-aims)
 - it can work with ASE bandstructure objects
+- it can work with Octopus output files
 
 💃 `effmass` now includes a command line interface
 
@@ -57,7 +58,7 @@ it may be that one of the packages listed [here](https://effmass.readthedocs.io/
 
 ## Supported Codes
 
-`effmass` currently supports `VASP`, `FHI-Aims`, `Castep` and `ASE`. In the near future we hope to play nicely with other codes that interface with the ASE bandstructure class, and pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
+`effmass` currently supports `VASP`, `FHI-Aims`, `Castep`, `ASE`, and `Octopus`. In the near future we hope to play nicely with other codes that interface with the ASE bandstructure class, and pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
 
 ## Installation
 

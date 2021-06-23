@@ -27,6 +27,7 @@ config = {
                           'matplotlib',
                           'adjustText',
                           'ase>=3.21.1',
+                          'octopuspy>=1.0.2',
                           'questionary>=1.9.0',
                           'prettytable>=2.1.0'],
     'extras_require': {
