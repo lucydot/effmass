@@ -1,4 +1,4 @@
-# effmass 2.1.0
+# effmass 2.2.0
 
 [![PyPI version](https://badge.fury.io/py/effmass.svg)](https://badge.fury.io/py/effmass)
 [![Documentation Status](https://readthedocs.org/projects/effmass/badge/?version=latest)](https://effmass.readthedocs.io/en/latest/?badge=latest)
@@ -12,7 +12,7 @@
 
 💃 Effmass now has a command line interface  
 💃 Effmass now supports FHI-Aims, Castep, ASE, and Octopus  
-⚠️ The `Data` class has now been renamed `DataVasp`. You may need to update your scripts!
+⚠️ The `Data` class was renamed `DataVasp` in `effmass` versions 2.0.0+. You may need to update your scripts!
 
 `effmass` is a [peer-reviewed](https://joss.theoj.org/papers/10.21105/joss.00797) Python (3.6+) package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core `Segment` class that calculates the effective mass and other associated properties of selected bandstructure segments. The programme also contains functions for locating bandstructure extrema, constructing segments and plotting approximations to the dispersion. There is a command line interface for calculating parabolic effective mass values, and an API for the more complex, non-parabolic definitions of effective mass.
 
