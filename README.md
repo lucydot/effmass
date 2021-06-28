@@ -173,7 +173,7 @@ Link to paper [here](https://joss.theoj.org/papers/10.21105/joss.00797).
 Lead developer: 
 [Lucy Whalley](https://lucydot.github.io), a.k.a [lucydot](https://github.com/lucydot)
 
-Contributors: 
+Contributors:   
 Austin Fatt (support for Ocotpus), a.k.a [afatt](afatt) //  
 Matthias Goloumb (Support for FHI-Aims), a.k.a [MatthiasGolomb](https://github.com/MatthiasGolomb) //  
 Sean Kavanagh (Documentation), a.k.a [kavanase](https://github.com/kavanase) //  
