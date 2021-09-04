@@ -1,5 +1,9 @@
 build:
-    image: latest
+  image: latest
 
 python:
-    version: 3.7
+  version: 3.7
+  install:
+    # Need to fetch version info from installed package metadata
+    - method: pip
+      path: .

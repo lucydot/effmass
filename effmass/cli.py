@@ -7,9 +7,10 @@ from random import randint
 import warnings
 warnings.filterwarnings("ignore")
 
-def cli():
+from effmass import __version__ as version
 
-	print("Welcome to effmass 2.0.0 \U0001F388")
+def cli():
+	print(f"Welcome to effmass {version} \U0001F388")
 
 	ignore, seedname, fermi_level = None, None, None
 	random_int = randint(10000,99999)
