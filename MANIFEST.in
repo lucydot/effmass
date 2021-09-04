@@ -1,0 +1,7 @@
+prune *
+exclude *
+
+graft effmass
+include README.md cli2.gif
+include LICENCE
+include pyproject.toml setup.cfg MANIFEST.in
