@@ -62,25 +62,26 @@ it may be that one of the packages listed [here](https://effmass.readthedocs.io/
 
 ## Installation
 
-`effmass` can then be installed using the Python package manager `pip`:
+`effmass` can be installed using the Python package manager `pip`:
 
 ```
 pip install effmass
 ```
 
-If you use conda/anaconda the safest thing to do is to create a new environment and then install effmass:
+If you use conda/anaconda, the safest thing to do is to create a new environment and then install effmass:
 
 ```
-conda create --name effmass
+conda create -n effmass python
 conda activate effmass
-conda install pip
 pip install effmass
 ```
 
-If you do not use `pip` you can download and install the latest release from [GitHub](https://github.com/lucydot/effmass/releases) and install:
+If you wish, you can install the very latest version of `effmass` from GitHub with the commands below. **Note**: The latest GitHub version may include more features and data format support that the latest release, but it is not a stable release, so may have more issues than usual. If you are unsure, use one of the above install methods instead.
+
 ```
+git clone https://github.com/lucydot/effmass.git
 cd effmass
-python setup.py install
+pip install .
 ```
 
 ## Command Line Interface
