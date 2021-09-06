@@ -25,7 +25,7 @@ Details
 :Citation: :download:`bibtex<.static/Whalley2018_CITATION.bib>`
 
 .. image:: https://badge.fury.io/py/effmass.svg
-   :target: https://pypi.org/project/effmass/0.1.0/  
+   :target: https://pypi.org/project/effmass/
 .. image:: https://readthedocs.org/projects/pip/badge/?version=latest
    :target: http://effmass.readthedocs.io/en/latest/?badge=latest
 .. image:: https://travis-ci.com/lucydot/effmass.svg?branch=master
