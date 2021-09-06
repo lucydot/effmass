@@ -6,7 +6,12 @@ graft effmass
 include README.md cli2.gif Tutorial.ipynb Castep_ASE_interface.ipynb
 include LICENCE
 
+# JOSS Paper (to cite effmass)
+graft paper
+include paper.md paper.pdf paper.bib
+
 # Development Files and Full Documentation
+graft .github
 graft docs
 graft tests
 include .coveragerc .readthedocs.yaml .travis.yml
