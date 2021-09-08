@@ -178,7 +178,7 @@ Contributors:
 William Taylor (auto-versioning and build system requirements), a.k.a [musicmrman99](https://github.com/musicmrman99) //  
 Austin Fatt (support for Ocotpus), a.k.a [afatt](https://github.com/afatt) //  
 Matthias Goloumb (Support for FHI-Aims), a.k.a [MatthiasGolomb](https://github.com/MatthiasGolomb) //  
-Katarina Brlec (Support for vasprun files) a.k.a [brlec]((https://github.com/brlec) //  
+Katarina Brlec (Support for vasprun files) a.k.a [brlec](https://github.com/brlec) //  
 Sean Kavanagh (Documentation), a.k.a [kavanase](https://github.com/kavanase) //  
 Benjamin Morgan (Vasppy compatability), a.k.a [bjmorgan](https://github.com/bjmorgan) //  
 
