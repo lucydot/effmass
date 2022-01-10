@@ -60,6 +60,14 @@ it may be that one of the packages listed [here](https://effmass.readthedocs.io/
 
 `effmass` currently supports `VASP`, `FHI-Aims`, `Castep`, `ASE`, and `Octopus`. In the near future we hope to play nicely with other codes that interface with the ASE bandstructure class, and pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
 
+## Other effective mass codes
+
+There are other codes that can calculate effective mass. The best effective mass code depends on your use case. 
+- You may find [Sumo bandstats](https://smtg-ucl.github.io/sumo/sumo-bandstats.html) easier to use if you are looking for a basic parabolic fit. 
+- [Amset](https://github.com/hackingmaterials/amset) can be used to calculate the effective mass across the whole Brillouin Zone (useful if your CBM/VBM is not at a high symmetry point, for example). Further details can be found on MatSci discussion forum [here](https://matsci.org/t/effective-mass/3585/9)
+
+You may find that someone else has already calculated the effective mass you need - there are 10,000's DFT-calculated effective mass values on MPContribs [here](https://contribs.materialsproject.org/projects/carrier_transport).
+
 ## Installation
 
 `effmass` can be installed using the Python package manager `pip`:
