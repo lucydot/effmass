@@ -88,7 +88,7 @@ def cli():
 		data = inputs.DataVasp(pathname+"/OUTCAR",pathname+"/PROCAR", ignore=int(ignore))
 
 	elif DFT_code == "FHI-aims":
-		data = inputs.DataAims(pathname)
+		data = inputs.DataAims(pathname, output_name=output_name)
 
 	elif DFT_code == "Octopus":
 		data = inputs.DataOctopus(pathname+"/", pathname+"/", pathname+"/")
