@@ -117,14 +117,28 @@ def plot_dos(DataVasp, figsize=_default_figsize):
 
     return fig, ax
 
-def make_table(segments, which_values):
-    """Prints table summary of segments data to terminal"""
 
+def make_table(segments, which_values=None):
+    """Prints table summary of segments data to terminal
+
+    Args:
+        segments (list): Which segments to use.
+        which_values (list): use 'least squares' or 'finite differences' (default: both)
+
+    """
     table = PrettyTable()
     column_names = ["particle", "band-index", "direction"]
-    if 'parabolic m* (least squares)' in which_values:
+
+    least_squares, finite_differences = True, True
+    if which_values is not None:
+        if 'parabolic m* (least squares)' not in which_values:
+            least_squares = False
+        if 'parabolic m* (finite difference)' not in which_values:
+            finite_differences = False
+
+    if least_squares:
         column_names.append("Least squares m* (m_e)")
-    if 'parabolic m* (finite difference)' in which_values:
+    if finite_differences:
         column_names.append("Finite difference m* (m_e)")
     table.field_names = column_names
     for segment in segments:
@@ -139,9 +153,9 @@ def make_table(segments, which_values):
             segment.band,
             segment.direction
         ]
-        if 'parabolic m* (least squares)' in which_values:
+        if least_squares:
             segment_data.append("{:.4f}".format(segment.five_point_leastsq_effmass()))
-        if 'parabolic m* (finite difference)' in which_values:
+        if finite_differences:
             segment_data.append("{:.4f}".format(segment.finite_difference_effmass()))
         table.add_row(segment_data)
 
