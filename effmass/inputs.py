@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
 
+from pathlib import Path
+
 """
 A module for storing electronic structure data and user settings. Currently supported codes are VASP and FHI-Aims (with limited functionality).
 
@@ -472,13 +474,11 @@ class DataAims(Data):
         """
         super().__init__()
 
-        assert (type(directory_path) == str), "The file path must be a string"
-
         "Finding reciprocal lattice vectors"
 
         latvec = []
 
-        for line in open("{}/geometry.in".format(directory_path)):
+        for line in open(Path(directory_path) / "geometry.in"):
             line = line.split("\t")[0]
             words = line.split()
             if len(words) == 0:
