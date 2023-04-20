@@ -19,7 +19,10 @@ from effmass.dos import _check_dos_loaded
 from effmass.analysis import _check_poly_order
 
 
-def plot_segments(Data, Settings, segments, savefig=False, random_int=None):
+_default_figsize = (8, 8)
+
+
+def plot_segments(Data, Settings, segments, savefig=False, random_int=None, figsize=_default_figsize):
     """Plots bandstructure overlaid with the DFT-calculated points for each Segment
     instance. Each Segment is labelled with it's direction in reciprocal space
     and index number from the segments argument.
@@ -28,6 +31,7 @@ def plot_segments(Data, Settings, segments, savefig=False, random_int=None):
         Data (Data): instance of the :class:`Data` class.
         Settings (Settings): instance of the :class:`Settings` class.
         segments (list(Segment)): A list of instances of the :class:`Segment` class.
+        figsize (list): Size of matplotlib figure. Default: (8, 8)
 
     Returns:
         Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
@@ -36,7 +40,7 @@ def plot_segments(Data, Settings, segments, savefig=False, random_int=None):
         The x-axis of the plot is not to scale.
     """
    
-    fig = plt.figure(figsize=(8, 8))
+    fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
 
     [ax.plot(range(len(Data.energies[i])), Data.energies[i] - Data.VBM) for i in range(len(Data.energies))]
@@ -57,12 +61,13 @@ def plot_segments(Data, Settings, segments, savefig=False, random_int=None):
     return fig, ax
     
 
-def plot_integrated_dos(DataVasp):
+def plot_integrated_dos(DataVasp, figsize=_default_figsize):
     """Plots integrated density of states (states/unit-cell) against energy
     (eV).
 
     Args:
         DataVasp (DataVasp): instance of the :class:`DataVasp` class.
+        figsize (list): Size of matplotlib figure. Default: (8, 8)
 
     Returns:
         Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
@@ -72,7 +77,7 @@ def plot_integrated_dos(DataVasp):
     """
     _check_integrated_dos_loaded(DataVasp)
 
-    fig = plt.figure(figsize=(8, 8))
+    fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
     energy = [x[0] - DataVasp.VBM for x in DataVasp.integrated_dos]
     dos_data = [x[1] for x in DataVasp.integrated_dos]
@@ -85,11 +90,12 @@ def plot_integrated_dos(DataVasp):
     return fig, ax
 
 
-def plot_dos(DataVasp):
+def plot_dos(DataVasp, figsize=_default_figsize):
     """Plots density of states (states/unit-cell) against energy (eV).
 
     Args:
         DataVasp (DataVasp): instance of the :class:`DataVasp` class.
+        figsize (list): Size of matplotlib figure. Default: (8, 8)
 
     Returns:
         Figure, Axes: tuple containing instance of the `matplotlib.pyplot.figure <https://matplotlib.org/api/figure_api.html>`_ class and `matplotlib.pyplot.axes <https://matplotlib.org/api/axes_api.html>`_ class.
@@ -99,7 +105,7 @@ def plot_dos(DataVasp):
     """
     _check_dos_loaded(DataVasp)
 
-    fig = plt.figure(figsize=(8, 8))
+    fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
     energy = [x[0] - DataVasp.VBM for x in DataVasp.dos]
     dos = [x[1] for x in DataVasp.dos]
@@ -111,14 +117,28 @@ def plot_dos(DataVasp):
 
     return fig, ax
 
-def make_table(segments, which_values):
-    """Prints table summary of segments data to terminal"""
 
+def make_table(segments, which_values=None):
+    """Prints table summary of segments data to terminal
+
+    Args:
+        segments (list): Which segments to use.
+        which_values (list): use 'least squares' or 'finite differences' (default: both)
+
+    """
     table = PrettyTable()
     column_names = ["particle", "band-index", "direction"]
-    if 'parabolic m* (least squares)' in which_values:
+
+    least_squares, finite_differences = True, True
+    if which_values is not None:
+        if 'parabolic m* (least squares)' not in which_values:
+            least_squares = False
+        if 'parabolic m* (finite difference)' not in which_values:
+            finite_differences = False
+
+    if least_squares:
         column_names.append("Least squares m* (m_e)")
-    if 'parabolic m* (finite difference)' in which_values:
+    if finite_differences:
         column_names.append("Finite difference m* (m_e)")
     table.field_names = column_names
     for segment in segments:
@@ -133,9 +153,9 @@ def make_table(segments, which_values):
             segment.band,
             segment.direction
         ]
-        if 'parabolic m* (least squares)' in which_values:
+        if least_squares:
             segment_data.append("{:.4f}".format(segment.five_point_leastsq_effmass()))
-        if 'parabolic m* (finite difference)' in which_values:
+        if finite_differences:
             segment_data.append("{:.4f}".format(segment.finite_difference_effmass()))
         table.add_row(segment_data)
 
@@ -168,7 +188,7 @@ def print_summary_file(random_int, DFT_code, pathname, ignore, seedname,
         )
         out.write(table.get_string())
 
-def print_results(segment, data, settings, polyfit_order=None):
+def print_results(segment, data, settings, polyfit_order=None, figsize=_default_figsize):
     
     polyfit_order = settings.degree_bandfit if polyfit_order is None else polyfit_order
     _check_poly_order(polyfit_order)
@@ -212,7 +232,7 @@ def print_results(segment, data, settings, polyfit_order=None):
     except AssertionError:
         pass
 
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=figsize)
     plt.plot(
         np.linspace(segment.dk_angs[0], segment.dk_angs[-1], 100),
         np.divide(
@@ -262,10 +282,10 @@ def print_results(segment, data, settings, polyfit_order=None):
     plt.legend()
     plt.show()
 
-    fig, axes = plot_segments(data, settings, [segment])
+    fig, axes = plot_segments(data, settings, [segment], figsize=figsize)
     plt.show()
 
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=figsize)
     idx = segment.explosion_index(polyfit_order=polyfit_order)
     plt.scatter(
         segment.dE_hartree[1:idx + 1],
