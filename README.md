@@ -183,6 +183,7 @@ Lead developer:
 [Lucy Whalley](https://lucydot.github.io), a.k.a [lucydot](https://github.com/lucydot)
 
 Contributors:   
+Florian Knoop (bugs, tweaks and script improvements), a.k.a [flokno](https://github.com/flokno) 
 William Taylor (auto-versioning and build system requirements), a.k.a [musicmrman99](https://github.com/musicmrman99) //  
 Austin Fatt (support for Ocotpus), a.k.a [afatt](https://github.com/afatt) //  
 Matthias Goloumb (Support for FHI-Aims), a.k.a [MatthiasGolomb](https://github.com/MatthiasGolomb) //  
