@@ -72,7 +72,7 @@ class Settings:
         assert (self.extrema_search_depth >
                 0), "The energy depth must be a positive number"
         assert (
-            type(self.degree_bandfit) == int and self.degree_bandfit > 1
+            isinstance(self.degree_bandfit, int) and self.degree_bandfit > 1
         ), "The bandfit degree must be a positive integer greater than 1"     
 
 class Data():
@@ -131,10 +131,10 @@ class Data():
             ((spin_channels == 1) | (spin_channels == 2) |
              (spin_channels == 4)) is True
         ), "Spin channels must have value 1 (non spin-polarised) or 2 (spin-polarised)"
-        assert (type(number_of_kpoints) == int
+        assert (isinstance(number_of_kpoints, int)
                 and number_of_kpoints > 0
                 ), "The number of kpoints is not a positive integer"
-        assert (type(number_of_bands) == int and number_of_bands > 0
+        assert (isinstance(number_of_bands, int) and number_of_bands > 0
                 ), "The number of bands is not a positive integer"
         assert (CBM >
                 VBM), "The CBM energy is lower than than the VBM energy"
@@ -340,8 +340,8 @@ class DataVasp(Data):
 
         super().__init__()
 
-        assert (type(outcar_path) == str), "The OUTCAR path must be a string"
-        assert (type(ignore) == int and ignore >= 0
+        assert (isinstance(outcar_path, str)), "The OUTCAR path must be a string"
+        assert (isinstance(ignore, int) and ignore >= 0
                 ), "The number of kpoints to ignore must be a positive integer"
 
         reciprocal_lattice = outcar.reciprocal_lattice_from_outcar(outcar_path)
@@ -665,9 +665,9 @@ class DataOctopus(Data):
 
         super().__init__()
 
-        assert (type(bandstructure_path) == str), "The bandStructure path must be a string"
-        assert (type(info_path) == str), "The info path must be a string"
-        assert (type(results_path) == str), "The results path must be a string"
+        assert (isinstance(bandstructure_path, str)), "The bandStructure path must be a string"
+        assert (isinstance(info_path, str)), "The info path must be a string"
+        assert (isinstance(results_path, str)), "The results path must be a string"
 
         # load the Octopus data 
         band_struct = bandstructure.Bandstructure(bandstructure_path)
