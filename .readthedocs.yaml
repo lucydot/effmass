@@ -5,5 +5,8 @@ python:
   version: 3.8
   install:
     # Need to fetch version info from installed package metadata
+    - requirements: docs/requirements.txt
     - method: pip
       path: .
+
+  
