@@ -68,7 +68,7 @@ author = u'Lucy Whalley'
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = _version('myproject')
+release = _version("effmass")
 # The short X.Y version.
 version = '.'.join(release.split('.')[:2])
 
