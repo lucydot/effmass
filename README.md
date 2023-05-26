@@ -1,7 +1,7 @@
 # Effmass
 
 [![PyPI version](https://badge.fury.io/py/effmass.svg)](https://badge.fury.io/py/effmass)
-[![Documentation Status](https://readthedocs.org/projects/effmass/badge/?version=latest)](https://readthedocs.org/projects/effmass/badge/?version=latest)
+[![Documentation Status](https://readthedocs.org/projects/effmass/badge/?version=latest)](https://effmass.readthedocs.io/en/latest/)
 [![Tests Status](https://travis-ci.com/lucydot/effmass.svg?branch=master)](https://app.travis-ci.com/github/lucydot/effmass)
 [![Test Coverage](https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg)](https://codeclimate.com/github/lucydot/effmass/coverage)
 [![DOI](https://zenodo.org/badge/136037407.svg)](https://zenodo.org/badge/latestdoi/136037407)
