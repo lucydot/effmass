@@ -108,8 +108,8 @@ and follow the prompts. You are asked if you would like to print a plot of the s
 
 ## Documentation
 
-- An overview of the features of effmass, along with example code for Vasp and FHI-aims output data, is contained in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/Tutorial.ipynb).
-- Additional Jupyter notebook examples for the Castep and ASE interfaces are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tests/Castep_ASE_interface.ipynb).
+- An overview of the features of effmass, along with example code for Vasp and FHI-aims output data, is contained in a Jupyter notebook [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tutorials/Tutorial.ipynb).
+- Additional Jupyter notebook examples for the Castep and ASE interfaces are [here](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tutorials/Castep_ASE_interface.ipynb).
 - The API documentation is [here](https://effmass.readthedocs.io/en/latest/).
 - Further details about the various effective mass definitions implemented in `effmass` can be found in Phys. Rev. B **99** (8), 085207, which is also [available on arXiv](https://arxiv.org/pdf/1811.02281.pdf).
 - The source code is available as a git repository at [https://github.com/lucydot/effmass](https://github.com/lucydot/effmass).
@@ -146,7 +146,7 @@ If you would like to contribute please do so via a pull request. All contributor
 
 ## Tests
 
-Automated testing of the latest commit happens [here](https://travis-ci.com/lucydot/effmass).
+Automated testing of the latest commit happens [here](https://app.travis-ci.com/github/lucydot/effmass).
 
 You can also run tests locally:
 ```
