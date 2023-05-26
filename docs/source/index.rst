@@ -26,7 +26,7 @@ Details
 
 .. image:: https://badge.fury.io/py/effmass.svg
    :target: https://pypi.org/project/effmass/
-.. image:: https://readthedocs.org/projects/pip/badge/?version=latest
+.. image:: https://readthedocs.org/projects/effmass/badge/?version=latest
    :target: http://effmass.readthedocs.io/en/latest/?badge=latest
 .. image:: https://travis-ci.com/lucydot/effmass.svg?branch=master
    :target: https://travis-ci.com/lucydot/effmass
