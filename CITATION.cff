@@ -1,0 +1,35 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: effmass
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Lucy
+    name-particle: Lucy
+    family-names: Whalley
+    email: l.whalley@northumbria.ac.uk
+    affiliation: >-
+      Department of Materials, Imperial College London,
+      London, United Kingdom
+    orcid: 'https://orcid.org/0000-0002-2992-9871'
+identifiers:
+  - type: doi
+    value: 10.21105/joss.00797
+    description: Publication with the Journal of Open Source Software
+repository-code: 'https://github.com/lucydot/effmass'
+abstract: >-
+  effmass is a peer-reviewed Python package for calculating
+  various definitions of effective mass from the electronic
+  bandstructure of a semiconducting material.
+keywords:
+  - electronic structure
+  - materials science
+  - condensed matter
+license: MIT
+commit: dac39d4
+version: 2.2.0
+date-released: '2021-06-28'
