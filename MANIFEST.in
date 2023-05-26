@@ -3,20 +3,22 @@ exclude *
 
 # Core Package and Basic User Documentation
 graft effmass
-include README.md cli2.gif Tutorial.ipynb Castep_ASE_interface.ipynb
+graft assets
+include README.md 
 include LICENCE
+include CITATION.cff
+include CODE_OF_CONDUCT.md
 
-# JOSS Paper (to cite effmass)
+# JOSS and PRB Paper (to cite effmass)
 graft paper
-include paper.md paper.pdf paper.bib
+graft joss
 
 # Development Files and Full Documentation
 graft .github
 graft docs
 graft tests
+graft tutorials
 include .coveragerc .readthedocs.yaml .travis.yml
-include CODE_OF_CONDUCT.md
 
 # Project Metadata
-include pyproject.toml setup.cfg MANIFEST.in
-include codemeta.json
+include pyproject.toml setup.cfg MANIFEST.in requirements.txt

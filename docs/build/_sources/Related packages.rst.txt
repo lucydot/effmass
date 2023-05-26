@@ -13,6 +13,10 @@ it may be that one of the packages listed below will suit your needs better.
 
 `pymatgen <http://pymatgen.org>`_: This is installed as a dependancy of `effmass`. Calculates an average effective mass *tensor* for non-parabolic dispersions with multiple bands and extrema. Also calculates the Seebeck effective mass as defined `here <https://perso.uclouvain.be/geoffroy.hautier/wp-content/papercite-data/pdf/gibbs2017.pdf>`_.
 
+`mstar <https://github.com/rubel75/mstar>`_: Effective mass calculator using k.p perturbation theory. Assumes parabolicity; provides the conductivity effective mass tensor at band edge. The advantage of this code is that it does not require a DFT calculation along the high symmetry paths in reciprocal space. 
+
+`EMAF <https://github.com/PatrizioGraziosi/EMAF-code>`_: Calculates the DOS effective mass (at a specific temperature), taking into account non-parabolicity and anisotropy. Also calculates the conductivity effective mass. Written in Matlab. 
+
 If you have an update to the information above then please use the Github `issue tracker <https://github.com/lucydot/effmass/issues/>`_. 
 
 ===================================================
