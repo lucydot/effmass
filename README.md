@@ -28,7 +28,7 @@ If you use `effmass` for your published research [please cite accordingly](#citi
 
 💃 `effmass` now includes a command line interface
 
-![](./cli2.gif)  
+![](./assets/cli2.gif)  
 
 As a result of these changes, and with view to supporting more DFT codes in the future, the `Data` class has been renamed to `DataVasp` ⚠️ **On updating to the latest version of effmass you may need to update your scripts / Jupyter Notebook to reflect this change** ⚠️
 
