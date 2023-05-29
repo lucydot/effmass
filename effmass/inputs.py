@@ -53,7 +53,7 @@ class Settings:
         conduction_band=True,
         valence_band=True,
         direction=None,
-        frontier_bands_only = False
+        frontier_bands_only = False,
         bandfit=6,
     ):
         """Initialises an instance of the Settings class and checks input using
@@ -100,9 +100,10 @@ class Settings:
         assert isinstance(
             self.frontier_bands_only, bool
         ), "`frontier_bands_only` must be set to True or False"
-        assert all(
-            isinstance(x, float) for x in self.direction
-        ), "`direction` must be a list of floats"
+        if self.direction:
+            assert all(
+                isinstance(x, float) for x in self.direction
+            ), "`direction` must be a list of floats"
         assert self.energy_range > 0, "`energy_range` must be a positive number"
         assert (
             self.extrema_search_depth > 0
