@@ -138,12 +138,51 @@ def calc_CBM_VBM_from_Fermi(Data, CBMVBM_search_depth=4.0):
 
     return CBM, VBM
 
+def get_minimum_indices(Data,extrema_search_depth):
+    """Finds the kpoint indices and band indices of all minimum turning points in CB within `extrema_search_depth`.
+
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        extrema_search_depth (float): energy in kT from bandedge over which to search for minima.
+
+    Returns:
+        array: A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each minimum in the CB band.
+    """
+    energy_CB = ma.masked_where(Data.energies < Data.CBM, Data.energies)
+    # returns array of energies within energy_range
+    electrons_in_range = ma.masked_where(
+        np.absolute(energy_CB - Data.CBM) > extrema_search_depth, energy_CB)
+    CB_minima = ma.masked_where(
+        _mark_minima(electrons_in_range) == 0, electrons_in_range)
+    CB_args = np.argwhere(CB_minima.mask == 0)
+    return CB_args
+
+def get_maximum_indices(Data,extrema_search_depth):
+    """Finds the kpoint indices and band indices of all maximum turning points in VB within `extrema_search_depth`.
+
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        extrema_search_depth (float): energy in kT from bandedge over which to search for maxima.
+
+    Returns:
+        array: A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each maximum in the VB band.
+    """
+    energy_VB = ma.masked_where(Data.energies > Data.VBM, Data.energies)
+    # returns array of energies within energy_range
+    holes_in_range = ma.masked_where(
+        np.absolute(energy_VB - Data.VBM) >
+        extrema_search_depth, energy_VB)
+    VB_maxima = ma.masked_where(
+        _mark_maxima(holes_in_range) == 0, holes_in_range)
+    VB_args = np.argwhere(VB_maxima.mask == 0)
+    return VB_args
 
 def find_extrema_indices(Data, Settings):
     """Finds the kpoint index and band index of the minimum/maximum energy
     turning points within :attr:`effmass.inputs.Settings.energy_range` of the
-    conduction band minimum (:attr:`effmass.inputs.Data.CBM`) / valence band
-    maximum (:attr:`effmass.inputs.Data.VBM`).
+    conduction band minimum (:attr:`effmass.inputs.Data.CBM`) and/or valence band
+    maximum (:attr:`effmass.inputs.Data.VBM`). Return effective masses for the 
+    highest energy VB or lowest energy CB if `frontier_bands_only` is True.
 
     Args:
         Data (Data): instance of the :class:`Data` class.
@@ -152,32 +191,31 @@ def find_extrema_indices(Data, Settings):
     Returns:
         array: A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each extrema.
     """
+    if Settings.conduction_band is True:
+        CB_args = get_minimum_indices(Data, Settings.extrema_search_depth)
 
-    energy_CB = ma.masked_where(Data.energies < Data.CBM, Data.energies)
-    energy_VB = ma.masked_where(Data.energies > Data.VBM, Data.energies)
+        if Settings.frontier_bands_only is True:
+            min_band_indices = np.argmin(CB_args, 0)[0]
+            # need to work out what happens for degenerate bands
+            CB_args = CB_args[min_band_indices]
+    else:
+        CB_args = []
+    
+    if Settings.valence_band is True:
+        VB_args = get_maximum_indices(Data, Settings.extrema_search_depth)
 
-    # returns array of energies within energy_range
-    holes_in_range = ma.masked_where(
-        np.absolute(energy_VB - Data.VBM) >
-        Settings.extrema_search_depth, energy_VB)
-    VB_maxima = ma.masked_where(
-        _mark_maxima(holes_in_range) == 0, holes_in_range)
+        if Settings.frontier_bands_only is True:
+            max_band_indices = np.argmax(VB_args, 0)[0]
+            # need to work out what happens for degenerate bands
+            VB_args = VB_args[max_band_indices]
+    else:
+        VB_args = []
 
-    # returns array of energies within energy_range
-    electrons_in_range = ma.masked_where(
-        np.absolute(energy_CB - Data.CBM) >
-        Settings.extrema_search_depth, energy_CB)
-    CB_minima = ma.masked_where(
-        _mark_minima(electrons_in_range) == 0, electrons_in_range)
-
-    # Returns an array of band numbers and k-points for extrema in the correct energy range.
+    # Returns an array of band numbers and k-points for extrema, selected according to user settings.
     # The first index differentiates between the valence band and conduction band.
     # At a given k-point there may be multiple bands with highest energy
-    extrema_position = np.array([
-        np.argwhere(VB_maxima.mask == 0),
-        np.argwhere(CB_minima.mask == 0)],dtype=object)
+    extrema_position = np.array([VB_args, CB_args],dtype=object)
     return extrema_position
-
 
 def _mark_maxima(holes_array):
     """Helper function which takes an array of hole energies and returns an
@@ -366,7 +404,7 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
         Settings (Settings): instance of the :class:`Settings` class.
         Data (Data): instance of the :class:`Data` class.
         truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.
-        bk (list(int)): To manually set an extrema point, in format [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index]. Defaults to None.
+        bk (list(int)): To manually set an extrema point, in format [:attr:`effmass.inputs.Data.energies` row index, :attr:`effmass.inputs.Data.kpoints` row index]. Defaults to None.
    
    Returns:
         list(Segments): A list of :class:`Segment` objects.
@@ -378,7 +416,7 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
         extrema_array = np.concatenate((extrema_array_3d[0],extrema_array_3d[1]))
     kpoints_list = []
     band_list = []
-    for band, kpoint in extrema_array: # flatten CB and VB arrays to a single array
+    for band, kpoint in extrema_array: # flattened CB and VB arrays to a single array
         kpoints_before = get_kpoints_before(
             band,
             kpoint,
