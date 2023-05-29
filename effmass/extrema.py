@@ -179,7 +179,15 @@ def get_maximum_indices(Data,extrema_search_depth):
     return VB_max_indices
 
 def get_frontier_CB_indices(Data,CB_min_indices):
-    """Returns the indices of the lowest energy minima across the Brillouin Zone"""
+    """Returns the indices of the lowest energy minima across the Brillouin Zone
+
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        CB_min_indices (array(int)): A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each minimum in the CB band.
+
+    Returns:
+        frontier_indices (array(int)): A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each minimum in the frontier conduction band(s).
+    """
     frontier_indices = np.where(CB_min_indices[:, 0] == CB_min_indices[:, 0].min())[0]
     frontier_indices = CB_min_indices[frontier_indices]
     for band, kpoint in frontier_indices:
@@ -191,7 +199,15 @@ def get_frontier_CB_indices(Data,CB_min_indices):
     return frontier_indices
 
 def get_frontier_VB_indices(Data,VB_max_indices):
-    """Returns the indices of the highest energy maxima across the Brillouin Zone"""
+    """Returns the indices of the highest energy maxima across the Brillouin Zone
+
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        VB_max_indices (array(int)): A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each maximum in the VB band.
+
+    Returns:
+        frontier_indices (array(int)): A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each maximum in the frontier valence band(s).
+    """
     frontier_indices = np.where(VB_max_indices[:, 0] == VB_max_indices[:, 0].max())[0]
     frontier_indices = VB_max_indices[frontier_indices]
     for band, kpoint in frontier_indices:
@@ -419,6 +435,26 @@ def get_kpoints_after(band_index,
     return kpoints_after
 
 
+def _dot_product(vector1, vector2):
+    return np.dot(vector1, vector2) / (np.linalg.norm(vector1)*np.linalg.norm(vector2))
+
+
+def filter_segments_by_direction(segment_list, direction):
+    """Filter a list of Segments so that only those in a particular direction remain.
+    
+    Args:
+        segment_list (list(Segment)):  A list of :class:`Segment` objects.
+        direction (array(float)): The direction array, length 3.
+         
+    Returns:
+        segment_list (list(Segment)):  A list of :class:`Segment` objects.
+    """
+    
+    return [segment for segment in segment_list if math.isclose(_dot_product(segment.direction, direction), 1)]    
+
+    # need to test for equality of direction not magnitude of vector
+
+
 def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
     """Generates a list of Segment objects.
 
@@ -429,7 +465,7 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
         bk (list(int)): To manually set an extrema point, in format [:attr:`effmass.inputs.Data.energies` row index, :attr:`effmass.inputs.Data.kpoints` row index]. Defaults to None.
    
    Returns:
-        list(Segments): A list of :class:`Segment` objects.
+        list(Segment): A list of :class:`Segment` objects.
     """
     if bk:
         extrema_array = bk
@@ -457,8 +493,12 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
         if kpoints_after:
             kpoints_list.append(kpoints_after)
             band_list.append(band)
-    segments = [
+    segment_list = [
         analysis.Segment(Data, band, kpoints)
         for band, kpoints in zip(band_list, kpoints_list)
     ]
-    return segments
+
+    if Settings.direction:
+        segment_list = filter_segments_by_direction(segment_list,np.array(Settings.direction))
+
+    return segment_list

@@ -72,7 +72,7 @@ class Segment:
         dE_eV (array(float)): 1-dimensional array which contains the difference in energy (hartree) between each kpoint and the extrema.
         dE_hartree (array(float)): 1-dimensional array which contains the difference in energy (eV) between each kpoint and the extrema.
         occupancy (array(float)): 2-dimensional array. Each row contains occupation number of the eigenstates for a particular band. A slice of :attr:`effmass.inputs.Data.occupancy`.
-        direction (array): 1-dimensional array with length 3. The direction between kpoints in the segment.
+        direction (array(float)): 1-dimensional array with length 3. The direction between kpoints in the segment.
         band_type (str): The band type, determined by occupancy of the eigenstate. Argument choices are "conduction_band", "valence_band" or "unknown". If set to "unknown", some class methods will raise a warning and return None.
         fermi_energy (float): the fermi energy in eV.
     """
