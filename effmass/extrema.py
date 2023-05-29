@@ -8,6 +8,7 @@ The extrema are found within an energy range given by the :class:`Settings` clas
 Each `Segment` object contains data for kpoints within an energy range given by the :class:`Settings` class. 
 """
 
+import math
 import warnings
 import numpy as np
 import numpy.ma as ma
@@ -154,8 +155,8 @@ def get_minimum_indices(Data,extrema_search_depth):
         np.absolute(energy_CB - Data.CBM) > extrema_search_depth, energy_CB)
     CB_minima = ma.masked_where(
         _mark_minima(electrons_in_range) == 0, electrons_in_range)
-    CB_args = np.argwhere(CB_minima.mask == 0)
-    return CB_args
+    CB_min_indices = np.argwhere(CB_minima.mask == 0)
+    return CB_min_indices
 
 def get_maximum_indices(Data,extrema_search_depth):
     """Finds the kpoint indices and band indices of all maximum turning points in VB within `extrema_search_depth`.
@@ -174,8 +175,31 @@ def get_maximum_indices(Data,extrema_search_depth):
         extrema_search_depth, energy_VB)
     VB_maxima = ma.masked_where(
         _mark_maxima(holes_in_range) == 0, holes_in_range)
-    VB_args = np.argwhere(VB_maxima.mask == 0)
-    return VB_args
+    VB_max_indices = np.argwhere(VB_maxima.mask == 0)
+    return VB_max_indices
+
+def get_frontier_CB_indices(Data,CB_min_indices):
+    """Returns the indices of the lowest energy minima across the Brillouin Zone"""
+    frontier_indices = np.where(CB_min_indices[:, 0] == CB_min_indices[:, 0].min())[0]
+    frontier_indices = CB_min_indices[frontier_indices]
+    for band, kpoint in frontier_indices:
+        i = 1
+        while math.isclose(Data.energies[band+i, kpoint],Data.energies[band, kpoint], abs_tol=1e-5):
+            print("close")
+            frontier_indices = np.append(frontier_indices, np.array([[band+i, kpoint]]), axis=0)
+            i += 1
+    return frontier_indices
+
+def get_frontier_VB_indices(Data,VB_max_indices):
+    """Returns the indices of the highest energy maxima across the Brillouin Zone"""
+    frontier_indices = np.where(VB_max_indices[:, 0] == VB_max_indices[:, 0].max())[0]
+    frontier_indices = VB_max_indices[frontier_indices]
+    for band, kpoint in frontier_indices:
+        i = 1
+        while math.isclose(Data.energies[band-i, kpoint],Data.energies[band, kpoint], abs_tol=1e-5):
+            frontier_indices = np.append(frontier_indices, np.array([[band-i, kpoint]]), axis=0)
+            i += 1
+    return frontier_indices
 
 def find_extrema_indices(Data, Settings):
     """Finds the kpoint index and band index of the minimum/maximum energy
@@ -192,29 +216,27 @@ def find_extrema_indices(Data, Settings):
         array: A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each extrema.
     """
     if Settings.conduction_band is True:
-        CB_args = get_minimum_indices(Data, Settings.extrema_search_depth)
+        CB_min_indices = get_minimum_indices(Data, Settings.extrema_search_depth)
 
         if Settings.frontier_bands_only is True:
-            min_band_indices = np.argmin(CB_args, 0)[0]
-            # need to work out what happens for degenerate bands
-            CB_args = CB_args[min_band_indices]
+            CB_min_indices = get_frontier_CB_indices(Data, CB_min_indices)
+
     else:
-        CB_args = []
+        CB_min_indices = []
     
     if Settings.valence_band is True:
-        VB_args = get_maximum_indices(Data, Settings.extrema_search_depth)
+        VB_max_indices = get_maximum_indices(Data, Settings.extrema_search_depth)
 
         if Settings.frontier_bands_only is True:
-            max_band_indices = np.argmax(VB_args, 0)[0]
-            # need to work out what happens for degenerate bands
-            VB_args = VB_args[max_band_indices]
+            VB_max_indices = get_frontier_VB_indices(Data, VB_max_indices)
+
     else:
-        VB_args = []
+        VB_max_indices = []
 
     # Returns an array of band numbers and k-points for extrema, selected according to user settings.
     # The first index differentiates between the valence band and conduction band.
     # At a given k-point there may be multiple bands with highest energy
-    extrema_position = np.array([VB_args, CB_args],dtype=object)
+    extrema_position = np.array([VB_max_indices, CB_min_indices],dtype=object)
     return extrema_position
 
 def _mark_maxima(holes_array):
