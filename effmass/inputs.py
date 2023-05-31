@@ -68,7 +68,7 @@ class Settings:
             extrema_search_depth (float): energy in eV from bandedge over which to search for extrema. Defaults to 0.025 eV.
             conduction_band (bool): calculate conduction band (electron) effective masses. Defaults to True.
             valence_band (bool): calculate valence band (hole) effective masses. Defaults to True.
-            direction (list(float)): calculate effective masses for this direction only. If None then effective masses for all directions are calculated. Defaults to False.
+            direction (list(float or int)): calculate effective masses for this direction only. If None then effective masses for all directions are calculated. Defaults to False.
             frontier_bands_only: calculate effective masses for the lowest energy conduction band and/or highest energy valence band only. When True this overrides `extrema_search_depth`. Defaults to False.
             bandfit (int): the degree of the polynomial which is used to fit to dispersion data when calculating the transport mass.
             degeneracy_condition (float): the energy difference below which bands are considered to be degenerate. Defaults to 1E-5.
@@ -108,7 +108,7 @@ class Settings:
         ), "`frontier_bands_only` must be set to True or False"
         if self.direction:
             assert all(
-                isinstance(x, float) for x in self.direction
+                isinstance(x, (int,float)) for x in self.direction
             ), "`direction` must be a list of floats"
         assert self.energy_range > 0, "`energy_range` must be a positive number"
         assert (
