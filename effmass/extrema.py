@@ -487,7 +487,7 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
         extrema_array = bk
 
     else:
-        if Settings.valence_band is True and Settings.conduction_band is True:
+        if (Settings.valence_band is True)and (Settings.conduction_band is True):
             extrema_array = np.concatenate((find_VB_indices(Data, Settings),find_CB_indices(Data, Settings)))
         elif Settings.valence_band is True:
             extrema_array = find_VB_indices(Data, Settings)
@@ -522,5 +522,8 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
 
     if Settings.direction:
         segment_list = filter_segments_by_direction(segment_list,np.array(Settings.direction))
+
+    if len(segment_list) == 0:
+        print("No segments found for current criteria in Settings")
 
     return segment_list
