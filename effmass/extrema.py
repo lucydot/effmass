@@ -232,19 +232,19 @@ def find_extrema_indices(Data, Settings):
         array: A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each extrema.
     """
     if Settings.conduction_band is True:
-        CB_min_indices = get_minimum_indices(Data, Settings.extrema_search_depth, Settings.degeneracy_condition)
+        CB_min_indices = get_minimum_indices(Data, Settings.extrema_search_depth)
 
         if Settings.frontier_bands_only is True:
-            CB_min_indices = get_frontier_CB_indices(Data, CB_min_indices)
+            CB_min_indices = get_frontier_CB_indices(Data, CB_min_indices, Settings.degeneracy_condition)
 
     else:
         CB_min_indices = []
     
     if Settings.valence_band is True:
-        VB_max_indices = get_maximum_indices(Data, Settings.extrema_search_depth, Settings.degeneracy_condition)
+        VB_max_indices = get_maximum_indices(Data, Settings.extrema_search_depth)
 
         if Settings.frontier_bands_only is True:
-            VB_max_indices = get_frontier_VB_indices(Data, VB_max_indices)
+            VB_max_indices = get_frontier_VB_indices(Data, VB_max_indices, Settings.degeneracy_condition)
 
     else:
         VB_max_indices = []
