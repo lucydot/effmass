@@ -21,7 +21,7 @@ If you use `effmass` for your published research [please cite accordingly](#citi
 
 ## What's new?
 
-💃 `effmass` now has more options for locating extrema of a particular type: by direction or band type (conduction/valence/frontier). There are updated usage examples in the [tutorial](./tutorials/Tutorial.ipynb).
+💃 `effmass` now has more options for locating extrema of a particular type: by direction or band type (conduction/valence/frontier). There are updated usage examples in the [tutorial](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tutorials/Tutorial.ipynb).
 
 💃 `effmass` now interfaces with more codes:
 - it can read in Castep output data (in addition to Vasp and FHI-aims)
