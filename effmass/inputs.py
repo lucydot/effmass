@@ -595,7 +595,7 @@ class DataAims(Data):
             raise Exception("geometry.in: Must contain exactly 3 lattice vectors")
 
         latvec = np.asarray(latvec)
-        latvec = latvec.astype(np.float)
+        latvec = latvec.astype(float)
 
         # Calculate reciprocal lattice vectors
         rlatvec = []
