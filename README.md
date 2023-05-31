@@ -146,6 +146,10 @@ Please use the Github [issue tracker](https://github.com/lucydot/effmass/issues/
 
 If you would like to contribute please do so via a pull request. All contributors must read and respect the [code of conduct](https://github.com/lucydot/effmass/blob/master/CODE_OF_CONDUCT.md). In particular, we welcome contributions which would extend `effmass` so that it is able to parse output from other electronic structure codes. 
 
+### Version numbers
+
+For versioning we are following the guidelines [here](https://carpentries-incubator.github.io/python_packaging/instructor/05-publishing.html#extra-consistent-versioning-with-setuptools-scm). This allows automatic versioning according to the latest tag on Github.
+
 ## Tests
 
 Automated testing of the latest commit happens [here](https://app.travis-ci.com/github/lucydot/effmass).
