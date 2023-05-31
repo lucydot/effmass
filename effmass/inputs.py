@@ -42,8 +42,10 @@ class Settings:
         conduction_band (bool): calculate conduction band (electron) effective masses. Defaults to True.
         valence_band (bool): calculate valence band (hole) effective masses. Defaults to True.
         direction (list(float)): calculate effective masses for this direction only. If None then effective masses for all directions are calculated. Defaults to False.
-        degree_bandfit (int): the degree of the polynomial which is used to fit to dispersion data
-        when calculating the transport mass.
+        frontier_bands_only: calculate effective masses for the lowest energy conduction band and/or highest energy valence band only. When True this overrides `extrema_search_depth`. Defaults to False.
+        degree_bandfit (int): the degree of the polynomial which is used to fit to dispersion data when calculating the transport mass.
+        degeneracy_condition (float): the energy difference below which bands are considered to be degenerate. Defaults to 1E-5.
+
     """
 
     def __init__(
@@ -55,6 +57,8 @@ class Settings:
         direction=None,
         frontier_bands_only = False,
         bandfit=6,
+        degeneracy_condition = 1E-5
+
     ):
         """Initialises an instance of the Settings class and checks input using
         :meth:`check_settings()`.
@@ -67,7 +71,7 @@ class Settings:
             direction (list(float)): calculate effective masses for this direction only. If None then effective masses for all directions are calculated. Defaults to False.
             frontier_bands_only: calculate effective masses for the lowest energy conduction band and/or highest energy valence band only. When True this overrides `extrema_search_depth`. Defaults to False.
             bandfit (int): the degree of the polynomial which is used to fit to dispersion data when calculating the transport mass.
-
+            degeneracy_condition (float): the energy difference below which bands are considered to be degenerate. Defaults to 1E-5.
         Returns:
             None.
         """
@@ -78,6 +82,7 @@ class Settings:
         self.energy_range = energy_range
         self.extrema_search_depth = extrema_search_depth
         self.degree_bandfit = bandfit
+        self.degeneracy_condition = degeneracy_condition
         self.check_settings()
 
     def check_settings(self):
@@ -90,6 +95,7 @@ class Settings:
             None.
         """
 
+        assert isinstance(self.degeneracy_condition, float), "`degeneracy_condition` must be a float"
         assert (self.conduction_band is True) or (self.valence_band is True), "`conduction_band` and `valence_band` cannot both be set to False"
         assert isinstance(
             self.conduction_band, bool

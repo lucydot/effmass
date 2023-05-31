@@ -178,7 +178,7 @@ def get_maximum_indices(Data,extrema_search_depth):
     VB_max_indices = np.argwhere(VB_maxima.mask == 0)
     return VB_max_indices
 
-def get_frontier_CB_indices(Data,CB_min_indices):
+def get_frontier_CB_indices(Data,CB_min_indices, degeneracy_condition):
     """Returns the indices of the lowest energy minima across the Brillouin Zone
 
     Args:
@@ -192,13 +192,13 @@ def get_frontier_CB_indices(Data,CB_min_indices):
     frontier_indices = CB_min_indices[frontier_indices]
     for band, kpoint in frontier_indices:
         i = 1
-        while math.isclose(Data.energies[band+i, kpoint],Data.energies[band, kpoint], abs_tol=1e-5):
+        while math.isclose(Data.energies[band+i, kpoint],Data.energies[band, kpoint], abs_tol=degeneracy_condition):
             print("close")
             frontier_indices = np.append(frontier_indices, np.array([[band+i, kpoint]]), axis=0)
             i += 1
     return frontier_indices
 
-def get_frontier_VB_indices(Data,VB_max_indices):
+def get_frontier_VB_indices(Data,VB_max_indices, degeneracy_condition):
     """Returns the indices of the highest energy maxima across the Brillouin Zone
 
     Args:
@@ -212,7 +212,7 @@ def get_frontier_VB_indices(Data,VB_max_indices):
     frontier_indices = VB_max_indices[frontier_indices]
     for band, kpoint in frontier_indices:
         i = 1
-        while math.isclose(Data.energies[band-i, kpoint],Data.energies[band, kpoint], abs_tol=1e-5):
+        while math.isclose(Data.energies[band-i, kpoint],Data.energies[band, kpoint], abs_tol=degeneracy_condition):
             frontier_indices = np.append(frontier_indices, np.array([[band-i, kpoint]]), axis=0)
             i += 1
     return frontier_indices
@@ -232,7 +232,7 @@ def find_extrema_indices(Data, Settings):
         array: A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each extrema.
     """
     if Settings.conduction_band is True:
-        CB_min_indices = get_minimum_indices(Data, Settings.extrema_search_depth)
+        CB_min_indices = get_minimum_indices(Data, Settings.extrema_search_depth, Settings.degeneracy_condition)
 
         if Settings.frontier_bands_only is True:
             CB_min_indices = get_frontier_CB_indices(Data, CB_min_indices)
@@ -241,7 +241,7 @@ def find_extrema_indices(Data, Settings):
         CB_min_indices = []
     
     if Settings.valence_band is True:
-        VB_max_indices = get_maximum_indices(Data, Settings.extrema_search_depth)
+        VB_max_indices = get_maximum_indices(Data, Settings.extrema_search_depth, Settings.degeneracy_condition)
 
         if Settings.frontier_bands_only is True:
             VB_max_indices = get_frontier_VB_indices(Data, VB_max_indices)
