@@ -8,6 +8,7 @@ The extrema are found within an energy range given by the :class:`Settings` clas
 Each `Segment` object contains data for kpoints within an energy range given by the :class:`Settings` class. 
 """
 
+import math
 import warnings
 import numpy as np
 import numpy.ma as ma
@@ -131,52 +132,143 @@ def calc_CBM_VBM_from_Fermi(Data, CBMVBM_search_depth=4.0):
     Data.VBM = Data.fermi_energy
 
     Settings = inputs.Settings(extrema_search_depth=CBMVBM_search_depth)
-    extrema_indices=find_extrema_indices(Data, Settings)
 
-    CBM = min([Data.energies[i][j] for i,j in extrema_indices[1]])
-    VBM = max([Data.energies[i][j] for i,j in extrema_indices[0]])
+    CB_indices = find_CB_indices(Data, Settings)
+    VB_indices = find_VB_indices(Data, Settings)
+
+    CBM = min([Data.energies[i][j] for i,j in CB_indices])
+    VBM = max([Data.energies[i][j] for i,j in VB_indices])
 
     return CBM, VBM
 
+def get_minimum_indices(Data,extrema_search_depth):
+    """Finds the kpoint indices and band indices of all minimum turning points in CB within `extrema_search_depth`.
 
-def find_extrema_indices(Data, Settings):
-    """Finds the kpoint index and band index of the minimum/maximum energy
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        extrema_search_depth (float): energy in kT from bandedge over which to search for minima.
+
+    Returns:
+        array: A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each minimum in the CB band.
+    """
+    energy_CB = ma.masked_where(Data.energies < Data.CBM, Data.energies)
+    # returns array of energies within energy_range
+    electrons_in_range = ma.masked_where(
+        np.absolute(energy_CB - Data.CBM) > extrema_search_depth, energy_CB)
+    CB_minima = ma.masked_where(
+        _mark_minima(electrons_in_range) == 0, electrons_in_range)
+    CB_min_indices = np.argwhere(CB_minima.mask == 0)
+    return CB_min_indices
+
+def get_maximum_indices(Data,extrema_search_depth):
+    """Finds the kpoint indices and band indices of all maximum turning points in VB within `extrema_search_depth`.
+
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        extrema_search_depth (float): energy in kT from bandedge over which to search for maxima.
+
+    Returns:
+        array: A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each maximum in the VB band.
+    """
+    energy_VB = ma.masked_where(Data.energies > Data.VBM, Data.energies)
+    # returns array of energies within energy_range
+    holes_in_range = ma.masked_where(
+        np.absolute(energy_VB - Data.VBM) >
+        extrema_search_depth, energy_VB)
+    VB_maxima = ma.masked_where(
+        _mark_maxima(holes_in_range) == 0, holes_in_range)
+    VB_max_indices = np.argwhere(VB_maxima.mask == 0)
+    return VB_max_indices
+
+def get_frontier_CB_indices(Data,CB_min_indices, degeneracy_condition):
+    """Returns the indices of the lowest energy minima across the Brillouin Zone
+
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        CB_min_indices (array(int)): A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each minimum in the CB band.
+
+    Returns:
+        frontier_indices (array(int)): A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each minimum in the frontier conduction band(s).
+    """
+    frontier_indices = np.where(CB_min_indices[:, 0] == CB_min_indices[:, 0].min())[0]
+    frontier_indices = CB_min_indices[frontier_indices]
+    for band, kpoint in frontier_indices:
+        i = 1
+        while math.isclose(Data.energies[band+i, kpoint],Data.energies[band, kpoint], abs_tol=degeneracy_condition):
+            frontier_indices = np.append(frontier_indices, np.array([[band+i, kpoint]]), axis=0)
+            i += 1
+    return frontier_indices
+
+def get_frontier_VB_indices(Data,VB_max_indices, degeneracy_condition):
+    """Returns the indices of the highest energy maxima across the Brillouin Zone
+
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        VB_max_indices (array(int)): A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each maximum in the VB band.
+
+    Returns:
+        frontier_indices (array(int)): A 2-dimensional array. Each row contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each maximum in the frontier valence band(s).
+    """
+    frontier_indices = np.where(VB_max_indices[:, 0] == VB_max_indices[:, 0].max())[0]
+    frontier_indices = VB_max_indices[frontier_indices]
+    for band, kpoint in frontier_indices:
+        i = 1
+        while math.isclose(Data.energies[band-i, kpoint],Data.energies[band, kpoint], abs_tol=degeneracy_condition):
+            frontier_indices = np.append(frontier_indices, np.array([[band-i, kpoint]]), axis=0)
+            i += 1
+    return frontier_indices
+
+def find_CB_indices(Data, Settings):
+    """Finds the kpoint index and band index of the minimum energy
     turning points within :attr:`effmass.inputs.Settings.energy_range` of the
-    conduction band minimum (:attr:`effmass.inputs.Data.CBM`) / valence band
-    maximum (:attr:`effmass.inputs.Data.VBM`).
+    conduction band minimum (:attr:`effmass.inputs.Data.CBM`). Return indices for the 
+    lowest energy CB only if `frontier_bands_only` is True.
 
     Args:
         Data (Data): instance of the :class:`Data` class.
         Settings (Settings): instance of the :class:`Settings` class.
 
     Returns:
-        array: A 3-dimensional array of shape (2, ). The first index differentiates between the valence band and conduction band. The second contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each extrema.
+        array: A 2-dimensional array. Contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each minima.
     """
+    if Settings.conduction_band is True:
+        CB_min_indices = get_minimum_indices(Data, Settings.extrema_search_depth)
 
-    energy_CB = ma.masked_where(Data.energies < Data.CBM, Data.energies)
-    energy_VB = ma.masked_where(Data.energies > Data.VBM, Data.energies)
+        if Settings.frontier_bands_only is True:
+            # At a given k-point there may be multiple bands with highest energy
+            CB_min_indices = get_frontier_CB_indices(Data, CB_min_indices, Settings.degeneracy_condition)
 
-    # returns array of energies within energy_range
-    holes_in_range = ma.masked_where(
-        np.absolute(energy_VB - Data.VBM) >
-        Settings.extrema_search_depth, energy_VB)
-    VB_maxima = ma.masked_where(
-        _mark_maxima(holes_in_range) == 0, holes_in_range)
+    else:
+        CB_min_indices = None
 
-    # returns array of energies within energy_range
-    electrons_in_range = ma.masked_where(
-        np.absolute(energy_CB - Data.CBM) >
-        Settings.extrema_search_depth, energy_CB)
-    CB_minima = ma.masked_where(
-        _mark_minima(electrons_in_range) == 0, electrons_in_range)
+    return CB_min_indices
 
-    # Returns an array of band numbers and k-points for extrema in the correct energy range.
+def find_VB_indices(Data, Settings):
+    """Finds the kpoint index and band index of the maximum energy
+    turning points within :attr:`effmass.inputs.Settings.energy_range` of the
+    valence band maximum (:attr:`effmass.inputs.Data.VBM`). Return indices for the 
+    highest energy VB only if `frontier_bands_only` is True.
+
+    Args:
+        Data (Data): instance of the :class:`Data` class.
+        Settings (Settings): instance of the :class:`Settings` class.
+
+    Returns:
+        array: A 2-dimensional array. Contains [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index] for each maxima.
+    """
+    
+    VB_max_indices = get_maximum_indices(Data, Settings.extrema_search_depth)
+
+    if Settings.frontier_bands_only is True:
+        # At a given k-point there may be multiple bands with highest energy
+        VB_max_indices = get_frontier_VB_indices(Data, VB_max_indices, Settings.degeneracy_condition)
+
+
+    return VB_max_indices
+
+    # Returns an array of band numbers and k-points for extrema, selected according to user settings.
     # The first index differentiates between the valence band and conduction band.
-    # At a given k-point there may be multiple bands with highest energy
-    extrema_position = np.array([
-        np.argwhere(VB_maxima.mask == 0),
-        np.argwhere(CB_minima.mask == 0)],dtype=object)
-    return extrema_position
+    
 
 
 def _mark_maxima(holes_array):
@@ -359,6 +451,26 @@ def get_kpoints_after(band_index,
     return kpoints_after
 
 
+def _dot_product(vector1, vector2):
+    return np.dot(vector1, vector2) / (np.linalg.norm(vector1)*np.linalg.norm(vector2))
+
+
+def filter_segments_by_direction(segment_list, direction):
+    """Filter a list of Segments so that only those in a particular direction remain.
+    
+    Args:
+        segment_list (list(Segment)):  A list of :class:`Segment` objects.
+        direction (array(float)): The direction array, length 3.
+         
+    Returns:
+        segment_list (list(Segment)):  A list of :class:`Segment` objects.
+    """
+    
+    return [segment for segment in segment_list if math.isclose(_dot_product(segment.direction, direction), 1)]    
+
+    # need to test for equality of direction not magnitude of vector
+
+
 def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
     """Generates a list of Segment objects.
 
@@ -366,19 +478,25 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
         Settings (Settings): instance of the :class:`Settings` class.
         Data (Data): instance of the :class:`Data` class.
         truncate_dir_change (bool): If True, truncates eigenstates when there is a change in direction. If False, there is no truncation. Defaults to True.
-        bk (list(int)): To manually set an extrema point, in format [:attr:`efmmas.inputs.Data.bands` index, :attr:`effmass.inputs.Data.kpoints` index]. Defaults to None.
+        bk (list(int)): To manually set an extrema point, in format [:attr:`effmass.inputs.Data.energies` row index, :attr:`effmass.inputs.Data.kpoints` row index]. Defaults to None.
    
    Returns:
-        list(Segments): A list of :class:`Segment` objects.
+        list(Segment): A list of :class:`Segment` objects.
     """
     if bk:
         extrema_array = bk
+
     else:
-        extrema_array_3d = find_extrema_indices(Data, Settings)
-        extrema_array = np.concatenate((extrema_array_3d[0],extrema_array_3d[1]))
+        if Settings.valence_band is True and Settings.conduction_band is True:
+            extrema_array = np.concatenate((find_VB_indices(Data, Settings),find_CB_indices(Data, Settings)))
+        elif Settings.valence_band is True:
+            extrema_array = find_VB_indices(Data, Settings)
+        elif Settings.conduction_band is True:
+            extrema_array = find_CB_indices(Data, Settings)
+    
     kpoints_list = []
     band_list = []
-    for band, kpoint in extrema_array: # flatten CB and VB arrays to a single array
+    for band, kpoint in extrema_array: # flattened CB and VB arrays to a single array
         kpoints_before = get_kpoints_before(
             band,
             kpoint,
@@ -397,8 +515,12 @@ def generate_segments(Settings, Data, bk=None, truncate_dir_change=True):
         if kpoints_after:
             kpoints_list.append(kpoints_after)
             band_list.append(band)
-    segments = [
+    segment_list = [
         analysis.Segment(Data, band, kpoints)
         for band, kpoints in zip(band_list, kpoints_list)
     ]
-    return segments
+
+    if Settings.direction:
+        segment_list = filter_segments_by_direction(segment_list,np.array(Settings.direction))
+
+    return segment_list
