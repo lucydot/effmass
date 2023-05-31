@@ -5,7 +5,7 @@ exclude *
 graft effmass
 graft assets
 include README.md 
-include LICENCE
+include LICENSE
 include CITATION.cff
 include CODE_OF_CONDUCT.md
 
