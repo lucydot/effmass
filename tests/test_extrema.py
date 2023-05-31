@@ -28,9 +28,13 @@ def test_change_direction(toy_data_object):
     
     assert extrema.change_direction(toy_data_object.kpoints, [0,1,2,3,4,5]) == 3
 
-def test_find_extrema_indices(toy_data_object,toy_settings_object):
+def test_find_CB_indices(toy_data_object, toy_settings_object):
 
-    assert np.array_equal(extrema.find_extrema_indices(toy_data_object, toy_settings_object),np.array([[[0,0],[0,3]],[[1,0],[1,4]]],dtype=object))
+    assert np.array_equal(extrema.find_CB_indices(toy_data_object, toy_settings_object),np.array([[1,0],[1,4]],dtype=object))
+
+def test_find_VB_indices(toy_data_object, toy_settings_object):
+
+    assert np.array_equal(extrema.find_VB_indices(toy_data_object, toy_settings_object),np.array([[0,0],[0,3]],dtype=object))
 
 def test_get_kpoints_before(toy_data_object,toy_settings_object):
 

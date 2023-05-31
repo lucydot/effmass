@@ -132,7 +132,6 @@ def calc_CBM_VBM_from_Fermi(Data, CBMVBM_search_depth=4.0):
     Data.VBM = Data.fermi_energy
 
     Settings = inputs.Settings(extrema_search_depth=CBMVBM_search_depth)
-    extrema_indices=find_extrema_indices(Data, Settings)
 
     CB_indices = find_CB_indices(Data, Settings)
     VB_indices = find_VB_indices(Data, Settings)
