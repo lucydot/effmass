@@ -11,7 +11,7 @@
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 
 
-💃 Effmass now has more options for locating extrema of a particular type: by direction or band type (conduction/valence/frontier). This may be useful for more high-throughput type studies.  
+💃 Effmass now has more options for locating extrema of a particular type: by direction or band type (conduction/valence/frontier). 
 💃 Effmass supports Vasp, FHI-Aims, Castep, ASE, and Octopus.  
 ⚠️ The `Data` class was renamed `DataVasp` in `effmass` versions 2.0.0+. You may need to update your scripts!
 
