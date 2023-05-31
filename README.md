@@ -11,8 +11,8 @@
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 
 
-💃 Effmass now has a command line interface  
-💃 Effmass now supports FHI-Aims, Castep, ASE, and Octopus  
+💃 Effmass now has more options for locating extrema of a particular type: by direction or band type (conduction/valence/frontier). This may be useful for more high-throughput type studies.
+💃 Effmass supports Vasp, FHI-Aims, Castep, ASE, and Octopus.  
 ⚠️ The `Data` class was renamed `DataVasp` in `effmass` versions 2.0.0+. You may need to update your scripts!
 
 `effmass` is a [peer-reviewed](https://joss.theoj.org/papers/10.21105/joss.00797) Python (3.6+) package for calculating various definitions of effective mass from the electronic bandstructure of a semiconducting material. It consists of a core `Segment` class that calculates the effective mass and other associated properties of selected bandstructure segments. The programme also contains functions for locating bandstructure extrema, constructing segments and plotting approximations to the dispersion. There is a command line interface for calculating parabolic effective mass values, and an API for the more complex, non-parabolic definitions of effective mass.
@@ -20,6 +20,8 @@
 If you use `effmass` for your published research [please cite accordingly](#citing-effmass).
 
 ## What's new?
+
+💃 `effmass` now has more options for locating extrema of a particular type: by direction or band type (conduction/valence/frontier). There are updated usage examples in the [tutorial](./tutorials/Tutorial.ipynb).
 
 💃 `effmass` now interfaces with more codes:
 - it can read in Castep output data (in addition to Vasp and FHI-aims)
