@@ -10,7 +10,7 @@
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/7405/badge)](https://bestpractices.coreinfrastructure.org/projects/7405)
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 
-💃 31/5/23: Effmass-2.3.1 has been released!! 
+💃 31/5/23: Effmass-2.3.1 has been released!!   
 💃 Effmass now has more options for locating extrema of a particular type: by direction or band type (conduction/valence/frontier).   
 ⚠️ The `Data` class was renamed `DataVasp` in `effmass` versions 2.0.0+. You may need to update your scripts!
 
