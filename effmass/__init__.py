@@ -1,6 +1,8 @@
 #! /usr/bin/env python3
-
-from importlib.metadata import version, PackageNotFoundError
+try:
+    from importlib.metadata import version, PackageNotFoundError
+except ImportError:
+    from importlib_metadata import version, PackageNotFoundError
 
 angstrom_to_bohr = 1.88973
 ev_to_hartree = 0.0367493
