@@ -16,3 +16,4 @@ __pycache__/
 docs/build/
 **/.pytest_cache
 **/.vscode/*
+_version.py
