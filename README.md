@@ -150,6 +150,11 @@ If you would like to contribute please do so via a pull request. All contributor
 
 For versioning we are following the guidelines [here](https://carpentries-incubator.github.io/python_packaging/instructor/05-publishing.html#extra-consistent-versioning-with-setuptools-scm). This allows automatic versioning according to the latest tag on Github.
 
+### Test PYPI
+
+When testing a build on the test PYPI site it is important to point to the actual PYPI for the dependencies..its a *GOTCHA*...
+```pip install -i https://pypi.org/pypi/ --extra-index-url https://test.pypi.org/simple effmass==2.3.4.dev3```
+
 ## Tests
 
 Automated testing of the latest commit happens [here](https://app.travis-ci.com/github/lucydot/effmass).
