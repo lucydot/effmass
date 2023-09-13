@@ -139,7 +139,7 @@ A [number of publications](https://scholar.google.co.uk/scholar?oi=bibs&hl=en&ci
 
 ## Questions, bug reports, feature requests
 
-Please use the Github [issue tracker](https://github.com/lucydot/effmass/issues/) for any questions, feature requests or bug reports. Please do not contact the developers via email unless there is a specific reason you do not want the conversation to be public.
+Please use the Github [issue tracker](https://github.com/lucydot/effmass/issues/) for any questions, feature requests or bug reports. Please do not contact the developers via email unless there is a specific reason you do not want the conversation to be public. If we do not respond within a reasonable timeframe, then please feel free to reach out to Lucy via email; Github notifications have a nasty habit of getting lost.
 
 ## Development
 
