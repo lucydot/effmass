@@ -24,7 +24,7 @@ If you use `effmass` for your published research [please cite accordingly](#citi
 
 💃 `effmass` now interfaces with more codes:
 - it can read in Castep output data (in addition to Vasp and FHI-aims)
-- it can work with ASE bandstructure objects
+- it can work with ASE bandstructure objects (see an example of using this with Quantum Espresso output [here](https://github.com/lucydot/effmass?tab=readme-ov-file#inter-operability-with-ase))
 - it can work with Octopus output files
 
 💃 `effmass` now includes a command line interface
