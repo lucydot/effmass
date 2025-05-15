@@ -62,6 +62,34 @@ it may be that one of the packages listed [here](https://effmass.readthedocs.io/
 
 `effmass` currently supports `VASP`, `FHI-Aims`, `Castep`, `ASE`, and `Octopus`. In the near future we hope to play nicely with other codes that interface with the ASE bandstructure class, and pymatgen. We especially welcome contributions that will help make `effmass` available to more researchers.
 
+### Inter-operability with ASE 
+
+If you can create an ASE bandstructure object (with the energies and path specified) and an ASE atoms object (with the reciprocal lattice), you should be able to use `effmass` code. 
+
+The [`inputs.DataASE`](https://effmass.readthedocs.io/en/latest/_modules/effmass/inputs.html#DataASE) class can be used to create an `inputs.Data` instance using an [ASE bandstructure object](https://wiki.fysik.dtu.dk/ase/_modules/ase/spectrum/band_structure.html) and [ASE atoms object](https://wiki.fysik.dtu.dk/ase/ase/atoms.html). Once you have `inputs.Data` you can use the standard workflow as outlined in [the tutorial](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tutorials/Tutorial.ipynb).
+
+Note that the `DataASE` class does not read in occupancy data, so the CBM/VBM are inferred from the position of the Fermi level. It may be that you need to manually set this via the `Data.fermi_energy` attribute and then re-find the CBM/VBM using the `Data.find_cbm_vbm` method, as outlined above.
+
+An example of how to use effmass with Quantum Espresso output is below. Here `bs_calc.log` is the log file for a calculation performed with `calculation_mode=‘bands’`, and `scf_calc.log` is the log file for a self-consistent calculation to get the fermi energy:
+
+```
+from effmass import inputs, extrema, outputs
+from ase.io import read
+
+atoms=read('bs_calc.log',format='espresso-out')
+bs=atoms.calc.band_structure()
+
+calc_scf=read('scf_calc.log',format='espresso-out')
+
+data=inputs.DataASE(bs,atoms)
+data.fermi_energy=calc_scf.calc.eFermi
+data.find_cbm_vbm()
+
+settings = inputs.Settings(extrema_search_depth=0.075, energy_range=0.25)
+segments = extrema.generate_segments(settings,data)
+outputs.plot_segments(data,settings,segments)
+```
+
 ## Other effective mass codes
 
 There are other codes that can calculate effective mass. The best effective mass code depends on your use case. 
@@ -133,9 +161,32 @@ This will open a web browser tab, which you can use to navigate to the notebook 
 
 ## Publications using `effmass`
 
-A [number of publications](https://scholar.google.co.uk/scholar?oi=bibs&hl=en&cites=12032412581356217625) have used `effmass`.
+Over 50 publications have used `effmass` (according to [citation data](https://scholar.google.co.uk/scholar?oi=bibs&hl=en&cites=12032412581356217625)).
 
-`effmass` was initially developed for a project that has been published as *Impact of nonparabolic electronic band structure on the optical and transport properties of photovoltaic materials*  Phys. Rev. B **99** (8), 085207. This paper is also [avaiable on arXiv](https://arxiv.org/pdf/1811.02281.pdf). The [paper directory](https://github.com/lucydot/effmass/paper) contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for this study.
+`effmass` was initially developed for work published as *Impact of nonparabolic electronic band structure on the optical and transport properties of photovoltaic materials*  Phys. Rev. B **99** (8), 085207. This paper is also [avaiable on arXiv](https://arxiv.org/pdf/1811.02281.pdf). The [paper directory](https://github.com/lucydot/effmass/paper) contains the Vasp input data (POSCAR), Vasp output data (OUTCAR/PROCAR) and band structures generated for this study.
+
+## Citing `effmass`
+
+If you use this code in your research, please cite the following paper:
+
+Whalley, Lucy D. (2018). *effmass - an effective mass package*. The Journal of Open Source Software, 3(28) 797.
+Link to paper [here](https://joss.theoj.org/papers/10.21105/joss.00797).
+
+### Bibtex
+
+```
+@misc{Whalley_JOSS2018,
+  author       = {Lucy D. Whalley},
+  title        = {effmass: An effective mass package},
+  volume       = {3},
+  issue        = {28},
+  pages        = {797},
+  month        = {Aug},
+  year         = {2018},
+  doi          = {10.21105/joss.00797},
+  url          = {http://joss.theoj.org/papers/10.21105/joss.00797}
+}
+```
 
 ## Questions, bug reports, feature requests
 
@@ -165,35 +216,13 @@ cd effmass
 python -m pytest
 ```
 
-## Citing `effmass`
-
-If you use this code in your research, please cite the following paper:
-
-Whalley, Lucy D. (2018). *effmass - an effective mass package*. The Journal of Open Source Software, 3(28) 797.
-Link to paper [here](https://joss.theoj.org/papers/10.21105/joss.00797).
-
-### Bibtex
-
-```
-@misc{Whalley_JOSS2018,
-  author       = {Lucy D. Whalley},
-  title        = {effmass: An effective mass package},
-  volume       = {3},
-  issue        = {28},
-  pages        = {797},
-  month        = {Aug},
-  year         = {2018},
-  doi          = {10.21105/joss.00797},
-  url          = {http://joss.theoj.org/papers/10.21105/joss.00797}
-}
-```
-
 ## Contributors
 
 Lead developer: 
 [Lucy Whalley](https://lucydot.github.io), a.k.a [lucydot](https://github.com/lucydot)
 
 Contributors:   
+Roberto D'Agosta (test data for Quantum Espresso compatibility via ASE), [profile](https://www.ikerbasque.net/es/roberto-dagosta) //  
 Eisuke Kawashima (tests), a.k.a [e-kwsm](https://github.com/e-kwsm) //   
 Florian Knoop (bugs, tweaks and script improvements), a.k.a [flokno](https://github.com/flokno) //  
 William Taylor (auto-versioning and build system requirements), a.k.a [musicmrman99](https://github.com/musicmrman99) //  
