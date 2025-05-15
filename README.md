@@ -68,7 +68,7 @@ If you can create an ASE bandstructure object (with the energies and path specif
 
 The [`inputs.DataASE`](https://effmass.readthedocs.io/en/latest/_modules/effmass/inputs.html#DataASE) class can be used to create an `inputs.Data` instance using an [ASE bandstructure object](https://wiki.fysik.dtu.dk/ase/_modules/ase/spectrum/band_structure.html) and [ASE atoms object](https://wiki.fysik.dtu.dk/ase/ase/atoms.html). Once you have `inputs.Data` you can use the standard workflow as outlined in [the tutorial](https://nbviewer.jupyter.org/github/lucydot/effmass/blob/master/tutorials/Tutorial.ipynb).
 
-Note that the `DataASE` class does not read in occupancy data, so the CBM/VBM are inferred from the position of the Fermi level. It may be that you need to manually set this via the `Data.fermi_energy` attribute and then re-find the CBM/VBM using the `Data.find_cbm_vbm` method, as outlined above.
+Note that the `DataASE` class does not read in occupancy data, so the CBM/VBM are inferred from the position of the Fermi level. It may be that you need to manually set this via the `Data.fermi_energy` attribute and then re-find the CBM/VBM using the `Data.find_cbm_vbm` method.
 
 An example of how to use effmass with Quantum Espresso output is below. Here `bs_calc.log` is the log file for a calculation performed with `calculation_mode=‘bands’`, and `scf_calc.log` is the log file for a self-consistent calculation to get the fermi energy:
 
