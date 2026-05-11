@@ -2,9 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/effmass.svg)](https://badge.fury.io/py/effmass)
 [![Documentation Status](https://readthedocs.org/projects/effmass/badge/?version=latest)](https://effmass.readthedocs.io/en/latest/)
-[![Tests Status](https://travis-ci.com/lucydot/effmass.svg?branch=master)](https://app.travis-ci.com/github/lucydot/effmass)
 [![Test Coverage](https://codeclimate.com/github/lucydot/effmass/badges/coverage.svg)](https://codeclimate.com/github/lucydot/effmass/coverage)
-[![DOI](https://zenodo.org/badge/136037407.svg)](https://zenodo.org/badge/latestdoi/136037407)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![JOSS status](http://joss.theoj.org/papers/389754561f0710b756514b8cb9ac0e6a/status.svg)](http://joss.theoj.org/papers/389754561f0710b756514b8cb9ac0e6a)
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/7405/badge)](https://bestpractices.coreinfrastructure.org/projects/7405)
